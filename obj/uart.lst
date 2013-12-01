@@ -1,0 +1,1039 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 6
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.file	"uart.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.rb_getc,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  24              	rb_getc:
+  25              	.LFB112:
+  26              		.file 1 "src/ringbuf.h"
+   1:src/ringbuf.h **** #ifndef RINGBUF_H
+   2:src/ringbuf.h **** #define RINGBUF_H
+   3:src/ringbuf.h **** 
+   4:src/ringbuf.h **** #include <stdlib.h>
+   5:src/ringbuf.h **** #include <string.h>
+   6:src/ringbuf.h **** #include "stm32f4xx.h"
+   7:src/ringbuf.h **** #include "FreeRTOS.h"
+   8:src/ringbuf.h **** 
+   9:src/ringbuf.h **** /**
+  10:src/ringbuf.h ****  * Ringbuffer structure
+  11:src/ringbuf.h ****  *
+  12:src/ringbuf.h ****  */
+  13:src/ringbuf.h **** struct ringbuf {
+  14:src/ringbuf.h ****     char *buf;          ///< Pointer to buffer memory
+  15:src/ringbuf.h ****     int   bufsize;      ///< Size of buffer memory
+  16:src/ringbuf.h ****     volatile int pos;   ///< Current read position
+  17:src/ringbuf.h ****     volatile int len;   ///< Length of data in buffer
+  18:src/ringbuf.h **** };
+  19:src/ringbuf.h **** 
+  20:src/ringbuf.h **** 
+  21:src/ringbuf.h **** /**
+  22:src/ringbuf.h ****  * Allocate buffer memory
+  23:src/ringbuf.h ****  *
+  24:src/ringbuf.h ****  * \param   rb      pointer to ringbuffer struct
+  25:src/ringbuf.h ****  * \param   bufsize requested buffer size
+  26:src/ringbuf.h ****  * \return  size of allocated buffer
+  27:src/ringbuf.h ****  */
+  28:src/ringbuf.h **** static inline int rb_alloc(struct ringbuf *rb, int bufsize)
+  29:src/ringbuf.h **** {
+  30:src/ringbuf.h ****     rb->buf = malloc(bufsize);
+  31:src/ringbuf.h ****     if (!rb->buf)
+  32:src/ringbuf.h ****         bufsize = 0;
+  33:src/ringbuf.h **** 
+  34:src/ringbuf.h ****     rb->bufsize = bufsize;
+  35:src/ringbuf.h ****     rb->pos = 0;
+  36:src/ringbuf.h ****     rb->len = 0;
+  37:src/ringbuf.h **** 
+  38:src/ringbuf.h ****     return rb->bufsize;
+  39:src/ringbuf.h **** }
+  40:src/ringbuf.h **** 
+  41:src/ringbuf.h **** 
+  42:src/ringbuf.h **** /**
+  43:src/ringbuf.h ****  * Free buffer memory
+  44:src/ringbuf.h ****  *
+  45:src/ringbuf.h ****  */
+  46:src/ringbuf.h **** static inline void rb_free(struct ringbuf *rb)
+  47:src/ringbuf.h **** {
+  48:src/ringbuf.h ****     if (rb->buf)
+  49:src/ringbuf.h ****         free(rb->buf);
+  50:src/ringbuf.h **** 
+  51:src/ringbuf.h ****     rb->buf = 0;
+  52:src/ringbuf.h ****     rb->bufsize = 0;
+  53:src/ringbuf.h ****     rb->len = 0;
+  54:src/ringbuf.h ****     rb->pos = 0;
+  55:src/ringbuf.h **** }
+  56:src/ringbuf.h **** 
+  57:src/ringbuf.h **** 
+  58:src/ringbuf.h **** /**
+  59:src/ringbuf.h ****  * Read a single byte from a buffer
+  60:src/ringbuf.h ****  *
+  61:src/ringbuf.h ****  * \param   rb    pointer to ringbuffer struct
+  62:src/ringbuf.h ****  * \param   data  pointer to data byte
+  63:src/ringbuf.h ****  * \return  number of bytes read (0 if buffer was empty)
+  64:src/ringbuf.h ****  */
+  65:src/ringbuf.h **** static inline int rb_getc(struct ringbuf *rb, char *data)
+  66:src/ringbuf.h **** {
+  27              		.loc 1 66 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 8
+  30              		@ frame_needed = 1, uses_anonymous_args = 0
+  31 0000 80B5     		push	{r7, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 14, -4
+  35              		.cfi_offset 7, -8
+  36 0002 82B0     		sub	sp, sp, #8
+  37              	.LCFI1:
+  38              		.cfi_def_cfa_offset 16
+  39 0004 00AF     		add	r7, sp, #0
+  40              	.LCFI2:
+  41              		.cfi_def_cfa_register 7
+  42 0006 7860     		str	r0, [r7, #4]
+  43 0008 3960     		str	r1, [r7, #0]
+  67:src/ringbuf.h ****     if (!rb->len)
+  44              		.loc 1 67 0
+  45 000a 7B68     		ldr	r3, [r7, #4]
+  46 000c DB68     		ldr	r3, [r3, #12]
+  47 000e 002B     		cmp	r3, #0
+  48 0010 02D1     		bne	.L2
+  68:src/ringbuf.h ****         return 0;
+  49              		.loc 1 68 0
+  50 0012 4FF00003 		mov	r3, #0
+  51 0016 25E0     		b	.L3
+  52              	.L2:
+  69:src/ringbuf.h **** 
+  70:src/ringbuf.h ****     vPortEnterCritical();
+  53              		.loc 1 70 0
+  54 0018 FFF7FEFF 		bl	vPortEnterCritical
+  71:src/ringbuf.h **** 
+  72:src/ringbuf.h ****     *data = rb->buf[rb->pos++];
+  55              		.loc 1 72 0
+  56 001c 7B68     		ldr	r3, [r7, #4]
+  57 001e 1968     		ldr	r1, [r3, #0]
+  58 0020 7B68     		ldr	r3, [r7, #4]
+  59 0022 9B68     		ldr	r3, [r3, #8]
+  60 0024 1A46     		mov	r2, r3
+  61 0026 8A18     		adds	r2, r1, r2
+  62 0028 1178     		ldrb	r1, [r2, #0]	@ zero_extendqisi2
+  63 002a 3A68     		ldr	r2, [r7, #0]
+  64 002c 1170     		strb	r1, [r2, #0]
+  65 002e 03F10102 		add	r2, r3, #1
+  66 0032 7B68     		ldr	r3, [r7, #4]
+  67 0034 9A60     		str	r2, [r3, #8]
+  73:src/ringbuf.h **** 	if (rb->pos >= rb->bufsize)
+  68              		.loc 1 73 0
+  69 0036 7B68     		ldr	r3, [r7, #4]
+  70 0038 9A68     		ldr	r2, [r3, #8]
+  71 003a 7B68     		ldr	r3, [r7, #4]
+  72 003c 5B68     		ldr	r3, [r3, #4]
+  73 003e 9A42     		cmp	r2, r3
+  74 0040 06DB     		blt	.L4
+  74:src/ringbuf.h **** 		rb->pos -= rb->bufsize;
+  75              		.loc 1 74 0
+  76 0042 7B68     		ldr	r3, [r7, #4]
+  77 0044 9A68     		ldr	r2, [r3, #8]
+  78 0046 7B68     		ldr	r3, [r7, #4]
+  79 0048 5B68     		ldr	r3, [r3, #4]
+  80 004a D21A     		subs	r2, r2, r3
+  81 004c 7B68     		ldr	r3, [r7, #4]
+  82 004e 9A60     		str	r2, [r3, #8]
+  83              	.L4:
+  75:src/ringbuf.h **** 	rb->len--;
+  84              		.loc 1 75 0
+  85 0050 7B68     		ldr	r3, [r7, #4]
+  86 0052 DB68     		ldr	r3, [r3, #12]
+  87 0054 03F1FF32 		add	r2, r3, #-1
+  88 0058 7B68     		ldr	r3, [r7, #4]
+  89 005a DA60     		str	r2, [r3, #12]
+  76:src/ringbuf.h **** 
+  77:src/ringbuf.h ****     vPortExitCritical();
+  90              		.loc 1 77 0
+  91 005c FFF7FEFF 		bl	vPortExitCritical
+  78:src/ringbuf.h ****     return 1;
+  92              		.loc 1 78 0
+  93 0060 4FF00103 		mov	r3, #1
+  94              	.L3:
+  79:src/ringbuf.h **** }
+  95              		.loc 1 79 0
+  96 0064 1846     		mov	r0, r3
+  97 0066 07F10807 		add	r7, r7, #8
+  98 006a BD46     		mov	sp, r7
+  99 006c 80BD     		pop	{r7, pc}
+ 100              		.cfi_endproc
+ 101              	.LFE112:
+ 103 006e 00BF     		.section	.text.rb_putc,"ax",%progbits
+ 104              		.align	2
+ 105              		.thumb
+ 106              		.thumb_func
+ 108              	rb_putc:
+ 109              	.LFB113:
+  80:src/ringbuf.h **** 
+  81:src/ringbuf.h **** 
+  82:src/ringbuf.h **** /**
+  83:src/ringbuf.h ****  * Write a single byte to a buffer
+  84:src/ringbuf.h ****  *
+  85:src/ringbuf.h ****  * \param   rb    pointer to ringbuffer struct
+  86:src/ringbuf.h ****  * \param   data  pointer to data byte
+  87:src/ringbuf.h ****  * \return  number of bytes written (0 if buffer was full)
+  88:src/ringbuf.h ****  */
+  89:src/ringbuf.h **** static inline int rb_putc(struct ringbuf *rb, const char data)
+  90:src/ringbuf.h **** {
+ 110              		.loc 1 90 0
+ 111              		.cfi_startproc
+ 112              		@ args = 0, pretend = 0, frame = 16
+ 113              		@ frame_needed = 1, uses_anonymous_args = 0
+ 114 0000 80B5     		push	{r7, lr}
+ 115              	.LCFI3:
+ 116              		.cfi_def_cfa_offset 8
+ 117              		.cfi_offset 14, -4
+ 118              		.cfi_offset 7, -8
+ 119 0002 84B0     		sub	sp, sp, #16
+ 120              	.LCFI4:
+ 121              		.cfi_def_cfa_offset 24
+ 122 0004 00AF     		add	r7, sp, #0
+ 123              	.LCFI5:
+ 124              		.cfi_def_cfa_register 7
+ 125 0006 7860     		str	r0, [r7, #4]
+ 126 0008 0B46     		mov	r3, r1
+ 127 000a FB70     		strb	r3, [r7, #3]
+  91:src/ringbuf.h ****     if (rb->len >= rb->bufsize)
+ 128              		.loc 1 91 0
+ 129 000c 7B68     		ldr	r3, [r7, #4]
+ 130 000e DA68     		ldr	r2, [r3, #12]
+ 131 0010 7B68     		ldr	r3, [r7, #4]
+ 132 0012 5B68     		ldr	r3, [r3, #4]
+ 133 0014 9A42     		cmp	r2, r3
+ 134 0016 02DB     		blt	.L6
+  92:src/ringbuf.h ****         return 0;
+ 135              		.loc 1 92 0
+ 136 0018 4FF00003 		mov	r3, #0
+ 137 001c 21E0     		b	.L7
+ 138              	.L6:
+  93:src/ringbuf.h **** 
+  94:src/ringbuf.h ****     vPortEnterCritical();
+ 139              		.loc 1 94 0
+ 140 001e FFF7FEFF 		bl	vPortEnterCritical
+  95:src/ringbuf.h **** 
+  96:src/ringbuf.h **** 	int i = rb->pos + rb->len;
+ 141              		.loc 1 96 0
+ 142 0022 7B68     		ldr	r3, [r7, #4]
+ 143 0024 9A68     		ldr	r2, [r3, #8]
+ 144 0026 7B68     		ldr	r3, [r7, #4]
+ 145 0028 DB68     		ldr	r3, [r3, #12]
+ 146 002a D318     		adds	r3, r2, r3
+ 147 002c FB60     		str	r3, [r7, #12]
+  97:src/ringbuf.h **** 	if (i >= rb->bufsize)
+ 148              		.loc 1 97 0
+ 149 002e 7B68     		ldr	r3, [r7, #4]
+ 150 0030 5A68     		ldr	r2, [r3, #4]
+ 151 0032 FB68     		ldr	r3, [r7, #12]
+ 152 0034 9A42     		cmp	r2, r3
+ 153 0036 04DC     		bgt	.L8
+  98:src/ringbuf.h **** 		i -= rb->bufsize;
+ 154              		.loc 1 98 0
+ 155 0038 7B68     		ldr	r3, [r7, #4]
+ 156 003a 5B68     		ldr	r3, [r3, #4]
+ 157 003c FA68     		ldr	r2, [r7, #12]
+ 158 003e D31A     		subs	r3, r2, r3
+ 159 0040 FB60     		str	r3, [r7, #12]
+ 160              	.L8:
+  99:src/ringbuf.h **** 
+ 100:src/ringbuf.h **** 	rb->buf[i] = data;
+ 161              		.loc 1 100 0
+ 162 0042 7B68     		ldr	r3, [r7, #4]
+ 163 0044 1A68     		ldr	r2, [r3, #0]
+ 164 0046 FB68     		ldr	r3, [r7, #12]
+ 165 0048 D318     		adds	r3, r2, r3
+ 166 004a FA78     		ldrb	r2, [r7, #3]
+ 167 004c 1A70     		strb	r2, [r3, #0]
+ 101:src/ringbuf.h **** 	rb->len++;
+ 168              		.loc 1 101 0
+ 169 004e 7B68     		ldr	r3, [r7, #4]
+ 170 0050 DB68     		ldr	r3, [r3, #12]
+ 171 0052 03F10102 		add	r2, r3, #1
+ 172 0056 7B68     		ldr	r3, [r7, #4]
+ 173 0058 DA60     		str	r2, [r3, #12]
+ 102:src/ringbuf.h **** 
+ 103:src/ringbuf.h ****     vPortExitCritical();
+ 174              		.loc 1 103 0
+ 175 005a FFF7FEFF 		bl	vPortExitCritical
+ 104:src/ringbuf.h ****     return 1;
+ 176              		.loc 1 104 0
+ 177 005e 4FF00103 		mov	r3, #1
+ 178              	.L7:
+ 105:src/ringbuf.h **** }
+ 179              		.loc 1 105 0
+ 180 0062 1846     		mov	r0, r3
+ 181 0064 07F11007 		add	r7, r7, #16
+ 182 0068 BD46     		mov	sp, r7
+ 183 006a 80BD     		pop	{r7, pc}
+ 184              		.cfi_endproc
+ 185              	.LFE113:
+ 187              		.section	.bss.__compound_literal.0,"aw",%nobits
+ 188              		.align	2
+ 191              	__compound_literal.0:
+ 192 0000 00000000 		.space	128
+ 192      00000000 
+ 192      00000000 
+ 192      00000000 
+ 192      00000000 
+ 193              		.section	.data.rx_buf,"aw",%progbits
+ 194              		.align	2
+ 197              	rx_buf:
+ 198 0000 00000000 		.word	__compound_literal.0
+ 199 0004 80000000 		.word	128
+ 200 0008 00000000 		.space	8
+ 200      00000000 
+ 201              		.section	.bss.__compound_literal.1,"aw",%nobits
+ 202              		.align	2
+ 205              	__compound_literal.1:
+ 206 0000 00000000 		.space	128
+ 206      00000000 
+ 206      00000000 
+ 206      00000000 
+ 206      00000000 
+ 207              		.section	.data.tx_buf,"aw",%progbits
+ 208              		.align	2
+ 211              	tx_buf:
+ 212 0000 00000000 		.word	__compound_literal.1
+ 213 0004 80000000 		.word	128
+ 214 0008 00000000 		.space	8
+ 214      00000000 
+ 215              		.section	.bss.uart_stats,"aw",%nobits
+ 216              		.align	2
+ 219              	uart_stats:
+ 220 0000 00000000 		.space	12
+ 220      00000000 
+ 220      00000000 
+ 221              		.section	.text.USART1_IRQHandler,"ax",%progbits
+ 222              		.align	2
+ 223              		.global	USART1_IRQHandler
+ 224              		.thumb
+ 225              		.thumb_func
+ 227              	USART1_IRQHandler:
+ 228              	.LFB114:
+ 229              		.file 2 "src/uart.c"
+   1:src/uart.c    **** #include "uart.h"
+   2:src/uart.c    **** #include "stm32f4xx.h"
+   3:src/uart.c    **** #include "ringbuf.h"
+   4:src/uart.c    **** #include <stdlib.h>
+   5:src/uart.c    **** #include <stdio.h>
+   6:src/uart.c    **** #include <errno.h>
+   7:src/uart.c    **** 
+   8:src/uart.c    **** #define RX_SIZE  128
+   9:src/uart.c    **** #define TX_SIZE  128
+  10:src/uart.c    **** 
+  11:src/uart.c    **** static struct ringbuf rx_buf = { .buf = (char[RX_SIZE]) {}, .bufsize = RX_SIZE };
+  12:src/uart.c    **** static struct ringbuf tx_buf = { .buf = (char[TX_SIZE]) {}, .bufsize = TX_SIZE };
+  13:src/uart.c    **** 
+  14:src/uart.c    **** static volatile struct uart_stats {
+  15:src/uart.c    ****     uint32_t    rx_overrun;
+  16:src/uart.c    ****     uint32_t    rx_bytes;
+  17:src/uart.c    ****     uint32_t    tx_bytes;
+  18:src/uart.c    **** } uart_stats;
+  19:src/uart.c    **** 
+  20:src/uart.c    **** 
+  21:src/uart.c    **** void USART1_IRQHandler(void)
+  22:src/uart.c    **** {
+ 230              		.loc 2 22 0
+ 231              		.cfi_startproc
+ 232              		@ args = 0, pretend = 0, frame = 8
+ 233              		@ frame_needed = 1, uses_anonymous_args = 0
+ 234 0000 80B5     		push	{r7, lr}
+ 235              	.LCFI6:
+ 236              		.cfi_def_cfa_offset 8
+ 237              		.cfi_offset 14, -4
+ 238              		.cfi_offset 7, -8
+ 239 0002 82B0     		sub	sp, sp, #8
+ 240              	.LCFI7:
+ 241              		.cfi_def_cfa_offset 16
+ 242 0004 00AF     		add	r7, sp, #0
+ 243              	.LCFI8:
+ 244              		.cfi_def_cfa_register 7
+  23:src/uart.c    ****     if (USART1->SR & USART_SR_RXNE) {
+ 245              		.loc 2 23 0
+ 246 0006 4FF48053 		mov	r3, #4096
+ 247 000a C4F20103 		movt	r3, 16385
+ 248 000e 1B88     		ldrh	r3, [r3, #0]	@ movhi
+ 249 0010 9BB2     		uxth	r3, r3
+ 250 0012 03F02003 		and	r3, r3, #32
+ 251 0016 002B     		cmp	r3, #0
+ 252 0018 29D0     		beq	.L10
+  24:src/uart.c    ****         if (!rb_putc(&rx_buf, USART1->DR))
+ 253              		.loc 2 24 0
+ 254 001a 4FF48053 		mov	r3, #4096
+ 255 001e C4F20103 		movt	r3, 16385
+ 256 0022 9B88     		ldrh	r3, [r3, #4]	@ movhi
+ 257 0024 9BB2     		uxth	r3, r3
+ 258 0026 DBB2     		uxtb	r3, r3
+ 259 0028 40F20000 		movw	r0, #:lower16:rx_buf
+ 260 002c C0F20000 		movt	r0, #:upper16:rx_buf
+ 261 0030 1946     		mov	r1, r3
+ 262 0032 FFF7FEFF 		bl	rb_putc
+ 263 0036 0346     		mov	r3, r0
+ 264 0038 002B     		cmp	r3, #0
+ 265 003a 0CD1     		bne	.L11
+  25:src/uart.c    ****             uart_stats.rx_overrun++;
+ 266              		.loc 2 25 0
+ 267 003c 40F20003 		movw	r3, #:lower16:uart_stats
+ 268 0040 C0F20003 		movt	r3, #:upper16:uart_stats
+ 269 0044 1B68     		ldr	r3, [r3, #0]
+ 270 0046 03F10102 		add	r2, r3, #1
+ 271 004a 40F20003 		movw	r3, #:lower16:uart_stats
+ 272 004e C0F20003 		movt	r3, #:upper16:uart_stats
+ 273 0052 1A60     		str	r2, [r3, #0]
+ 274 0054 0BE0     		b	.L10
+ 275              	.L11:
+  26:src/uart.c    ****         else
+  27:src/uart.c    ****             uart_stats.rx_bytes++;
+ 276              		.loc 2 27 0
+ 277 0056 40F20003 		movw	r3, #:lower16:uart_stats
+ 278 005a C0F20003 		movt	r3, #:upper16:uart_stats
+ 279 005e 5B68     		ldr	r3, [r3, #4]
+ 280 0060 03F10102 		add	r2, r3, #1
+ 281 0064 40F20003 		movw	r3, #:lower16:uart_stats
+ 282 0068 C0F20003 		movt	r3, #:upper16:uart_stats
+ 283 006c 5A60     		str	r2, [r3, #4]
+ 284              	.L10:
+  28:src/uart.c    ****     }
+  29:src/uart.c    **** 
+  30:src/uart.c    ****     if (USART1->SR & USART_SR_TXE) {
+ 285              		.loc 2 30 0
+ 286 006e 4FF48053 		mov	r3, #4096
+ 287 0072 C4F20103 		movt	r3, 16385
+ 288 0076 1B88     		ldrh	r3, [r3, #0]	@ movhi
+ 289 0078 9BB2     		uxth	r3, r3
+ 290 007a 03F08003 		and	r3, r3, #128
+ 291 007e 002B     		cmp	r3, #0
+ 292 0080 2CD0     		beq	.L9
+ 293              	.LBB2:
+  31:src/uart.c    ****         char c;
+  32:src/uart.c    ****         if (rb_getc(&tx_buf, &c)) {
+ 294              		.loc 2 32 0
+ 295 0082 40F20000 		movw	r0, #:lower16:tx_buf
+ 296 0086 C0F20000 		movt	r0, #:upper16:tx_buf
+ 297 008a 07F10703 		add	r3, r7, #7
+ 298 008e 1946     		mov	r1, r3
+ 299 0090 FFF7FEFF 		bl	rb_getc
+ 300 0094 0346     		mov	r3, r0
+ 301 0096 002B     		cmp	r3, #0
+ 302 0098 06D0     		beq	.L13
+  33:src/uart.c    ****             // send a queued byte
+  34:src/uart.c    ****             //
+  35:src/uart.c    ****             USART1->DR = c;
+ 303              		.loc 2 35 0
+ 304 009a 4FF48053 		mov	r3, #4096
+ 305 009e C4F20103 		movt	r3, 16385
+ 306 00a2 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 307 00a4 9A80     		strh	r2, [r3, #4]	@ movhi
+ 308 00a6 0DE0     		b	.L14
+ 309              	.L13:
+  36:src/uart.c    ****         }
+  37:src/uart.c    ****         else {
+  38:src/uart.c    ****             // nothing to send, disable interrupt
+  39:src/uart.c    ****             //
+  40:src/uart.c    ****             USART1->CR1 &= ~USART_CR1_TXEIE;
+ 310              		.loc 2 40 0
+ 311 00a8 4FF48053 		mov	r3, #4096
+ 312 00ac C4F20103 		movt	r3, 16385
+ 313 00b0 4FF48052 		mov	r2, #4096
+ 314 00b4 C4F20102 		movt	r2, 16385
+ 315 00b8 9289     		ldrh	r2, [r2, #12]	@ movhi
+ 316 00ba 92B2     		uxth	r2, r2
+ 317 00bc 22F08002 		bic	r2, r2, #128
+ 318 00c0 92B2     		uxth	r2, r2
+ 319 00c2 9A81     		strh	r2, [r3, #12]	@ movhi
+ 320              	.L14:
+  41:src/uart.c    ****         }
+  42:src/uart.c    ****         uart_stats.tx_bytes++;
+ 321              		.loc 2 42 0
+ 322 00c4 40F20003 		movw	r3, #:lower16:uart_stats
+ 323 00c8 C0F20003 		movt	r3, #:upper16:uart_stats
+ 324 00cc 9B68     		ldr	r3, [r3, #8]
+ 325 00ce 03F10102 		add	r2, r3, #1
+ 326 00d2 40F20003 		movw	r3, #:lower16:uart_stats
+ 327 00d6 C0F20003 		movt	r3, #:upper16:uart_stats
+ 328 00da 9A60     		str	r2, [r3, #8]
+ 329              	.L9:
+ 330              	.LBE2:
+  43:src/uart.c    ****     }
+  44:src/uart.c    **** }
+ 331              		.loc 2 44 0
+ 332 00dc 07F10807 		add	r7, r7, #8
+ 333 00e0 BD46     		mov	sp, r7
+ 334 00e2 80BD     		pop	{r7, pc}
+ 335              		.cfi_endproc
+ 336              	.LFE114:
+ 338              		.section	.text.uart_chars_avail,"ax",%progbits
+ 339              		.align	2
+ 340              		.global	uart_chars_avail
+ 341              		.thumb
+ 342              		.thumb_func
+ 344              	uart_chars_avail:
+ 345              	.LFB115:
+  45:src/uart.c    **** 
+  46:src/uart.c    **** 
+  47:src/uart.c    **** int uart_chars_avail(void)
+  48:src/uart.c    **** {
+ 346              		.loc 2 48 0
+ 347              		.cfi_startproc
+ 348              		@ args = 0, pretend = 0, frame = 0
+ 349              		@ frame_needed = 1, uses_anonymous_args = 0
+ 350              		@ link register save eliminated.
+ 351 0000 80B4     		push	{r7}
+ 352              	.LCFI9:
+ 353              		.cfi_def_cfa_offset 4
+ 354              		.cfi_offset 7, -4
+ 355 0002 00AF     		add	r7, sp, #0
+ 356              	.LCFI10:
+ 357              		.cfi_def_cfa_register 7
+  49:src/uart.c    ****     return rx_buf.len;
+ 358              		.loc 2 49 0
+ 359 0004 40F20003 		movw	r3, #:lower16:rx_buf
+ 360 0008 C0F20003 		movt	r3, #:upper16:rx_buf
+ 361 000c DB68     		ldr	r3, [r3, #12]
+  50:src/uart.c    **** }
+ 362              		.loc 2 50 0
+ 363 000e 1846     		mov	r0, r3
+ 364 0010 BD46     		mov	sp, r7
+ 365 0012 80BC     		pop	{r7}
+ 366 0014 7047     		bx	lr
+ 367              		.cfi_endproc
+ 368              	.LFE115:
+ 370 0016 00BF     		.section	.text.uart_write_r,"ax",%progbits
+ 371              		.align	2
+ 372              		.global	uart_write_r
+ 373              		.thumb
+ 374              		.thumb_func
+ 376              	uart_write_r:
+ 377              	.LFB116:
+  51:src/uart.c    **** 
+  52:src/uart.c    **** 
+  53:src/uart.c    **** ssize_t uart_write_r(struct _reent *r, int fd, const void *ptr, size_t len)
+  54:src/uart.c    **** {
+ 378              		.loc 2 54 0
+ 379              		.cfi_startproc
+ 380              		@ args = 0, pretend = 0, frame = 24
+ 381              		@ frame_needed = 1, uses_anonymous_args = 0
+ 382 0000 80B5     		push	{r7, lr}
+ 383              	.LCFI11:
+ 384              		.cfi_def_cfa_offset 8
+ 385              		.cfi_offset 14, -4
+ 386              		.cfi_offset 7, -8
+ 387 0002 86B0     		sub	sp, sp, #24
+ 388              	.LCFI12:
+ 389              		.cfi_def_cfa_offset 32
+ 390 0004 00AF     		add	r7, sp, #0
+ 391              	.LCFI13:
+ 392              		.cfi_def_cfa_register 7
+ 393 0006 F860     		str	r0, [r7, #12]
+ 394 0008 B960     		str	r1, [r7, #8]
+ 395 000a 7A60     		str	r2, [r7, #4]
+ 396 000c 3B60     		str	r3, [r7, #0]
+  55:src/uart.c    ****     const char *c = (const char*) ptr;
+ 397              		.loc 2 55 0
+ 398 000e 7B68     		ldr	r3, [r7, #4]
+ 399 0010 7B61     		str	r3, [r7, #20]
+ 400              	.LBB3:
+  56:src/uart.c    **** 
+  57:src/uart.c    ****     for (int i = 0; i < len; i++) {
+ 401              		.loc 2 57 0
+ 402 0012 4FF00003 		mov	r3, #0
+ 403 0016 3B61     		str	r3, [r7, #16]
+ 404 0018 22E0     		b	.L17
+ 405              	.L20:
+  58:src/uart.c    ****         while (!rb_putc(&tx_buf, *c));
+ 406              		.loc 2 58 0
+ 407 001a 00BF     		nop
+ 408              	.L18:
+ 409              		.loc 2 58 0 is_stmt 0 discriminator 1
+ 410 001c 7B69     		ldr	r3, [r7, #20]
+ 411 001e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 412 0020 40F20000 		movw	r0, #:lower16:tx_buf
+ 413 0024 C0F20000 		movt	r0, #:upper16:tx_buf
+ 414 0028 1946     		mov	r1, r3
+ 415 002a FFF7FEFF 		bl	rb_putc
+ 416 002e 0346     		mov	r3, r0
+ 417 0030 002B     		cmp	r3, #0
+ 418 0032 F3D0     		beq	.L18
+  59:src/uart.c    ****         c++;
+ 419              		.loc 2 59 0 is_stmt 1
+ 420 0034 7B69     		ldr	r3, [r7, #20]
+ 421 0036 03F10103 		add	r3, r3, #1
+ 422 003a 7B61     		str	r3, [r7, #20]
+  60:src/uart.c    **** 
+  61:src/uart.c    ****         // Enable TX empty interrupt
+  62:src/uart.c    ****         USART1->CR1 |= USART_CR1_TXEIE;
+ 423              		.loc 2 62 0
+ 424 003c 4FF48053 		mov	r3, #4096
+ 425 0040 C4F20103 		movt	r3, 16385
+ 426 0044 4FF48052 		mov	r2, #4096
+ 427 0048 C4F20102 		movt	r2, 16385
+ 428 004c 9289     		ldrh	r2, [r2, #12]	@ movhi
+ 429 004e 92B2     		uxth	r2, r2
+ 430 0050 42F08002 		orr	r2, r2, #128
+ 431 0054 92B2     		uxth	r2, r2
+ 432 0056 9A81     		strh	r2, [r3, #12]	@ movhi
+  57:src/uart.c    ****     for (int i = 0; i < len; i++) {
+ 433              		.loc 2 57 0
+ 434 0058 3B69     		ldr	r3, [r7, #16]
+ 435 005a 03F10103 		add	r3, r3, #1
+ 436 005e 3B61     		str	r3, [r7, #16]
+ 437              	.L17:
+  57:src/uart.c    ****     for (int i = 0; i < len; i++) {
+ 438              		.loc 2 57 0 is_stmt 0 discriminator 1
+ 439 0060 3A69     		ldr	r2, [r7, #16]
+ 440 0062 3B68     		ldr	r3, [r7, #0]
+ 441 0064 9A42     		cmp	r2, r3
+ 442 0066 D8D3     		bcc	.L20
+ 443              	.LBE3:
+  63:src/uart.c    ****     }
+  64:src/uart.c    **** 
+  65:src/uart.c    ****     return len;
+ 444              		.loc 2 65 0 is_stmt 1
+ 445 0068 3B68     		ldr	r3, [r7, #0]
+  66:src/uart.c    **** }
+ 446              		.loc 2 66 0
+ 447 006a 1846     		mov	r0, r3
+ 448 006c 07F11807 		add	r7, r7, #24
+ 449 0070 BD46     		mov	sp, r7
+ 450 0072 80BD     		pop	{r7, pc}
+ 451              		.cfi_endproc
+ 452              	.LFE116:
+ 454              		.section	.text.uart_read_r,"ax",%progbits
+ 455              		.align	2
+ 456              		.global	uart_read_r
+ 457              		.thumb
+ 458              		.thumb_func
+ 460              	uart_read_r:
+ 461              	.LFB117:
+  67:src/uart.c    **** 
+  68:src/uart.c    **** ssize_t uart_read_r(struct _reent *r, int fd, void *ptr, size_t len)
+  69:src/uart.c    **** {
+ 462              		.loc 2 69 0
+ 463              		.cfi_startproc
+ 464              		@ args = 0, pretend = 0, frame = 24
+ 465              		@ frame_needed = 1, uses_anonymous_args = 0
+ 466 0000 80B5     		push	{r7, lr}
+ 467              	.LCFI14:
+ 468              		.cfi_def_cfa_offset 8
+ 469              		.cfi_offset 14, -4
+ 470              		.cfi_offset 7, -8
+ 471 0002 86B0     		sub	sp, sp, #24
+ 472              	.LCFI15:
+ 473              		.cfi_def_cfa_offset 32
+ 474 0004 00AF     		add	r7, sp, #0
+ 475              	.LCFI16:
+ 476              		.cfi_def_cfa_register 7
+ 477 0006 F860     		str	r0, [r7, #12]
+ 478 0008 B960     		str	r1, [r7, #8]
+ 479 000a 7A60     		str	r2, [r7, #4]
+ 480 000c 3B60     		str	r3, [r7, #0]
+  70:src/uart.c    ****     while (!rx_buf.len);
+ 481              		.loc 2 70 0
+ 482 000e 00BF     		nop
+ 483              	.L22:
+ 484              		.loc 2 70 0 is_stmt 0 discriminator 1
+ 485 0010 40F20003 		movw	r3, #:lower16:rx_buf
+ 486 0014 C0F20003 		movt	r3, #:upper16:rx_buf
+ 487 0018 DB68     		ldr	r3, [r3, #12]
+ 488 001a 002B     		cmp	r3, #0
+ 489 001c F8D0     		beq	.L22
+  71:src/uart.c    **** 
+  72:src/uart.c    ****     if (len > rx_buf.len)
+ 490              		.loc 2 72 0 is_stmt 1
+ 491 001e 40F20003 		movw	r3, #:lower16:rx_buf
+ 492 0022 C0F20003 		movt	r3, #:upper16:rx_buf
+ 493 0026 DB68     		ldr	r3, [r3, #12]
+ 494 0028 1A46     		mov	r2, r3
+ 495 002a 3B68     		ldr	r3, [r7, #0]
+ 496 002c 9A42     		cmp	r2, r3
+ 497 002e 05D2     		bcs	.L23
+  73:src/uart.c    ****         len = rx_buf.len;
+ 498              		.loc 2 73 0
+ 499 0030 40F20003 		movw	r3, #:lower16:rx_buf
+ 500 0034 C0F20003 		movt	r3, #:upper16:rx_buf
+ 501 0038 DB68     		ldr	r3, [r3, #12]
+ 502 003a 3B60     		str	r3, [r7, #0]
+ 503              	.L23:
+  74:src/uart.c    **** 
+  75:src/uart.c    ****     char *c = (char*)ptr;
+ 504              		.loc 2 75 0
+ 505 003c 7B68     		ldr	r3, [r7, #4]
+ 506 003e 7B61     		str	r3, [r7, #20]
+ 507              	.LBB4:
+  76:src/uart.c    ****     for (int i = 0; i < len; i++)
+ 508              		.loc 2 76 0
+ 509 0040 4FF00003 		mov	r3, #0
+ 510 0044 3B61     		str	r3, [r7, #16]
+ 511 0046 0FE0     		b	.L24
+ 512              	.L25:
+  77:src/uart.c    ****         rb_getc(&rx_buf, c++);
+ 513              		.loc 2 77 0 discriminator 2
+ 514 0048 7B69     		ldr	r3, [r7, #20]
+ 515 004a 7A69     		ldr	r2, [r7, #20]
+ 516 004c 02F10102 		add	r2, r2, #1
+ 517 0050 7A61     		str	r2, [r7, #20]
+ 518 0052 40F20000 		movw	r0, #:lower16:rx_buf
+ 519 0056 C0F20000 		movt	r0, #:upper16:rx_buf
+ 520 005a 1946     		mov	r1, r3
+ 521 005c FFF7FEFF 		bl	rb_getc
+  76:src/uart.c    ****     for (int i = 0; i < len; i++)
+ 522              		.loc 2 76 0 discriminator 2
+ 523 0060 3B69     		ldr	r3, [r7, #16]
+ 524 0062 03F10103 		add	r3, r3, #1
+ 525 0066 3B61     		str	r3, [r7, #16]
+ 526              	.L24:
+  76:src/uart.c    ****     for (int i = 0; i < len; i++)
+ 527              		.loc 2 76 0 is_stmt 0 discriminator 1
+ 528 0068 3A69     		ldr	r2, [r7, #16]
+ 529 006a 3B68     		ldr	r3, [r7, #0]
+ 530 006c 9A42     		cmp	r2, r3
+ 531 006e EBD3     		bcc	.L25
+ 532              	.LBE4:
+  78:src/uart.c    **** 
+  79:src/uart.c    ****     return len;
+ 533              		.loc 2 79 0 is_stmt 1
+ 534 0070 3B68     		ldr	r3, [r7, #0]
+  80:src/uart.c    **** }
+ 535              		.loc 2 80 0
+ 536 0072 1846     		mov	r0, r3
+ 537 0074 07F11807 		add	r7, r7, #24
+ 538 0078 BD46     		mov	sp, r7
+ 539 007a 80BD     		pop	{r7, pc}
+ 540              		.cfi_endproc
+ 541              	.LFE117:
+ 543              		.section	.text.uart_poll_send,"ax",%progbits
+ 544              		.align	2
+ 545              		.global	uart_poll_send
+ 546              		.thumb
+ 547              		.thumb_func
+ 549              	uart_poll_send:
+ 550              	.LFB118:
+  81:src/uart.c    **** 
+  82:src/uart.c    **** 
+  83:src/uart.c    **** void uart_poll_send(const char *ch)
+  84:src/uart.c    **** {
+ 551              		.loc 2 84 0
+ 552              		.cfi_startproc
+ 553              		@ args = 0, pretend = 0, frame = 8
+ 554              		@ frame_needed = 1, uses_anonymous_args = 0
+ 555              		@ link register save eliminated.
+ 556 0000 80B4     		push	{r7}
+ 557              	.LCFI17:
+ 558              		.cfi_def_cfa_offset 4
+ 559              		.cfi_offset 7, -4
+ 560 0002 83B0     		sub	sp, sp, #12
+ 561              	.LCFI18:
+ 562              		.cfi_def_cfa_offset 16
+ 563 0004 00AF     		add	r7, sp, #0
+ 564              	.LCFI19:
+ 565              		.cfi_def_cfa_register 7
+ 566 0006 7860     		str	r0, [r7, #4]
+  85:src/uart.c    ****     while (*ch) {
+ 567              		.loc 2 85 0
+ 568 0008 21E0     		b	.L27
+ 569              	.L29:
+  86:src/uart.c    ****         USART1->DR = *ch++ & 0xff;
+ 570              		.loc 2 86 0
+ 571 000a 4FF48053 		mov	r3, #4096
+ 572 000e C4F20103 		movt	r3, 16385
+ 573 0012 7A68     		ldr	r2, [r7, #4]
+ 574 0014 1278     		ldrb	r2, [r2, #0]	@ zero_extendqisi2
+ 575 0016 9A80     		strh	r2, [r3, #4]	@ movhi
+ 576 0018 7B68     		ldr	r3, [r7, #4]
+ 577 001a 03F10103 		add	r3, r3, #1
+ 578 001e 7B60     		str	r3, [r7, #4]
+  87:src/uart.c    ****         while (!(USART1->SR & USART_FLAG_TXE));
+ 579              		.loc 2 87 0
+ 580 0020 00BF     		nop
+ 581              	.L28:
+ 582              		.loc 2 87 0 is_stmt 0 discriminator 1
+ 583 0022 4FF48053 		mov	r3, #4096
+ 584 0026 C4F20103 		movt	r3, 16385
+ 585 002a 1B88     		ldrh	r3, [r3, #0]	@ movhi
+ 586 002c 9BB2     		uxth	r3, r3
+ 587 002e 03F08003 		and	r3, r3, #128
+ 588 0032 002B     		cmp	r3, #0
+ 589 0034 F5D0     		beq	.L28
+  88:src/uart.c    ****         uart_stats.tx_bytes++;
+ 590              		.loc 2 88 0 is_stmt 1
+ 591 0036 40F20003 		movw	r3, #:lower16:uart_stats
+ 592 003a C0F20003 		movt	r3, #:upper16:uart_stats
+ 593 003e 9B68     		ldr	r3, [r3, #8]
+ 594 0040 03F10102 		add	r2, r3, #1
+ 595 0044 40F20003 		movw	r3, #:lower16:uart_stats
+ 596 0048 C0F20003 		movt	r3, #:upper16:uart_stats
+ 597 004c 9A60     		str	r2, [r3, #8]
+ 598              	.L27:
+  85:src/uart.c    ****     while (*ch) {
+ 599              		.loc 2 85 0 discriminator 1
+ 600 004e 7B68     		ldr	r3, [r7, #4]
+ 601 0050 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 602 0052 002B     		cmp	r3, #0
+ 603 0054 D9D1     		bne	.L29
+  89:src/uart.c    ****     }
+  90:src/uart.c    **** }
+ 604              		.loc 2 90 0
+ 605 0056 07F10C07 		add	r7, r7, #12
+ 606 005a BD46     		mov	sp, r7
+ 607 005c 80BC     		pop	{r7}
+ 608 005e 7047     		bx	lr
+ 609              		.cfi_endproc
+ 610              	.LFE118:
+ 612              		.section	.rodata
+ 613              		.align	2
+ 614              	.LC0:
+ 615 0000 25       		.byte	37
+ 616 0001 0F       		.byte	15
+ 617 0002 00       		.byte	0
+ 618 0003 01       		.byte	1
+ 619              		.section	.text.uart_init,"ax",%progbits
+ 620              		.align	2
+ 621              		.global	uart_init
+ 622              		.thumb
+ 623              		.thumb_func
+ 625              	uart_init:
+ 626              	.LFB119:
+  91:src/uart.c    **** 
+  92:src/uart.c    **** /**
+  93:src/uart.c    ****  * Initialize UART.
+  94:src/uart.c    ****  *
+  95:src/uart.c    ****  * \param  baudrate  Baudrate
+  96:src/uart.c    ****  *
+  97:src/uart.c    ****  *  PB6   USART1_TXD
+  98:src/uart.c    ****  *  PB7   USART1_RXD
+  99:src/uart.c    ****  *
+ 100:src/uart.c    ****  */
+ 101:src/uart.c    **** void uart_init(int baudrate)
+ 102:src/uart.c    **** {
+ 627              		.loc 2 102 0
+ 628              		.cfi_startproc
+ 629              		@ args = 0, pretend = 0, frame = 48
+ 630              		@ frame_needed = 1, uses_anonymous_args = 0
+ 631 0000 80B5     		push	{r7, lr}
+ 632              	.LCFI20:
+ 633              		.cfi_def_cfa_offset 8
+ 634              		.cfi_offset 14, -4
+ 635              		.cfi_offset 7, -8
+ 636 0002 8CB0     		sub	sp, sp, #48
+ 637              	.LCFI21:
+ 638              		.cfi_def_cfa_offset 56
+ 639 0004 00AF     		add	r7, sp, #0
+ 640              	.LCFI22:
+ 641              		.cfi_def_cfa_register 7
+ 642 0006 7860     		str	r0, [r7, #4]
+ 103:src/uart.c    ****     // Enable peripheral clocks
+ 104:src/uart.c    ****     //
+ 105:src/uart.c    ****     RCC->AHB1ENR |= RCC_AHB1Periph_GPIOB;
+ 643              		.loc 2 105 0
+ 644 0008 4FF46053 		mov	r3, #14336
+ 645 000c C4F20203 		movt	r3, 16386
+ 646 0010 4FF46052 		mov	r2, #14336
+ 647 0014 C4F20202 		movt	r2, 16386
+ 648 0018 126B     		ldr	r2, [r2, #48]
+ 649 001a 42F00202 		orr	r2, r2, #2
+ 650 001e 1A63     		str	r2, [r3, #48]
+ 106:src/uart.c    ****     RCC->APB2ENR |= RCC_APB2Periph_USART1;
+ 651              		.loc 2 106 0
+ 652 0020 4FF46053 		mov	r3, #14336
+ 653 0024 C4F20203 		movt	r3, 16386
+ 654 0028 4FF46052 		mov	r2, #14336
+ 655 002c C4F20202 		movt	r2, 16386
+ 656 0030 526C     		ldr	r2, [r2, #68]
+ 657 0032 42F01002 		orr	r2, r2, #16
+ 658 0036 5A64     		str	r2, [r3, #68]
+ 107:src/uart.c    **** 
+ 108:src/uart.c    ****     // Initialize Serial Port
+ 109:src/uart.c    ****     //
+ 110:src/uart.c    ****     GPIO_Init(GPIOB, &(GPIO_InitTypeDef) {
+ 659              		.loc 2 110 0
+ 660 0038 4FF00003 		mov	r3, #0
+ 661 003c FB60     		str	r3, [r7, #12]
+ 662 003e 4FF00003 		mov	r3, #0
+ 663 0042 3B61     		str	r3, [r7, #16]
+ 664 0044 4FF04003 		mov	r3, #64
+ 665 0048 FB60     		str	r3, [r7, #12]
+ 666 004a 4FF00203 		mov	r3, #2
+ 667 004e 3B74     		strb	r3, [r7, #16]
+ 668 0050 4FF00203 		mov	r3, #2
+ 669 0054 7B74     		strb	r3, [r7, #17]
+ 670 0056 4FF48060 		mov	r0, #1024
+ 671 005a C4F20200 		movt	r0, 16386
+ 672 005e 07F10C03 		add	r3, r7, #12
+ 673 0062 1946     		mov	r1, r3
+ 674 0064 FFF7FEFF 		bl	GPIO_Init
+ 111:src/uart.c    ****         .GPIO_Pin   = GPIO_Pin_6,
+ 112:src/uart.c    ****         .GPIO_Speed = GPIO_Speed_50MHz,
+ 113:src/uart.c    ****         .GPIO_Mode  = GPIO_Mode_AF,
+ 114:src/uart.c    ****         .GPIO_OType = GPIO_OType_PP
+ 115:src/uart.c    ****     });
+ 116:src/uart.c    **** 
+ 117:src/uart.c    ****     GPIO_Init(GPIOB, &(GPIO_InitTypeDef) {
+ 675              		.loc 2 117 0
+ 676 0068 4FF00003 		mov	r3, #0
+ 677 006c 7B61     		str	r3, [r7, #20]
+ 678 006e 4FF00003 		mov	r3, #0
+ 679 0072 BB61     		str	r3, [r7, #24]
+ 680 0074 4FF08003 		mov	r3, #128
+ 681 0078 7B61     		str	r3, [r7, #20]
+ 682 007a 4FF00103 		mov	r3, #1
+ 683 007e FB76     		strb	r3, [r7, #27]
+ 684 0080 4FF48060 		mov	r0, #1024
+ 685 0084 C4F20200 		movt	r0, 16386
+ 686 0088 07F11403 		add	r3, r7, #20
+ 687 008c 1946     		mov	r1, r3
+ 688 008e FFF7FEFF 		bl	GPIO_Init
+ 118:src/uart.c    ****         .GPIO_Pin = GPIO_Pin_7,
+ 119:src/uart.c    ****         .GPIO_Mode = GPIO_Mode_IN,
+ 120:src/uart.c    ****         .GPIO_PuPd = GPIO_PuPd_UP
+ 121:src/uart.c    ****     });
+ 122:src/uart.c    **** 
+ 123:src/uart.c    ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
+ 689              		.loc 2 123 0
+ 690 0092 4FF48060 		mov	r0, #1024
+ 691 0096 C4F20200 		movt	r0, 16386
+ 692 009a 4FF00601 		mov	r1, #6
+ 693 009e 4FF00702 		mov	r2, #7
+ 694 00a2 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 124:src/uart.c    ****     GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
+ 695              		.loc 2 124 0
+ 696 00a6 4FF48060 		mov	r0, #1024
+ 697 00aa C4F20200 		movt	r0, 16386
+ 698 00ae 4FF00701 		mov	r1, #7
+ 699 00b2 4FF00702 		mov	r2, #7
+ 700 00b6 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 125:src/uart.c    **** 
+ 126:src/uart.c    ****     USART_Init(USART1, &(USART_InitTypeDef) {
+ 701              		.loc 2 126 0
+ 702 00ba 7B68     		ldr	r3, [r7, #4]
+ 703 00bc FB61     		str	r3, [r7, #28]
+ 704 00be 4FF00003 		mov	r3, #0
+ 705 00c2 3B84     		strh	r3, [r7, #32]	@ movhi
+ 706 00c4 4FF00003 		mov	r3, #0
+ 707 00c8 7B84     		strh	r3, [r7, #34]	@ movhi
+ 708 00ca 4FF00003 		mov	r3, #0
+ 709 00ce BB84     		strh	r3, [r7, #36]	@ movhi
+ 710 00d0 4FF00C03 		mov	r3, #12
+ 711 00d4 FB84     		strh	r3, [r7, #38]	@ movhi
+ 712 00d6 4FF00003 		mov	r3, #0
+ 713 00da 3B85     		strh	r3, [r7, #40]	@ movhi
+ 714 00dc 4FF48050 		mov	r0, #4096
+ 715 00e0 C4F20100 		movt	r0, 16385
+ 716 00e4 07F11C03 		add	r3, r7, #28
+ 717 00e8 1946     		mov	r1, r3
+ 718 00ea FFF7FEFF 		bl	USART_Init
+ 127:src/uart.c    ****         .USART_BaudRate = baudrate,
+ 128:src/uart.c    ****         .USART_WordLength = USART_WordLength_8b,
+ 129:src/uart.c    ****         .USART_StopBits = USART_StopBits_1,
+ 130:src/uart.c    ****         .USART_Parity = USART_Parity_No ,
+ 131:src/uart.c    ****         .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+ 132:src/uart.c    ****         .USART_Mode = USART_Mode_Rx | USART_Mode_Tx
+ 133:src/uart.c    ****     });
+ 134:src/uart.c    **** 
+ 135:src/uart.c    ****     NVIC_Init(&(NVIC_InitTypeDef) {
+ 719              		.loc 2 135 0
+ 720 00ee 40F20003 		movw	r3, #:lower16:.LC0
+ 721 00f2 C0F20003 		movt	r3, #:upper16:.LC0
+ 722 00f6 1868     		ldr	r0, [r3, #0]	@ unaligned
+ 723 00f8 07F12C03 		add	r3, r7, #44
+ 724 00fc 1860     		str	r0, [r3, #0]	@ unaligned
+ 725 00fe 07F12C03 		add	r3, r7, #44
+ 726 0102 1846     		mov	r0, r3
+ 727 0104 FFF7FEFF 		bl	NVIC_Init
+ 136:src/uart.c    ****         .NVIC_IRQChannel = USART1_IRQn,
+ 137:src/uart.c    ****         .NVIC_IRQChannelPreemptionPriority = configLIBRARY_KERNEL_INTERRUPT_PRIORITY,
+ 138:src/uart.c    ****         .NVIC_IRQChannelSubPriority = 0,
+ 139:src/uart.c    ****         .NVIC_IRQChannelCmd = ENABLE
+ 140:src/uart.c    ****     });
+ 141:src/uart.c    **** 
+ 142:src/uart.c    ****     USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+ 728              		.loc 2 142 0
+ 729 0108 4FF48050 		mov	r0, #4096
+ 730 010c C4F20100 		movt	r0, 16385
+ 731 0110 40F22551 		movw	r1, #1317
+ 732 0114 4FF00102 		mov	r2, #1
+ 733 0118 FFF7FEFF 		bl	USART_ITConfig
+ 143:src/uart.c    ****     USART_Cmd(USART1, ENABLE);
+ 734              		.loc 2 143 0
+ 735 011c 4FF48050 		mov	r0, #4096
+ 736 0120 C4F20100 		movt	r0, 16385
+ 737 0124 4FF00101 		mov	r1, #1
+ 738 0128 FFF7FEFF 		bl	USART_Cmd
+ 144:src/uart.c    **** }
+ 739              		.loc 2 144 0
+ 740 012c 07F13007 		add	r7, r7, #48
+ 741 0130 BD46     		mov	sp, r7
+ 742 0132 80BD     		pop	{r7, pc}
+ 743              		.cfi_endproc
+ 744              	.LFE119:
+ 746              		.text
+ 747              	.Letext0:
+ 748              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 749              		.file 4 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 750              		.file 5 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
+ 751              		.file 6 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 752              		.file 7 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 753              		.file 8 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 754              		.file 9 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 755              		.file 10 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
+ 756              		.file 11 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h"
+ 757              		.file 12 "libs/STM32F4xx_StdPeriph_Driver/inc/misc.h"
+ 758              		.file 13 "libs/CMSIS/Include/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart.c
+     /tmp/ccsMIB73.s:20     .text.rb_getc:00000000 $t
+     /tmp/ccsMIB73.s:24     .text.rb_getc:00000000 rb_getc
+     /tmp/ccsMIB73.s:104    .text.rb_putc:00000000 $t
+     /tmp/ccsMIB73.s:108    .text.rb_putc:00000000 rb_putc
+     /tmp/ccsMIB73.s:188    .bss.__compound_literal.0:00000000 $d
+     /tmp/ccsMIB73.s:191    .bss.__compound_literal.0:00000000 __compound_literal.0
+     /tmp/ccsMIB73.s:194    .data.rx_buf:00000000 $d
+     /tmp/ccsMIB73.s:197    .data.rx_buf:00000000 rx_buf
+     /tmp/ccsMIB73.s:202    .bss.__compound_literal.1:00000000 $d
+     /tmp/ccsMIB73.s:205    .bss.__compound_literal.1:00000000 __compound_literal.1
+     /tmp/ccsMIB73.s:208    .data.tx_buf:00000000 $d
+     /tmp/ccsMIB73.s:211    .data.tx_buf:00000000 tx_buf
+     /tmp/ccsMIB73.s:216    .bss.uart_stats:00000000 $d
+     /tmp/ccsMIB73.s:219    .bss.uart_stats:00000000 uart_stats
+     /tmp/ccsMIB73.s:222    .text.USART1_IRQHandler:00000000 $t
+     /tmp/ccsMIB73.s:227    .text.USART1_IRQHandler:00000000 USART1_IRQHandler
+     /tmp/ccsMIB73.s:339    .text.uart_chars_avail:00000000 $t
+     /tmp/ccsMIB73.s:344    .text.uart_chars_avail:00000000 uart_chars_avail
+     /tmp/ccsMIB73.s:371    .text.uart_write_r:00000000 $t
+     /tmp/ccsMIB73.s:376    .text.uart_write_r:00000000 uart_write_r
+     /tmp/ccsMIB73.s:455    .text.uart_read_r:00000000 $t
+     /tmp/ccsMIB73.s:460    .text.uart_read_r:00000000 uart_read_r
+     /tmp/ccsMIB73.s:544    .text.uart_poll_send:00000000 $t
+     /tmp/ccsMIB73.s:549    .text.uart_poll_send:00000000 uart_poll_send
+     /tmp/ccsMIB73.s:613    .rodata:00000000 $d
+     /tmp/ccsMIB73.s:614    .rodata:00000000 .LC0
+     /tmp/ccsMIB73.s:620    .text.uart_init:00000000 $t
+     /tmp/ccsMIB73.s:625    .text.uart_init:00000000 uart_init
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+vPortEnterCritical
+vPortExitCritical
+GPIO_Init
+GPIO_PinAFConfig
+USART_Init
+NVIC_Init
+USART_ITConfig
+USART_Cmd

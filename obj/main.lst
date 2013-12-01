@@ -1,0 +1,819 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 6
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.pwm,"ax",%progbits
+  20              		.align	2
+  21              		.global	pwm
+  22              		.thumb
+  23              		.thumb_func
+  25              	pwm:
+  26              	.LFB110:
+  27              		.file 1 "src/main.c"
+   1:src/main.c    **** /**
+   2:src/main.c    ****  * Copyright (C) 2013 Chetan Patil, http://chetanpatil.info
+   3:src/main.c    ****  * 
+   4:src/main.c    ****  * Permission is hereby granted, free of charge, to any person obtaining a copy
+   5:src/main.c    ****  * of this software and associated documentation files (the "Software"), to deal
+   6:src/main.c    ****  * in the Software without restriction, including without limitation the rights
+   7:src/main.c    ****  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   8:src/main.c    ****  * copies of the Software, and to permit persons to whom the Software is
+   9:src/main.c    ****  * furnished to do so, subject to the following conditions:
+  10:src/main.c    ****  * 
+  11:src/main.c    ****  * The above copyright notice and this permission notice shall be included in
+  12:src/main.c    ****  * all copies or substantial portions of the Software.
+  13:src/main.c    ****  * 
+  14:src/main.c    ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  15:src/main.c    ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  16:src/main.c    ****  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  17:src/main.c    ****  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  18:src/main.c    ****  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  19:src/main.c    ****  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  20:src/main.c    ****  * THE SOFTWARE.
+  21:src/main.c    ****  * 
+  22:src/main.c    ****  * @author Chetan Patil | http://chetanpatil.info
+  23:src/main.c    ****  */
+  24:src/main.c    **** 
+  25:src/main.c    **** //Example code to loop back the data sent to USART2 on STM32F4DISCOVERY
+  26:src/main.c    **** 
+  27:src/main.c    **** //Inlcude header files
+  28:src/main.c    **** #include "stm32f4xx.h"
+  29:src/main.c    **** #include "FreeRTOS.h"
+  30:src/main.c    **** #include "task.h"
+  31:src/main.c    **** #include <math.h>
+  32:src/main.c    **** #include <stdio.h>
+  33:src/main.c    **** #include <stdlib.h>
+  34:src/main.c    **** 
+  35:src/main.c    **** 
+  36:src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  37:src/main.c    **** /* Private define ------------------------------------------------------------*/
+  38:src/main.c    **** 
+  39:src/main.c    **** #define PWM_MOTOR_MIN 100
+  40:src/main.c    **** #define PWM_MOTOR_MAX 1000
+  41:src/main.c    **** #define TEST 200
+  42:src/main.c    **** 
+  43:src/main.c    **** #define PWM_Motor1 TIM4->CCR1   // 無刷 PWM
+  44:src/main.c    **** #define PWM_Motor2 TIM4->CCR2   // 無刷 PWM
+  45:src/main.c    **** #define PWM_Motor3 TIM4->CCR3   // 無刷 PWM
+  46:src/main.c    **** #define PWM_Motor4 TIM4->CCR4   // 無刷 PWM
+  47:src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  48:src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  49:src/main.c    **** 
+  50:src/main.c    **** 
+  51:src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+  52:src/main.c    **** void RCC_Configuration(void);
+  53:src/main.c    **** void TIM_Configuration(void);
+  54:src/main.c    **** void GPIO_Configuration(void);;
+  55:src/main.c    **** 
+  56:src/main.c    **** /* Private functions ---------------------------------------------------------*/
+  57:src/main.c    **** 
+  58:src/main.c    **** void pwm(void)
+  59:src/main.c    **** {
+  28              		.loc 1 59 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 16
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32 0000 90B5     		push	{r4, r7, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 12
+  35              		.cfi_offset 14, -4
+  36              		.cfi_offset 7, -8
+  37              		.cfi_offset 4, -12
+  38 0002 85B0     		sub	sp, sp, #20
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 32
+  41 0004 00AF     		add	r7, sp, #0
+  42              	.LCFI2:
+  43              		.cfi_def_cfa_register 7
+  60:src/main.c    ****   volatile int i;
+  61:src/main.c    ****   int n = 1;
+  44              		.loc 1 61 0
+  45 0006 4FF00103 		mov	r3, #1
+  46 000a FB60     		str	r3, [r7, #12]
+  62:src/main.c    ****   uint16_t brightness = 0;      
+  47              		.loc 1 62 0
+  48 000c 4FF00003 		mov	r3, #0
+  49 0010 7B81     		strh	r3, [r7, #10]	@ movhi
+  63:src/main.c    ****   uint16_t who_run = 1;
+  50              		.loc 1 63 0
+  51 0012 4FF00103 		mov	r3, #1
+  52 0016 3B81     		strh	r3, [r7, #8]	@ movhi
+  64:src/main.c    **** 
+  65:src/main.c    ****  Delay_1ms(1000);
+  53              		.loc 1 65 0
+  54 0018 40F20003 		movw	r3, #:lower16:Delay_1ms
+  55 001c C0F20003 		movt	r3, #:upper16:Delay_1ms
+  56 0020 4FF47A70 		mov	r0, #1000
+  57 0024 9847     		blx	r3
+  66:src/main.c    **** 
+  67:src/main.c    ****   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+  58              		.loc 1 67 0
+  59 0026 40F20004 		movw	r4, #:lower16:Motor_Control
+  60 002a C0F20004 		movt	r4, #:upper16:Motor_Control
+  61 002e 4FF47A70 		mov	r0, #1000
+  62 0032 4FF47A71 		mov	r1, #1000
+  63 0036 4FF47A72 		mov	r2, #1000
+  64 003a 4FF47A73 		mov	r3, #1000
+  65 003e A047     		blx	r4
+  68:src/main.c    **** 
+  69:src/main.c    ****  Delay_1ms(1000);
+  66              		.loc 1 69 0
+  67 0040 40F20003 		movw	r3, #:lower16:Delay_1ms
+  68 0044 C0F20003 		movt	r3, #:upper16:Delay_1ms
+  69 0048 4FF47A70 		mov	r0, #1000
+  70 004c 9847     		blx	r3
+  70:src/main.c    **** 
+  71:src/main.c    ****   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+  71              		.loc 1 71 0
+  72 004e 40F20004 		movw	r4, #:lower16:Motor_Control
+  73 0052 C0F20004 		movt	r4, #:upper16:Motor_Control
+  74 0056 4FF06400 		mov	r0, #100
+  75 005a 4FF06401 		mov	r1, #100
+  76 005e 4FF06402 		mov	r2, #100
+  77 0062 4FF06403 		mov	r3, #100
+  78 0066 A047     		blx	r4
+  72:src/main.c    ****   
+  73:src/main.c    ****  Delay_1ms(1000);
+  79              		.loc 1 73 0
+  80 0068 40F20003 		movw	r3, #:lower16:Delay_1ms
+  81 006c C0F20003 		movt	r3, #:upper16:Delay_1ms
+  82 0070 4FF47A70 		mov	r0, #1000
+  83 0074 9847     		blx	r3
+  84              	.L2:
+  74:src/main.c    **** 
+  75:src/main.c    ****   while(1)  // Do not exit
+  76:src/main.c    ****   {
+  77:src/main.c    ****    Motor_Control(TEST, TEST, TEST, TEST);
+  85              		.loc 1 77 0 discriminator 1
+  86 0076 40F20004 		movw	r4, #:lower16:Motor_Control
+  87 007a C0F20004 		movt	r4, #:upper16:Motor_Control
+  88 007e 4FF0C800 		mov	r0, #200
+  89 0082 4FF0C801 		mov	r1, #200
+  90 0086 4FF0C802 		mov	r2, #200
+  91 008a 4FF0C803 		mov	r3, #200
+  92 008e A047     		blx	r4
+  78:src/main.c    ****    
+  79:src/main.c    ****    Delay_1ms(1000);
+  93              		.loc 1 79 0 discriminator 1
+  94 0090 40F20003 		movw	r3, #:lower16:Delay_1ms
+  95 0094 C0F20003 		movt	r3, #:upper16:Delay_1ms
+  96 0098 4FF47A70 		mov	r0, #1000
+  97 009c 9847     		blx	r3
+  80:src/main.c    **** 
+  81:src/main.c    ****    Motor_Control(TEST+50, TEST+50, TEST+50, TEST+50);
+  98              		.loc 1 81 0 discriminator 1
+  99 009e 40F20004 		movw	r4, #:lower16:Motor_Control
+ 100 00a2 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 101 00a6 4FF0FA00 		mov	r0, #250
+ 102 00aa 4FF0FA01 		mov	r1, #250
+ 103 00ae 4FF0FA02 		mov	r2, #250
+ 104 00b2 4FF0FA03 		mov	r3, #250
+ 105 00b6 A047     		blx	r4
+  82:src/main.c    **** 
+  83:src/main.c    ****    Delay_1ms(1000);
+ 106              		.loc 1 83 0 discriminator 1
+ 107 00b8 40F20003 		movw	r3, #:lower16:Delay_1ms
+ 108 00bc C0F20003 		movt	r3, #:upper16:Delay_1ms
+ 109 00c0 4FF47A70 		mov	r0, #1000
+ 110 00c4 9847     		blx	r3
+  84:src/main.c    **** 
+  85:src/main.c    **** 
+  86:src/main.c    **** 
+  87:src/main.c    ****     //Light LEDs in turn
+  88:src/main.c    ****     // switch(who_run){
+  89:src/main.c    ****     //     case 0:
+  90:src/main.c    ****     //         TIM4->CCR1 = brightness - 1; // set brightness
+  91:src/main.c    ****     //         break;
+  92:src/main.c    ****     //     case 1:
+  93:src/main.c    ****     //         TIM4->CCR2 = brightness - 1; // set brightness
+  94:src/main.c    ****     //         break;
+  95:src/main.c    ****     //     case 2:
+  96:src/main.c    ****     //         TIM4->CCR3 = brightness - 1; // set brightness
+  97:src/main.c    ****     //         break;
+  98:src/main.c    ****     //     case 3:
+  99:src/main.c    ****     //         TIM4->CCR4 = brightness - 1; // set brightness
+ 100:src/main.c    ****     //         break;
+ 101:src/main.c    ****     // }
+ 102:src/main.c    **** 
+ 103:src/main.c    ****   }
+ 111              		.loc 1 103 0 discriminator 1
+ 112 00c6 D6E7     		b	.L2
+ 113              		.cfi_endproc
+ 114              	.LFE110:
+ 116              		.section	.text.Delay_1ms,"ax",%progbits
+ 117              		.align	2
+ 118              		.global	Delay_1ms
+ 119              		.thumb
+ 120              		.thumb_func
+ 122              	Delay_1ms:
+ 123              	.LFB111:
+ 104:src/main.c    ****  
+ 105:src/main.c    ****   return(0); // System will implode
+ 106:src/main.c    **** } 
+ 107:src/main.c    **** 
+ 108:src/main.c    **** 
+ 109:src/main.c    **** void Delay_1ms( vu32 nCnt_1ms )
+ 110:src/main.c    **** {
+ 124              		.loc 1 110 0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 16
+ 127              		@ frame_needed = 1, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+ 129 0000 80B4     		push	{r7}
+ 130              	.LCFI3:
+ 131              		.cfi_def_cfa_offset 4
+ 132              		.cfi_offset 7, -4
+ 133 0002 85B0     		sub	sp, sp, #20
+ 134              	.LCFI4:
+ 135              		.cfi_def_cfa_offset 24
+ 136 0004 00AF     		add	r7, sp, #0
+ 137              	.LCFI5:
+ 138              		.cfi_def_cfa_register 7
+ 139 0006 7860     		str	r0, [r7, #4]
+ 111:src/main.c    ****     u32 nCnt;
+ 112:src/main.c    **** 	  for(; nCnt_1ms != 0; nCnt_1ms--)
+ 140              		.loc 1 112 0
+ 141 0008 0EE0     		b	.L4
+ 142              	.L7:
+ 113:src/main.c    **** 		    for(nCnt = 56580; nCnt != 0; nCnt--);
+ 143              		.loc 1 113 0
+ 144 000a 4DF60453 		movw	r3, #56580
+ 145 000e FB60     		str	r3, [r7, #12]
+ 146 0010 03E0     		b	.L5
+ 147              	.L6:
+ 148              		.loc 1 113 0 is_stmt 0 discriminator 2
+ 149 0012 FB68     		ldr	r3, [r7, #12]
+ 150 0014 03F1FF33 		add	r3, r3, #-1
+ 151 0018 FB60     		str	r3, [r7, #12]
+ 152              	.L5:
+ 153              		.loc 1 113 0 discriminator 1
+ 154 001a FB68     		ldr	r3, [r7, #12]
+ 155 001c 002B     		cmp	r3, #0
+ 156 001e F8D1     		bne	.L6
+ 112:src/main.c    **** 	  for(; nCnt_1ms != 0; nCnt_1ms--)
+ 157              		.loc 1 112 0 is_stmt 1
+ 158 0020 7B68     		ldr	r3, [r7, #4]
+ 159 0022 03F1FF33 		add	r3, r3, #-1
+ 160 0026 7B60     		str	r3, [r7, #4]
+ 161              	.L4:
+ 112:src/main.c    **** 	  for(; nCnt_1ms != 0; nCnt_1ms--)
+ 162              		.loc 1 112 0 is_stmt 0 discriminator 1
+ 163 0028 7B68     		ldr	r3, [r7, #4]
+ 164 002a 002B     		cmp	r3, #0
+ 165 002c EDD1     		bne	.L7
+ 114:src/main.c    **** }
+ 166              		.loc 1 114 0 is_stmt 1
+ 167 002e 07F11407 		add	r7, r7, #20
+ 168 0032 BD46     		mov	sp, r7
+ 169 0034 80BC     		pop	{r7}
+ 170 0036 7047     		bx	lr
+ 171              		.cfi_endproc
+ 172              	.LFE111:
+ 174              		.section	.text.Motor_Control,"ax",%progbits
+ 175              		.align	2
+ 176              		.global	Motor_Control
+ 177              		.thumb
+ 178              		.thumb_func
+ 180              	Motor_Control:
+ 181              	.LFB112:
+ 115:src/main.c    ****   
+ 116:src/main.c    **** void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
+ 117:src/main.c    **** {
+ 182              		.loc 1 117 0
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 8
+ 185              		@ frame_needed = 1, uses_anonymous_args = 0
+ 186              		@ link register save eliminated.
+ 187 0000 80B4     		push	{r7}
+ 188              	.LCFI6:
+ 189              		.cfi_def_cfa_offset 4
+ 190              		.cfi_offset 7, -4
+ 191 0002 83B0     		sub	sp, sp, #12
+ 192              	.LCFI7:
+ 193              		.cfi_def_cfa_offset 16
+ 194 0004 00AF     		add	r7, sp, #0
+ 195              	.LCFI8:
+ 196              		.cfi_def_cfa_register 7
+ 197 0006 F880     		strh	r0, [r7, #6]	@ movhi
+ 198 0008 B980     		strh	r1, [r7, #4]	@ movhi
+ 199 000a 7A80     		strh	r2, [r7, #2]	@ movhi
+ 200 000c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 118:src/main.c    **** 	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
+ 201              		.loc 1 118 0
+ 202 000e FB88     		ldrh	r3, [r7, #6]
+ 203 0010 B3F57A7F 		cmp	r3, #1000
+ 204 0014 03D9     		bls	.L9
+ 205              		.loc 1 118 0 is_stmt 0 discriminator 1
+ 206 0016 4FF47A73 		mov	r3, #1000
+ 207 001a FB80     		strh	r3, [r7, #6]	@ movhi
+ 208 001c 05E0     		b	.L10
+ 209              	.L9:
+ 119:src/main.c    **** 	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
+ 210              		.loc 1 119 0 is_stmt 1
+ 211 001e FB88     		ldrh	r3, [r7, #6]
+ 212 0020 632B     		cmp	r3, #99
+ 213 0022 02D8     		bhi	.L10
+ 214              		.loc 1 119 0 is_stmt 0 discriminator 1
+ 215 0024 4FF06403 		mov	r3, #100
+ 216 0028 FB80     		strh	r3, [r7, #6]	@ movhi
+ 217              	.L10:
+ 120:src/main.c    **** 		
+ 121:src/main.c    **** 	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
+ 218              		.loc 1 121 0 is_stmt 1
+ 219 002a BB88     		ldrh	r3, [r7, #4]
+ 220 002c B3F57A7F 		cmp	r3, #1000
+ 221 0030 03D9     		bls	.L11
+ 222              		.loc 1 121 0 is_stmt 0 discriminator 1
+ 223 0032 4FF47A73 		mov	r3, #1000
+ 224 0036 BB80     		strh	r3, [r7, #4]	@ movhi
+ 225 0038 05E0     		b	.L12
+ 226              	.L11:
+ 122:src/main.c    **** 	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
+ 227              		.loc 1 122 0 is_stmt 1
+ 228 003a BB88     		ldrh	r3, [r7, #4]
+ 229 003c 632B     		cmp	r3, #99
+ 230 003e 02D8     		bhi	.L12
+ 231              		.loc 1 122 0 is_stmt 0 discriminator 1
+ 232 0040 4FF06403 		mov	r3, #100
+ 233 0044 BB80     		strh	r3, [r7, #4]	@ movhi
+ 234              	.L12:
+ 123:src/main.c    **** 				
+ 124:src/main.c    **** 	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
+ 235              		.loc 1 124 0 is_stmt 1
+ 236 0046 7B88     		ldrh	r3, [r7, #2]
+ 237 0048 B3F57A7F 		cmp	r3, #1000
+ 238 004c 03D9     		bls	.L13
+ 239              		.loc 1 124 0 is_stmt 0 discriminator 1
+ 240 004e 4FF47A73 		mov	r3, #1000
+ 241 0052 7B80     		strh	r3, [r7, #2]	@ movhi
+ 242 0054 05E0     		b	.L14
+ 243              	.L13:
+ 125:src/main.c    **** 	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
+ 244              		.loc 1 125 0 is_stmt 1
+ 245 0056 7B88     		ldrh	r3, [r7, #2]
+ 246 0058 632B     		cmp	r3, #99
+ 247 005a 02D8     		bhi	.L14
+ 248              		.loc 1 125 0 is_stmt 0 discriminator 1
+ 249 005c 4FF06403 		mov	r3, #100
+ 250 0060 7B80     		strh	r3, [r7, #2]	@ movhi
+ 251              	.L14:
+ 126:src/main.c    **** 						
+ 127:src/main.c    **** 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
+ 252              		.loc 1 127 0 is_stmt 1
+ 253 0062 3B88     		ldrh	r3, [r7, #0]
+ 254 0064 B3F57A7F 		cmp	r3, #1000
+ 255 0068 03D9     		bls	.L15
+ 256              		.loc 1 127 0 is_stmt 0 discriminator 1
+ 257 006a 4FF47A73 		mov	r3, #1000
+ 258 006e 3B80     		strh	r3, [r7, #0]	@ movhi
+ 259 0070 05E0     		b	.L16
+ 260              	.L15:
+ 128:src/main.c    **** 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
+ 261              		.loc 1 128 0 is_stmt 1
+ 262 0072 3B88     		ldrh	r3, [r7, #0]
+ 263 0074 632B     		cmp	r3, #99
+ 264 0076 02D8     		bhi	.L16
+ 265              		.loc 1 128 0 is_stmt 0 discriminator 1
+ 266 0078 4FF06403 		mov	r3, #100
+ 267 007c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 268              	.L16:
+ 129:src/main.c    **** 								
+ 130:src/main.c    **** 	PWM_Motor1 = Motor1;
+ 269              		.loc 1 130 0 is_stmt 1
+ 270 007e 4FF40063 		mov	r3, #2048
+ 271 0082 C4F20003 		movt	r3, 16384
+ 272 0086 FA88     		ldrh	r2, [r7, #6]
+ 273 0088 5A63     		str	r2, [r3, #52]
+ 131:src/main.c    **** 	PWM_Motor2 = Motor2;
+ 274              		.loc 1 131 0
+ 275 008a 4FF40063 		mov	r3, #2048
+ 276 008e C4F20003 		movt	r3, 16384
+ 277 0092 BA88     		ldrh	r2, [r7, #4]
+ 278 0094 9A63     		str	r2, [r3, #56]
+ 132:src/main.c    **** 	PWM_Motor3 = Motor3;
+ 279              		.loc 1 132 0
+ 280 0096 4FF40063 		mov	r3, #2048
+ 281 009a C4F20003 		movt	r3, 16384
+ 282 009e 7A88     		ldrh	r2, [r7, #2]
+ 283 00a0 DA63     		str	r2, [r3, #60]
+ 133:src/main.c    **** 	PWM_Motor4 = Motor4;
+ 284              		.loc 1 133 0
+ 285 00a2 4FF40063 		mov	r3, #2048
+ 286 00a6 C4F20003 		movt	r3, 16384
+ 287 00aa 3A88     		ldrh	r2, [r7, #0]
+ 288 00ac 1A64     		str	r2, [r3, #64]
+ 134:src/main.c    **** }
+ 289              		.loc 1 134 0
+ 290 00ae 07F10C07 		add	r7, r7, #12
+ 291 00b2 BD46     		mov	sp, r7
+ 292 00b4 80BC     		pop	{r7}
+ 293 00b6 7047     		bx	lr
+ 294              		.cfi_endproc
+ 295              	.LFE112:
+ 297              		.section	.text.RCC_Configuration,"ax",%progbits
+ 298              		.align	2
+ 299              		.global	RCC_Configuration
+ 300              		.thumb
+ 301              		.thumb_func
+ 303              	RCC_Configuration:
+ 304              	.LFB113:
+ 135:src/main.c    **** 
+ 136:src/main.c    **** /**
+ 137:src/main.c    ****   * @brief  Configures the different system clocks.
+ 138:src/main.c    ****   * @param  None
+ 139:src/main.c    ****   * @retval None
+ 140:src/main.c    ****   */
+ 141:src/main.c    **** void RCC_Configuration(void)
+ 142:src/main.c    **** {
+ 305              		.loc 1 142 0
+ 306              		.cfi_startproc
+ 307              		@ args = 0, pretend = 0, frame = 0
+ 308              		@ frame_needed = 1, uses_anonymous_args = 0
+ 309 0000 80B5     		push	{r7, lr}
+ 310              	.LCFI9:
+ 311              		.cfi_def_cfa_offset 8
+ 312              		.cfi_offset 14, -4
+ 313              		.cfi_offset 7, -8
+ 314 0002 00AF     		add	r7, sp, #0
+ 315              	.LCFI10:
+ 316              		.cfi_def_cfa_register 7
+ 143:src/main.c    ****    RCC_AHB1PeriphClockCmd(  RCC_AHB1Periph_GPIOD , ENABLE );
+ 317              		.loc 1 143 0
+ 318 0004 4FF00800 		mov	r0, #8
+ 319 0008 4FF00101 		mov	r1, #1
+ 320 000c FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 144:src/main.c    ****    RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM4, ENABLE );
+ 321              		.loc 1 144 0
+ 322 0010 4FF00400 		mov	r0, #4
+ 323 0014 4FF00101 		mov	r1, #1
+ 324 0018 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 145:src/main.c    **** }
+ 325              		.loc 1 145 0
+ 326 001c 80BD     		pop	{r7, pc}
+ 327              		.cfi_endproc
+ 328              	.LFE113:
+ 330 001e 00BF     		.section	.text.GPIO_Configuration,"ax",%progbits
+ 331              		.align	2
+ 332              		.global	GPIO_Configuration
+ 333              		.thumb
+ 334              		.thumb_func
+ 336              	GPIO_Configuration:
+ 337              	.LFB114:
+ 146:src/main.c    **** 
+ 147:src/main.c    **** /**
+ 148:src/main.c    ****   * @brief  configure the PD12~15 to Timers
+ 149:src/main.c    ****   * @param  None
+ 150:src/main.c    ****   * @retval None
+ 151:src/main.c    ****   */
+ 152:src/main.c    **** void GPIO_Configuration(void)
+ 153:src/main.c    **** {
+ 338              		.loc 1 153 0
+ 339              		.cfi_startproc
+ 340              		@ args = 0, pretend = 0, frame = 8
+ 341              		@ frame_needed = 1, uses_anonymous_args = 0
+ 342 0000 80B5     		push	{r7, lr}
+ 343              	.LCFI11:
+ 344              		.cfi_def_cfa_offset 8
+ 345              		.cfi_offset 14, -4
+ 346              		.cfi_offset 7, -8
+ 347 0002 82B0     		sub	sp, sp, #8
+ 348              	.LCFI12:
+ 349              		.cfi_def_cfa_offset 16
+ 350 0004 00AF     		add	r7, sp, #0
+ 351              	.LCFI13:
+ 352              		.cfi_def_cfa_register 7
+ 154:src/main.c    ****     GPIO_InitTypeDef GPIO_InitStructure;
+ 155:src/main.c    ****     GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
+ 353              		.loc 1 155 0
+ 354 0006 3B46     		mov	r3, r7
+ 355 0008 1846     		mov	r0, r3
+ 356 000a FFF7FEFF 		bl	GPIO_StructInit
+ 156:src/main.c    ****  
+ 157:src/main.c    ****     GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+ 357              		.loc 1 157 0
+ 358 000e 4FF44060 		mov	r0, #3072
+ 359 0012 C4F20200 		movt	r0, 16386
+ 360 0016 4FF00C01 		mov	r1, #12
+ 361 001a 4FF00202 		mov	r2, #2
+ 362 001e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 158:src/main.c    ****     GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
+ 363              		.loc 1 158 0
+ 364 0022 4FF44060 		mov	r0, #3072
+ 365 0026 C4F20200 		movt	r0, 16386
+ 366 002a 4FF00D01 		mov	r1, #13
+ 367 002e 4FF00202 		mov	r2, #2
+ 368 0032 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 159:src/main.c    ****     GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
+ 369              		.loc 1 159 0
+ 370 0036 4FF44060 		mov	r0, #3072
+ 371 003a C4F20200 		movt	r0, 16386
+ 372 003e 4FF00E01 		mov	r1, #14
+ 373 0042 4FF00202 		mov	r2, #2
+ 374 0046 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 160:src/main.c    ****     GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
+ 375              		.loc 1 160 0
+ 376 004a 4FF44060 		mov	r0, #3072
+ 377 004e C4F20200 		movt	r0, 16386
+ 378 0052 4FF00F01 		mov	r1, #15
+ 379 0056 4FF00202 		mov	r2, #2
+ 380 005a FFF7FEFF 		bl	GPIO_PinAFConfig
+ 161:src/main.c    ****       
+ 162:src/main.c    **** 
+ 163:src/main.c    ****     // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
+ 164:src/main.c    ****     GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; //PD12->LED
+ 381              		.loc 1 164 0
+ 382 005e 4FF47043 		mov	r3, #61440
+ 383 0062 3B60     		str	r3, [r7, #0]
+ 165:src/main.c    ****     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
+ 384              		.loc 1 165 0
+ 385 0064 4FF00203 		mov	r3, #2
+ 386 0068 3B71     		strb	r3, [r7, #4]
+ 166:src/main.c    ****     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 387              		.loc 1 166 0
+ 388 006a 4FF00003 		mov	r3, #0
+ 389 006e BB71     		strb	r3, [r7, #6]
+ 167:src/main.c    ****     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+ 390              		.loc 1 167 0
+ 391 0070 4FF00303 		mov	r3, #3
+ 392 0074 7B71     		strb	r3, [r7, #5]
+ 168:src/main.c    ****     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+ 393              		.loc 1 168 0
+ 394 0076 4FF00003 		mov	r3, #0
+ 395 007a FB71     		strb	r3, [r7, #7]
+ 169:src/main.c    ****     GPIO_Init( GPIOD, &GPIO_InitStructure );  
+ 396              		.loc 1 169 0
+ 397 007c 4FF44060 		mov	r0, #3072
+ 398 0080 C4F20200 		movt	r0, 16386
+ 399 0084 3B46     		mov	r3, r7
+ 400 0086 1946     		mov	r1, r3
+ 401 0088 FFF7FEFF 		bl	GPIO_Init
+ 170:src/main.c    **** }
+ 402              		.loc 1 170 0
+ 403 008c 07F10807 		add	r7, r7, #8
+ 404 0090 BD46     		mov	sp, r7
+ 405 0092 80BD     		pop	{r7, pc}
+ 406              		.cfi_endproc
+ 407              	.LFE114:
+ 409              		.section	.text.TIM_Configuration,"ax",%progbits
+ 410              		.align	2
+ 411              		.global	TIM_Configuration
+ 412              		.thumb
+ 413              		.thumb_func
+ 415              	TIM_Configuration:
+ 416              	.LFB115:
+ 171:src/main.c    **** 
+ 172:src/main.c    **** /**
+ 173:src/main.c    ****   * @brief  configure the TIM4 for PWM mode
+ 174:src/main.c    ****   * @param  None
+ 175:src/main.c    ****   * @retval None
+ 176:src/main.c    ****   */
+ 177:src/main.c    **** void TIM_Configuration(void)
+ 178:src/main.c    **** {
+ 417              		.loc 1 178 0
+ 418              		.cfi_startproc
+ 419              		@ args = 0, pretend = 0, frame = 32
+ 420              		@ frame_needed = 1, uses_anonymous_args = 0
+ 421 0000 80B5     		push	{r7, lr}
+ 422              	.LCFI14:
+ 423              		.cfi_def_cfa_offset 8
+ 424              		.cfi_offset 14, -4
+ 425              		.cfi_offset 7, -8
+ 426 0002 88B0     		sub	sp, sp, #32
+ 427              	.LCFI15:
+ 428              		.cfi_def_cfa_offset 40
+ 429 0004 00AF     		add	r7, sp, #0
+ 430              	.LCFI16:
+ 431              		.cfi_def_cfa_register 7
+ 179:src/main.c    ****     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+ 180:src/main.c    ****     TIM_OCInitTypeDef TIM_OCInitStruct;
+ 181:src/main.c    **** 
+ 182:src/main.c    ****     // Let PWM frequency equal 100Hz.
+ 183:src/main.c    ****     // Let period equal 1000. Therefore, timer runs from zero to 1000. Gives 0.1Hz resolution.
+ 184:src/main.c    ****     // Solving for prescaler gives 240.
+ 185:src/main.c    ****     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
+ 432              		.loc 1 185 0
+ 433 0006 07F11403 		add	r3, r7, #20
+ 434 000a 1846     		mov	r0, r3
+ 435 000c FFF7FEFF 		bl	TIM_TimeBaseStructInit
+ 186:src/main.c    ****     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
+ 436              		.loc 1 186 0
+ 437 0010 4FF40073 		mov	r3, #512
+ 438 0014 BB83     		strh	r3, [r7, #28]	@ movhi
+ 187:src/main.c    ****     TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
+ 439              		.loc 1 187 0
+ 440 0016 40F61F53 		movw	r3, #3359
+ 441 001a BB61     		str	r3, [r7, #24]
+ 188:src/main.c    ****     TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
+ 442              		.loc 1 188 0
+ 443 001c 40F2F313 		movw	r3, #499
+ 444 0020 BB82     		strh	r3, [r7, #20]	@ movhi
+ 189:src/main.c    ****     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
+ 445              		.loc 1 189 0
+ 446 0022 4FF00003 		mov	r3, #0
+ 447 0026 FB82     		strh	r3, [r7, #22]	@ movhi
+ 190:src/main.c    ****     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );
+ 448              		.loc 1 190 0
+ 449 0028 4FF40060 		mov	r0, #2048
+ 450 002c C4F20000 		movt	r0, 16384
+ 451 0030 07F11403 		add	r3, r7, #20
+ 452 0034 1946     		mov	r1, r3
+ 453 0036 FFF7FEFF 		bl	TIM_TimeBaseInit
+ 191:src/main.c    ****     
+ 192:src/main.c    ****     TIM_OCStructInit( &TIM_OCInitStruct );
+ 454              		.loc 1 192 0
+ 455 003a 3B46     		mov	r3, r7
+ 456 003c 1846     		mov	r0, r3
+ 457 003e FFF7FEFF 		bl	TIM_OCStructInit
+ 193:src/main.c    ****     TIM_OCInitStruct.TIM_OutputState = TIM_OutputState_Enable;
+ 458              		.loc 1 193 0
+ 459 0042 4FF00103 		mov	r3, #1
+ 460 0046 7B80     		strh	r3, [r7, #2]	@ movhi
+ 194:src/main.c    ****     TIM_OCInitStruct.TIM_OCMode = TIM_OCMode_PWM1;
+ 461              		.loc 1 194 0
+ 462 0048 4FF06003 		mov	r3, #96
+ 463 004c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 195:src/main.c    ****     
+ 196:src/main.c    ****     // Initial duty cycle equals 0%. Value can range from zero to 65535.
+ 197:src/main.c    ****     //TIM_Pulse = TIM4_CCR1 register (16 bits)
+ 198:src/main.c    ****     TIM_OCInitStruct.TIM_Pulse = 0; //(0=Always Off, 65535=Always On)
+ 464              		.loc 1 198 0
+ 465 004e 4FF00003 		mov	r3, #0
+ 466 0052 BB60     		str	r3, [r7, #8]
+ 199:src/main.c    ****  
+ 200:src/main.c    ****     TIM_OC1Init( TIM4, &TIM_OCInitStruct ); // Channel 1  LED
+ 467              		.loc 1 200 0
+ 468 0054 4FF40060 		mov	r0, #2048
+ 469 0058 C4F20000 		movt	r0, 16384
+ 470 005c 3B46     		mov	r3, r7
+ 471 005e 1946     		mov	r1, r3
+ 472 0060 FFF7FEFF 		bl	TIM_OC1Init
+ 201:src/main.c    ****     TIM_OC2Init( TIM4, &TIM_OCInitStruct ); // Channel 2  LED
+ 473              		.loc 1 201 0
+ 474 0064 4FF40060 		mov	r0, #2048
+ 475 0068 C4F20000 		movt	r0, 16384
+ 476 006c 3B46     		mov	r3, r7
+ 477 006e 1946     		mov	r1, r3
+ 478 0070 FFF7FEFF 		bl	TIM_OC2Init
+ 202:src/main.c    ****     TIM_OC3Init( TIM4, &TIM_OCInitStruct ); // Channel 3  LED
+ 479              		.loc 1 202 0
+ 480 0074 4FF40060 		mov	r0, #2048
+ 481 0078 C4F20000 		movt	r0, 16384
+ 482 007c 3B46     		mov	r3, r7
+ 483 007e 1946     		mov	r1, r3
+ 484 0080 FFF7FEFF 		bl	TIM_OC3Init
+ 203:src/main.c    ****     TIM_OC4Init( TIM4, &TIM_OCInitStruct ); // Channel 4  LED
+ 485              		.loc 1 203 0
+ 486 0084 4FF40060 		mov	r0, #2048
+ 487 0088 C4F20000 		movt	r0, 16384
+ 488 008c 3B46     		mov	r3, r7
+ 489 008e 1946     		mov	r1, r3
+ 490 0090 FFF7FEFF 		bl	TIM_OC4Init
+ 204:src/main.c    ****  
+ 205:src/main.c    ****     TIM_Cmd( TIM4, ENABLE );
+ 491              		.loc 1 205 0
+ 492 0094 4FF40060 		mov	r0, #2048
+ 493 0098 C4F20000 		movt	r0, 16384
+ 494 009c 4FF00101 		mov	r1, #1
+ 495 00a0 FFF7FEFF 		bl	TIM_Cmd
+ 206:src/main.c    **** }
+ 496              		.loc 1 206 0
+ 497 00a4 07F12007 		add	r7, r7, #32
+ 498 00a8 BD46     		mov	sp, r7
+ 499 00aa 80BD     		pop	{r7, pc}
+ 500              		.cfi_endproc
+ 501              	.LFE115:
+ 503              		.section	.rodata
+ 504              		.align	2
+ 505              	.LC0:
+ 506 0000 70776D00 		.ascii	"pwm\000"
+ 507              		.section	.text.main,"ax",%progbits
+ 508              		.align	2
+ 509              		.global	main
+ 510              		.thumb
+ 511              		.thumb_func
+ 513              	main:
+ 514              	.LFB116:
+ 207:src/main.c    **** 
+ 208:src/main.c    **** 
+ 209:src/main.c    **** 
+ 210:src/main.c    **** 
+ 211:src/main.c    **** //Main Function
+ 212:src/main.c    **** int main(void)
+ 213:src/main.c    **** {
+ 515              		.loc 1 213 0
+ 516              		.cfi_startproc
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 1, uses_anonymous_args = 0
+ 519 0000 80B5     		push	{r7, lr}
+ 520              	.LCFI17:
+ 521              		.cfi_def_cfa_offset 8
+ 522              		.cfi_offset 14, -4
+ 523              		.cfi_offset 7, -8
+ 524 0002 84B0     		sub	sp, sp, #16
+ 525              	.LCFI18:
+ 526              		.cfi_def_cfa_offset 24
+ 527 0004 04AF     		add	r7, sp, #16
+ 528              	.LCFI19:
+ 529              		.cfi_def_cfa 7, 8
+ 214:src/main.c    **** 
+ 215:src/main.c    **** 	//Call initx(); To Initialize USART & GPIO
+ 216:src/main.c    **** 	RCC_Configuration();
+ 530              		.loc 1 216 0
+ 531 0006 FFF7FEFF 		bl	RCC_Configuration
+ 217:src/main.c    ****  	TIM_Configuration();
+ 532              		.loc 1 217 0
+ 533 000a FFF7FEFF 		bl	TIM_Configuration
+ 218:src/main.c    ****  	GPIO_Configuration();
+ 534              		.loc 1 218 0
+ 535 000e FFF7FEFF 		bl	GPIO_Configuration
+ 219:src/main.c    **** 
+ 220:src/main.c    **** 	//Create Task For USART
+ 221:src/main.c    **** 	xTaskCreate(pwm, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
+ 536              		.loc 1 221 0
+ 537 0012 40F20003 		movw	r3, #:lower16:pwm
+ 538 0016 C0F20003 		movt	r3, #:upper16:pwm
+ 539 001a 4FF00102 		mov	r2, #1
+ 540 001e 0092     		str	r2, [sp, #0]
+ 541 0020 4FF00002 		mov	r2, #0
+ 542 0024 0192     		str	r2, [sp, #4]
+ 543 0026 4FF00002 		mov	r2, #0
+ 544 002a 0292     		str	r2, [sp, #8]
+ 545 002c 4FF00002 		mov	r2, #0
+ 546 0030 0392     		str	r2, [sp, #12]
+ 547 0032 1846     		mov	r0, r3
+ 548 0034 40F20001 		movw	r1, #:lower16:.LC0
+ 549 0038 C0F20001 		movt	r1, #:upper16:.LC0
+ 550 003c 4FF08002 		mov	r2, #128
+ 551 0040 4FF00003 		mov	r3, #0
+ 552 0044 FFF7FEFF 		bl	xTaskGenericCreate
+ 222:src/main.c    **** 
+ 223:src/main.c    **** 	//Call Scheduler
+ 224:src/main.c    **** 	vTaskStartScheduler();
+ 553              		.loc 1 224 0
+ 554 0048 FFF7FEFF 		bl	vTaskStartScheduler
+ 555 004c 4FF00003 		mov	r3, #0
+ 225:src/main.c    **** 
+ 226:src/main.c    **** }
+ 556              		.loc 1 226 0
+ 557 0050 1846     		mov	r0, r3
+ 558 0052 BD46     		mov	sp, r7
+ 559 0054 80BD     		pop	{r7, pc}
+ 560              		.cfi_endproc
+ 561              	.LFE116:
+ 563 0056 00BF     		.text
+ 564              	.Letext0:
+ 565              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 566              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 567              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
+ 568              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
+ 569              		.file 6 "libs/CMSIS/Include/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/ccsyenmC.s:20     .text.pwm:00000000 $t
+     /tmp/ccsyenmC.s:25     .text.pwm:00000000 pwm
+     /tmp/ccsyenmC.s:122    .text.Delay_1ms:00000000 Delay_1ms
+     /tmp/ccsyenmC.s:180    .text.Motor_Control:00000000 Motor_Control
+     /tmp/ccsyenmC.s:117    .text.Delay_1ms:00000000 $t
+     /tmp/ccsyenmC.s:175    .text.Motor_Control:00000000 $t
+     /tmp/ccsyenmC.s:298    .text.RCC_Configuration:00000000 $t
+     /tmp/ccsyenmC.s:303    .text.RCC_Configuration:00000000 RCC_Configuration
+     /tmp/ccsyenmC.s:331    .text.GPIO_Configuration:00000000 $t
+     /tmp/ccsyenmC.s:336    .text.GPIO_Configuration:00000000 GPIO_Configuration
+     /tmp/ccsyenmC.s:410    .text.TIM_Configuration:00000000 $t
+     /tmp/ccsyenmC.s:415    .text.TIM_Configuration:00000000 TIM_Configuration
+     /tmp/ccsyenmC.s:504    .rodata:00000000 $d
+     /tmp/ccsyenmC.s:505    .rodata:00000000 .LC0
+     /tmp/ccsyenmC.s:508    .text.main:00000000 $t
+     /tmp/ccsyenmC.s:513    .text.main:00000000 main
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_AHB1PeriphClockCmd
+RCC_APB1PeriphClockCmd
+GPIO_StructInit
+GPIO_PinAFConfig
+GPIO_Init
+TIM_TimeBaseStructInit
+TIM_TimeBaseInit
+TIM_OCStructInit
+TIM_OC1Init
+TIM_OC2Init
+TIM_OC3Init
+TIM_OC4Init
+TIM_Cmd
+xTaskGenericCreate
+vTaskStartScheduler
