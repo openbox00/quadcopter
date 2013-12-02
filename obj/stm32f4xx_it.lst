@@ -1,0 +1,309 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 6
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.file	"stm32f4xx_it.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.NMI_Handler,"ax",%progbits
+  20              		.align	2
+  21              		.global	NMI_Handler
+  22              		.thumb
+  23              		.thumb_func
+  25              	NMI_Handler:
+  26              	.LFB110:
+  27              		.file 1 "src/stm32f4xx_it.c"
+   1:src/stm32f4xx_it.c **** /**
+   2:src/stm32f4xx_it.c ****   ******************************************************************************
+   3:src/stm32f4xx_it.c ****   * @file    LIS302DL/stm32f4xx_it.c 
+   4:src/stm32f4xx_it.c ****   * @author  MCD Application Team
+   5:src/stm32f4xx_it.c ****   * @version V1.0.0
+   6:src/stm32f4xx_it.c ****   * @date    19-September-2011
+   7:src/stm32f4xx_it.c ****   * @brief   Main Interrupt Service Routines.
+   8:src/stm32f4xx_it.c ****   *          This file provides template for all exceptions handler and 
+   9:src/stm32f4xx_it.c ****   *          peripherals interrupt service routine.
+  10:src/stm32f4xx_it.c ****   ******************************************************************************
+  11:src/stm32f4xx_it.c ****   * @attention
+  12:src/stm32f4xx_it.c ****   *
+  13:src/stm32f4xx_it.c ****   * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  14:src/stm32f4xx_it.c ****   * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  15:src/stm32f4xx_it.c ****   * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  16:src/stm32f4xx_it.c ****   * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  17:src/stm32f4xx_it.c ****   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  18:src/stm32f4xx_it.c ****   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  19:src/stm32f4xx_it.c ****   *
+  20:src/stm32f4xx_it.c ****   * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  21:src/stm32f4xx_it.c ****   ******************************************************************************
+  22:src/stm32f4xx_it.c ****   */ 
+  23:src/stm32f4xx_it.c **** 
+  24:src/stm32f4xx_it.c **** /* Includes ------------------------------------------------------------------*/
+  25:src/stm32f4xx_it.c **** #include "stm32f4xx_it.h"
+  26:src/stm32f4xx_it.c **** #include "main.h"
+  27:src/stm32f4xx_it.c **** 
+  28:src/stm32f4xx_it.c **** /** @addtogroup STM32F4_Discovery_Peripheral_Examples
+  29:src/stm32f4xx_it.c ****   * @{
+  30:src/stm32f4xx_it.c ****   */
+  31:src/stm32f4xx_it.c **** 
+  32:src/stm32f4xx_it.c **** /** @addtogroup SysTick_Example
+  33:src/stm32f4xx_it.c ****   * @{
+  34:src/stm32f4xx_it.c ****   */ 
+  35:src/stm32f4xx_it.c **** 
+  36:src/stm32f4xx_it.c **** /* Private typedef -----------------------------------------------------------*/
+  37:src/stm32f4xx_it.c **** /* Private define ------------------------------------------------------------*/
+  38:src/stm32f4xx_it.c **** /* Private macro -------------------------------------------------------------*/
+  39:src/stm32f4xx_it.c **** /* Private variables ---------------------------------------------------------*/
+  40:src/stm32f4xx_it.c **** //uint8_t Counter  = 0;
+  41:src/stm32f4xx_it.c **** extern __IO int8_t XOffset;
+  42:src/stm32f4xx_it.c **** extern __IO int8_t YOffset;
+  43:src/stm32f4xx_it.c **** extern uint8_t Buffer[4];
+  44:src/stm32f4xx_it.c **** //__IO uint8_t TempAcceleration = 0;
+  45:src/stm32f4xx_it.c **** //uint8_t ClickReg = 0;
+  46:src/stm32f4xx_it.c **** extern __IO uint32_t TimingDelay;
+  47:src/stm32f4xx_it.c **** extern __IO uint8_t SingleClickDetect;
+  48:src/stm32f4xx_it.c **** /* Private function prototypes -----------------------------------------------*/
+  49:src/stm32f4xx_it.c **** /* Private functions ---------------------------------------------------------*/
+  50:src/stm32f4xx_it.c **** 
+  51:src/stm32f4xx_it.c **** /******************************************************************************/
+  52:src/stm32f4xx_it.c **** /*            Cortex-M3 Processor Exceptions Handlers                         */
+  53:src/stm32f4xx_it.c **** /******************************************************************************/
+  54:src/stm32f4xx_it.c **** 
+  55:src/stm32f4xx_it.c **** /**
+  56:src/stm32f4xx_it.c ****   * @brief   This function handles NMI exception.
+  57:src/stm32f4xx_it.c ****   * @param  None
+  58:src/stm32f4xx_it.c ****   * @retval None
+  59:src/stm32f4xx_it.c ****   */
+  60:src/stm32f4xx_it.c **** void NMI_Handler(void)
+  61:src/stm32f4xx_it.c **** {
+  28              		.loc 1 61 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 80B4     		push	{r7}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 4
+  36              		.cfi_offset 7, -4
+  37 0002 00AF     		add	r7, sp, #0
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_register 7
+  62:src/stm32f4xx_it.c **** }
+  40              		.loc 1 62 0
+  41 0004 BD46     		mov	sp, r7
+  42 0006 80BC     		pop	{r7}
+  43 0008 7047     		bx	lr
+  44              		.cfi_endproc
+  45              	.LFE110:
+  47 000a 00BF     		.section	.text.HardFault_Handler,"ax",%progbits
+  48              		.align	2
+  49              		.global	HardFault_Handler
+  50              		.thumb
+  51              		.thumb_func
+  53              	HardFault_Handler:
+  54              	.LFB111:
+  63:src/stm32f4xx_it.c **** 
+  64:src/stm32f4xx_it.c **** /**
+  65:src/stm32f4xx_it.c ****   * @brief  This function handles Hard Fault exception.
+  66:src/stm32f4xx_it.c ****   * @param  None
+  67:src/stm32f4xx_it.c ****   * @retval None
+  68:src/stm32f4xx_it.c ****   */
+  69:src/stm32f4xx_it.c **** void HardFault_Handler(void)
+  70:src/stm32f4xx_it.c **** {
+  55              		.loc 1 70 0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 1, uses_anonymous_args = 0
+  59              		@ link register save eliminated.
+  60 0000 80B4     		push	{r7}
+  61              	.LCFI2:
+  62              		.cfi_def_cfa_offset 4
+  63              		.cfi_offset 7, -4
+  64 0002 00AF     		add	r7, sp, #0
+  65              	.LCFI3:
+  66              		.cfi_def_cfa_register 7
+  67              	.L3:
+  71:src/stm32f4xx_it.c ****   /* Go to infinite loop when Hard Fault exception occurs */
+  72:src/stm32f4xx_it.c ****   while (1)
+  73:src/stm32f4xx_it.c ****   {
+  74:src/stm32f4xx_it.c ****   }
+  68              		.loc 1 74 0 discriminator 1
+  69 0004 FEE7     		b	.L3
+  70              		.cfi_endproc
+  71              	.LFE111:
+  73 0006 00BF     		.section	.text.MemManage_Handler,"ax",%progbits
+  74              		.align	2
+  75              		.global	MemManage_Handler
+  76              		.thumb
+  77              		.thumb_func
+  79              	MemManage_Handler:
+  80              	.LFB112:
+  75:src/stm32f4xx_it.c **** }
+  76:src/stm32f4xx_it.c **** 
+  77:src/stm32f4xx_it.c **** /**
+  78:src/stm32f4xx_it.c ****   * @brief  This function handles Memory Manage exception.
+  79:src/stm32f4xx_it.c ****   * @param  None
+  80:src/stm32f4xx_it.c ****   * @retval None
+  81:src/stm32f4xx_it.c ****   */
+  82:src/stm32f4xx_it.c **** void MemManage_Handler(void)
+  83:src/stm32f4xx_it.c **** {
+  81              		.loc 1 83 0
+  82              		.cfi_startproc
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 1, uses_anonymous_args = 0
+  85              		@ link register save eliminated.
+  86 0000 80B4     		push	{r7}
+  87              	.LCFI4:
+  88              		.cfi_def_cfa_offset 4
+  89              		.cfi_offset 7, -4
+  90 0002 00AF     		add	r7, sp, #0
+  91              	.LCFI5:
+  92              		.cfi_def_cfa_register 7
+  93              	.L5:
+  84:src/stm32f4xx_it.c ****   /* Go to infinite loop when Memory Manage exception occurs */
+  85:src/stm32f4xx_it.c ****   while (1)
+  86:src/stm32f4xx_it.c ****   {
+  87:src/stm32f4xx_it.c ****   }
+  94              		.loc 1 87 0 discriminator 1
+  95 0004 FEE7     		b	.L5
+  96              		.cfi_endproc
+  97              	.LFE112:
+  99 0006 00BF     		.section	.text.BusFault_Handler,"ax",%progbits
+ 100              		.align	2
+ 101              		.global	BusFault_Handler
+ 102              		.thumb
+ 103              		.thumb_func
+ 105              	BusFault_Handler:
+ 106              	.LFB113:
+  88:src/stm32f4xx_it.c **** }
+  89:src/stm32f4xx_it.c **** 
+  90:src/stm32f4xx_it.c **** /**
+  91:src/stm32f4xx_it.c ****   * @brief  This function handles Bus Fault exception.
+  92:src/stm32f4xx_it.c ****   * @param  None
+  93:src/stm32f4xx_it.c ****   * @retval None
+  94:src/stm32f4xx_it.c ****   */
+  95:src/stm32f4xx_it.c **** void BusFault_Handler(void)
+  96:src/stm32f4xx_it.c **** {
+ 107              		.loc 1 96 0
+ 108              		.cfi_startproc
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 1, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+ 112 0000 80B4     		push	{r7}
+ 113              	.LCFI6:
+ 114              		.cfi_def_cfa_offset 4
+ 115              		.cfi_offset 7, -4
+ 116 0002 00AF     		add	r7, sp, #0
+ 117              	.LCFI7:
+ 118              		.cfi_def_cfa_register 7
+ 119              	.L7:
+  97:src/stm32f4xx_it.c ****   /* Go to infinite loop when Bus Fault exception occurs */
+  98:src/stm32f4xx_it.c ****   while (1)
+  99:src/stm32f4xx_it.c ****   {
+ 100:src/stm32f4xx_it.c ****   }
+ 120              		.loc 1 100 0 discriminator 1
+ 121 0004 FEE7     		b	.L7
+ 122              		.cfi_endproc
+ 123              	.LFE113:
+ 125 0006 00BF     		.section	.text.UsageFault_Handler,"ax",%progbits
+ 126              		.align	2
+ 127              		.global	UsageFault_Handler
+ 128              		.thumb
+ 129              		.thumb_func
+ 131              	UsageFault_Handler:
+ 132              	.LFB114:
+ 101:src/stm32f4xx_it.c **** }
+ 102:src/stm32f4xx_it.c **** 
+ 103:src/stm32f4xx_it.c **** /**
+ 104:src/stm32f4xx_it.c ****   * @brief  This function handles Usage Fault exception.
+ 105:src/stm32f4xx_it.c ****   * @param  None
+ 106:src/stm32f4xx_it.c ****   * @retval None
+ 107:src/stm32f4xx_it.c ****   */
+ 108:src/stm32f4xx_it.c **** void UsageFault_Handler(void)
+ 109:src/stm32f4xx_it.c **** {
+ 133              		.loc 1 109 0
+ 134              		.cfi_startproc
+ 135              		@ args = 0, pretend = 0, frame = 0
+ 136              		@ frame_needed = 1, uses_anonymous_args = 0
+ 137              		@ link register save eliminated.
+ 138 0000 80B4     		push	{r7}
+ 139              	.LCFI8:
+ 140              		.cfi_def_cfa_offset 4
+ 141              		.cfi_offset 7, -4
+ 142 0002 00AF     		add	r7, sp, #0
+ 143              	.LCFI9:
+ 144              		.cfi_def_cfa_register 7
+ 145              	.L9:
+ 110:src/stm32f4xx_it.c ****   /* Go to infinite loop when Usage Fault exception occurs */
+ 111:src/stm32f4xx_it.c ****   while (1)
+ 112:src/stm32f4xx_it.c ****   {
+ 113:src/stm32f4xx_it.c ****   }
+ 146              		.loc 1 113 0 discriminator 1
+ 147 0004 FEE7     		b	.L9
+ 148              		.cfi_endproc
+ 149              	.LFE114:
+ 151 0006 00BF     		.section	.text.DebugMon_Handler,"ax",%progbits
+ 152              		.align	2
+ 153              		.global	DebugMon_Handler
+ 154              		.thumb
+ 155              		.thumb_func
+ 157              	DebugMon_Handler:
+ 158              	.LFB115:
+ 114:src/stm32f4xx_it.c **** }
+ 115:src/stm32f4xx_it.c **** 
+ 116:src/stm32f4xx_it.c **** /**
+ 117:src/stm32f4xx_it.c ****   * @brief  This function handles Debug Monitor exception.
+ 118:src/stm32f4xx_it.c ****   * @param  None
+ 119:src/stm32f4xx_it.c ****   * @retval None
+ 120:src/stm32f4xx_it.c ****   */
+ 121:src/stm32f4xx_it.c **** void DebugMon_Handler(void)
+ 122:src/stm32f4xx_it.c **** {
+ 159              		.loc 1 122 0
+ 160              		.cfi_startproc
+ 161              		@ args = 0, pretend = 0, frame = 0
+ 162              		@ frame_needed = 1, uses_anonymous_args = 0
+ 163              		@ link register save eliminated.
+ 164 0000 80B4     		push	{r7}
+ 165              	.LCFI10:
+ 166              		.cfi_def_cfa_offset 4
+ 167              		.cfi_offset 7, -4
+ 168 0002 00AF     		add	r7, sp, #0
+ 169              	.LCFI11:
+ 170              		.cfi_def_cfa_register 7
+ 123:src/stm32f4xx_it.c **** }
+ 171              		.loc 1 123 0
+ 172 0004 BD46     		mov	sp, r7
+ 173 0006 80BC     		pop	{r7}
+ 174 0008 7047     		bx	lr
+ 175              		.cfi_endproc
+ 176              	.LFE115:
+ 178 000a 00BF     		.text
+ 179              	.Letext0:
+ 180              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 181              		.file 3 "libs/CMSIS/Include/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f4xx_it.c
+     /tmp/ccTKv7xO.s:20     .text.NMI_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:25     .text.NMI_Handler:00000000 NMI_Handler
+     /tmp/ccTKv7xO.s:48     .text.HardFault_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:53     .text.HardFault_Handler:00000000 HardFault_Handler
+     /tmp/ccTKv7xO.s:74     .text.MemManage_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:79     .text.MemManage_Handler:00000000 MemManage_Handler
+     /tmp/ccTKv7xO.s:100    .text.BusFault_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:105    .text.BusFault_Handler:00000000 BusFault_Handler
+     /tmp/ccTKv7xO.s:126    .text.UsageFault_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:131    .text.UsageFault_Handler:00000000 UsageFault_Handler
+     /tmp/ccTKv7xO.s:152    .text.DebugMon_Handler:00000000 $t
+     /tmp/ccTKv7xO.s:157    .text.DebugMon_Handler:00000000 DebugMon_Handler
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

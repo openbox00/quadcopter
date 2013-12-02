@@ -1,30 +1,7 @@
-/**
- * Copyright (C) 2013 Chetan Patil, http://chetanpatil.info
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * 
- * @author Chetan Patil | http://chetanpatil.info
- */
-
 //Example code to loop back the data sent to USART2 on STM32F4DISCOVERY
 
 //Inlcude header files
+
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -32,9 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "main.h"
+
+
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+
 
 #define PWM_MOTOR_MIN 100
 #define PWM_MOTOR_MAX 1000
@@ -44,14 +25,23 @@
 #define PWM_Motor2 TIM4->CCR2   // 無刷 PWM
 #define PWM_Motor3 TIM4->CCR3   // 無刷 PWM
 #define PWM_Motor4 TIM4->CCR4   // 無刷 PWM
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
 
 /* Private function prototypes -----------------------------------------------*/
-void RCC_Configuration(void);
-void TIM_Configuration(void);
-void GPIO_Configuration(void);;
+
+TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+uint16_t PrescalerValue = 0;
+uint8_t Buffer[6];
+__IO uint32_t TimingDelay = 0;
+__IO int8_t XOffset;
+__IO int8_t YOffset;
+
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -162,7 +152,8 @@ void GPIO_Configuration(void)
 
     // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
     GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; //PD12->LED3 PD13->LED4 PD14->LED5 PD15->LED6
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; 
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
@@ -204,22 +195,115 @@ void TIM_Configuration(void)
  
     TIM_Cmd( TIM4, ENABLE );
 }
+/**************************************************************************/
+/**
+  * @brief  Inserts a delay time.
+  * @param  nTime: specifies the delay time length, in milliseconds.
+  * @retval None
+  */
+void Delay(__IO uint32_t nTime)
+{ 
+  TimingDelay = nTime;
 
+  while(TimingDelay != 0);
+}
 
+/**
+  * @brief  Decrements the TimingDelay variable.
+  * @param  None
+  * @retval None
+  */
+void TimingDelay_Decrement(void)
+{
+  if (TimingDelay != 0x00)
+  { 
+    TimingDelay--;
+  }
+}
 
+/**
+  * @brief  MEMS accelerometre management of the timeout situation.
+  * @param  None.
+  * @retval None.
+  */
+uint32_t LIS302DL_TIMEOUT_UserCallback(void)
+{
+  /* MEMS Accelerometer Timeout error occured */
+  while (1)
+  {   
+  }
+}
+
+#ifdef  USE_FULL_ASSERT
+
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
+{ 
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+  /* Infinite loop */
+  while (1)
+  {
+  }
+}
+#endif
+
+void test(void)
+{
+
+	LIS302DL_InitTypeDef  LIS302DL_InitStruct;
+/*	STM_EVAL_LEDInit(LED3);
+	STM_EVAL_LEDInit(LED4);
+  	STM_EVAL_LEDInit(LED5);
+  	STM_EVAL_LEDInit(LED6);
+*/  
+  
+  /* Set configuration of LIS302DL*/
+  LIS302DL_InitStruct.Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
+  LIS302DL_InitStruct.Output_DataRate = LIS302DL_DATARATE_400;
+  LIS302DL_InitStruct.Axes_Enable = LIS302DL_X_ENABLE | LIS302DL_Y_ENABLE | LIS302DL_Z_ENABLE;
+  LIS302DL_InitStruct.Full_Scale = LIS302DL_FULLSCALE_2_3;
+  LIS302DL_InitStruct.Self_Test = LIS302DL_SELFTEST_NORMAL;
+  LIS302DL_Init(&LIS302DL_InitStruct);
+  /* SysTick end of count event each 100ms */
+  SysTick_Config(SystemCoreClock/1000);
+
+  /* Required delay for the MEMS Accelerometre: Turn-on time = 3/Output data Rate 
+                                                             = 3/100 = 30ms */
+  Delay(30);
+  
+
+  LIS302DL_Read(Buffer, LIS302DL_OUT_X_ADDR, 6);
+                  
+  XOffset = Buffer[0];
+  YOffset = Buffer[2];
+
+  while(1)
+  {
+
+  }
+}
 
 //Main Function
 int main(void)
 {
 
 	//Call initx(); To Initialize USART & GPIO
-	RCC_Configuration();
- 	TIM_Configuration();
- 	GPIO_Configuration();
+	//RCC_Configuration();
+ 	//TIM_Configuration();
+ 	//GPIO_Configuration();
 
 	//Create Task For USART
-	xTaskCreate(pwm, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
+	//xTaskCreate(pwm, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
 
+	xTaskCreate(test, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
 	//Call Scheduler
 	vTaskStartScheduler();
 

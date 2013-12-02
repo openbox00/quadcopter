@@ -33,7 +33,8 @@ obj/src/main.o: src/main.c libs/Device/STM32F4xx/Include/stm32f4xx.h \
  FreeRTOS/Source/include/portable.h \
  FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h \
  FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
- FreeRTOS/Source/include/list.h
+ FreeRTOS/Source/include/list.h src/main.h src/stm32f4_discovery.h \
+ src/stm32f4_discovery_lis302dl.h
 
 libs/Device/STM32F4xx/Include/stm32f4xx.h:
 
@@ -118,3 +119,9 @@ FreeRTOS/Source/include/mpu_wrappers.h:
 FreeRTOS/Source/include/task.h:
 
 FreeRTOS/Source/include/list.h:
+
+src/main.h:
+
+src/stm32f4_discovery.h:
+
+src/stm32f4_discovery_lis302dl.h:
