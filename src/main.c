@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "main.h"
+#include "stm32f4xx_conf.h"
 
 
 
@@ -32,15 +33,10 @@
 
 /* Private function prototypes -----------------------------------------------*/
 
-TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint16_t PrescalerValue = 0;
-uint8_t Buffer[6];
-__IO uint32_t TimingDelay = 0;
-__IO int8_t XOffset;
-__IO int8_t YOffset;
+
 
 
 /* Private functions ---------------------------------------------------------*/
@@ -52,25 +48,25 @@ void pwm(void)
   uint16_t brightness = 0;      
   uint16_t who_run = 1;
 
- Delay_1ms(1000);
+ //Delay_1ms(50);
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
 
- Delay_1ms(1000);
+ Delay_1ms(100);
 
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
   
- Delay_1ms(1000);
+ Delay_1ms(100);
 
   while(1)  // Do not exit
   {
    Motor_Control(TEST, TEST, TEST, TEST);
    
-   Delay_1ms(1000);
+   Delay_1ms(100);
 
    Motor_Control(TEST+50, TEST+50, TEST+50, TEST+50);
 
-   Delay_1ms(1000);
+   Delay_1ms(100);
 
 
 
@@ -153,7 +149,7 @@ void GPIO_Configuration(void)
     // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
     GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; //PD12->LED3 PD13->LED4 PD14->LED5 PD15->LED6
 	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; 
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; 
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
@@ -195,115 +191,22 @@ void TIM_Configuration(void)
  
     TIM_Cmd( TIM4, ENABLE );
 }
-/**************************************************************************/
-/**
-  * @brief  Inserts a delay time.
-  * @param  nTime: specifies the delay time length, in milliseconds.
-  * @retval None
-  */
-void Delay(__IO uint32_t nTime)
-{ 
-  TimingDelay = nTime;
 
-  while(TimingDelay != 0);
-}
 
-/**
-  * @brief  Decrements the TimingDelay variable.
-  * @param  None
-  * @retval None
-  */
-void TimingDelay_Decrement(void)
-{
-  if (TimingDelay != 0x00)
-  { 
-    TimingDelay--;
-  }
-}
 
-/**
-  * @brief  MEMS accelerometre management of the timeout situation.
-  * @param  None.
-  * @retval None.
-  */
-uint32_t LIS302DL_TIMEOUT_UserCallback(void)
-{
-  /* MEMS Accelerometer Timeout error occured */
-  while (1)
-  {   
-  }
-}
-
-#ifdef  USE_FULL_ASSERT
-
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t* file, uint32_t line)
-{ 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
-  /* Infinite loop */
-  while (1)
-  {
-  }
-}
-#endif
-
-void test(void)
-{
-
-	LIS302DL_InitTypeDef  LIS302DL_InitStruct;
-/*	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-  	STM_EVAL_LEDInit(LED5);
-  	STM_EVAL_LEDInit(LED6);
-*/  
-  
-  /* Set configuration of LIS302DL*/
-  LIS302DL_InitStruct.Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
-  LIS302DL_InitStruct.Output_DataRate = LIS302DL_DATARATE_400;
-  LIS302DL_InitStruct.Axes_Enable = LIS302DL_X_ENABLE | LIS302DL_Y_ENABLE | LIS302DL_Z_ENABLE;
-  LIS302DL_InitStruct.Full_Scale = LIS302DL_FULLSCALE_2_3;
-  LIS302DL_InitStruct.Self_Test = LIS302DL_SELFTEST_NORMAL;
-  LIS302DL_Init(&LIS302DL_InitStruct);
-  /* SysTick end of count event each 100ms */
-  SysTick_Config(SystemCoreClock/1000);
-
-  /* Required delay for the MEMS Accelerometre: Turn-on time = 3/Output data Rate 
-                                                             = 3/100 = 30ms */
-  Delay(30);
-  
-
-  LIS302DL_Read(Buffer, LIS302DL_OUT_X_ADDR, 6);
-                  
-  XOffset = Buffer[0];
-  YOffset = Buffer[2];
-
-  while(1)
-  {
-
-  }
-}
 
 //Main Function
 int main(void)
 {
 
 	//Call initx(); To Initialize USART & GPIO
-	//RCC_Configuration();
- 	//TIM_Configuration();
- 	//GPIO_Configuration();
+	RCC_Configuration();
+ 	TIM_Configuration();
+ 	GPIO_Configuration();
 
 	//Create Task For USART
-	//xTaskCreate(pwm, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
+	xTaskCreate(pwm, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
 
-	xTaskCreate(test, (signed char*)"pwm", 128, NULL, tskIDLE_PRIORITY+1, NULL);
 	//Call Scheduler
 	vTaskStartScheduler();
 

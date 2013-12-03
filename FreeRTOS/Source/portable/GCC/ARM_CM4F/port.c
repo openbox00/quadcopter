@@ -71,8 +71,6 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "../../../src/stm32f4xx_it.h"
-#include "../../../src/main.h"
 
 #ifndef __VFP_FP__
 	#error This port can only be used when the project options are configured to enable hardware floating point support.
@@ -128,15 +126,6 @@ static void vPortStartFirstTask( void ) __attribute__ (( naked ));
  */
  static void vPortEnableVFP( void ) __attribute__ (( naked ));
 
-
-uint8_t Counter  = 0;
-extern __IO int8_t XOffset;
-extern __IO int8_t YOffset;
-extern uint8_t Buffer[4];
-__IO uint8_t TempAcceleration = 0;
-uint8_t ClickReg = 0;
-extern __IO uint32_t TimingDelay;
-extern __IO uint8_t SingleClickDetect;
 
 /*-----------------------------------------------------------*/
 
@@ -326,130 +315,7 @@ unsigned long ulDummy;
 		vTaskIncrementTick();
 	}
 	portCLEAR_INTERRUPT_MASK_FROM_ISR( ulDummy );
-  uint8_t temp1, temp2 = 0;
-  
-  if (TimingDelay != 0x00)
-  {
-    TimingDelay_Decrement();
-  }
-  else
-  {
-    Counter ++;
-    if (Counter == 10)
-    {
-      Buffer[0] = 0;
-      Buffer[2] = 0;
-
-      LIS302DL_Read(Buffer, LIS302DL_OUT_X_ADDR, 6);
-      /* Remove the offsets values from data */
-      Buffer[0] -= XOffset;
-      Buffer[2] -= YOffset;
-
-      /* Update autoreload and capture compare registers value*/
-      temp1 = ABS((int8_t)(Buffer[0]));
-      temp2 = ABS((int8_t)(Buffer[2]));
-      TempAcceleration = MAX(temp1, temp2);
-
-      if(TempAcceleration != 0)
-      {
-        if ((int8_t)Buffer[0] < -2)
-        {
-
-        	STM_EVAL_LEDOn(LED6);
-
-
-        	if ((int8_t)Buffer[0] <= 2)
-        	{
-        		STM_EVAL_LEDOff(LED3);
-        	}
-
-        	if ((int8_t)Buffer[2] <= 2)
-        	{
-        		STM_EVAL_LEDOff(LED4);
-        	}
-
-        	if ((int8_t)Buffer[2] >= -2)
-        	{
-        		STM_EVAL_LEDOff(LED5);
-        	}
-
-        }
-        if ((int8_t)Buffer[0] > 2)
-        {
-
-        			STM_EVAL_LEDOn(LED3);
-
-        			if ((int8_t)Buffer[2] <= 2)
-        			{
-        			STM_EVAL_LEDOff(LED4);
-        			}
-
-        			if ((int8_t)Buffer[2] >= -2)
-        			{
-                	STM_EVAL_LEDOff(LED5);
-        			}
-
-        			if ((int8_t)Buffer[0] >= -2)
-        			{
-                	STM_EVAL_LEDOff(LED6);
-        			}
-
-        }
-        if ((int8_t)Buffer[2] > 2)
-        {
-
-        			STM_EVAL_LEDOn(LED4);
-
-        			if ((int8_t)Buffer[0] <= 2)
-        			{
-        				STM_EVAL_LEDOff(LED3);
-        			}
-
-        			if ((int8_t)Buffer[2] >= -2)
-        			{
-        				STM_EVAL_LEDOff(LED5);
-        			}
-
-        			if ((int8_t)Buffer[0] >= -2)
-        			{
-        				STM_EVAL_LEDOff(LED6);
-        			}
-
-        }
-        if ((int8_t)Buffer[2] < -2)
-        {
-
-        			STM_EVAL_LEDOn(LED5);
-
-        			if ((int8_t)Buffer[0] <= 2)
-        			{
-        				STM_EVAL_LEDOff(LED3);
-        			}
-
-        			if ((int8_t)Buffer[2] <= 2)
-        			{
-        			STM_EVAL_LEDOff(LED4);
-        			}
-
-        			if ((int8_t)Buffer[0] >= -2)
-        			{
-        				STM_EVAL_LEDOff(LED6);
-        			}
-        }
-      }
-      else
-             {
-             	STM_EVAL_LEDOff(LED3);
-             	STM_EVAL_LEDOff(LED4);
-             	STM_EVAL_LEDOff(LED5);
-             	STM_EVAL_LEDOff(LED6);
-
-             }
-      Counter = 0x00;
-    }
-  }
 }
-
 /*-----------------------------------------------------------*/
 
 /*

@@ -421,16 +421,16 @@
  271              		.file 4 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_dbgmcu.c
-     /tmp/ccFwqHAF.s:20     .text.DBGMCU_GetREVID:00000000 $t
-     /tmp/ccFwqHAF.s:25     .text.DBGMCU_GetREVID:00000000 DBGMCU_GetREVID
-     /tmp/ccFwqHAF.s:54     .text.DBGMCU_GetDEVID:00000000 $t
-     /tmp/ccFwqHAF.s:59     .text.DBGMCU_GetDEVID:00000000 DBGMCU_GetDEVID
-     /tmp/ccFwqHAF.s:88     .text.DBGMCU_Config:00000000 $t
-     /tmp/ccFwqHAF.s:93     .text.DBGMCU_Config:00000000 DBGMCU_Config
-     /tmp/ccFwqHAF.s:148    .text.DBGMCU_APB1PeriphConfig:00000000 $t
-     /tmp/ccFwqHAF.s:153    .text.DBGMCU_APB1PeriphConfig:00000000 DBGMCU_APB1PeriphConfig
-     /tmp/ccFwqHAF.s:208    .text.DBGMCU_APB2PeriphConfig:00000000 $t
-     /tmp/ccFwqHAF.s:213    .text.DBGMCU_APB2PeriphConfig:00000000 DBGMCU_APB2PeriphConfig
+     /tmp/ccYs34fW.s:20     .text.DBGMCU_GetREVID:00000000 $t
+     /tmp/ccYs34fW.s:25     .text.DBGMCU_GetREVID:00000000 DBGMCU_GetREVID
+     /tmp/ccYs34fW.s:54     .text.DBGMCU_GetDEVID:00000000 $t
+     /tmp/ccYs34fW.s:59     .text.DBGMCU_GetDEVID:00000000 DBGMCU_GetDEVID
+     /tmp/ccYs34fW.s:88     .text.DBGMCU_Config:00000000 $t
+     /tmp/ccYs34fW.s:93     .text.DBGMCU_Config:00000000 DBGMCU_Config
+     /tmp/ccYs34fW.s:148    .text.DBGMCU_APB1PeriphConfig:00000000 $t
+     /tmp/ccYs34fW.s:153    .text.DBGMCU_APB1PeriphConfig:00000000 DBGMCU_APB1PeriphConfig
+     /tmp/ccYs34fW.s:208    .text.DBGMCU_APB2PeriphConfig:00000000 $t
+     /tmp/ccYs34fW.s:213    .text.DBGMCU_APB2PeriphConfig:00000000 DBGMCU_APB2PeriphConfig
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

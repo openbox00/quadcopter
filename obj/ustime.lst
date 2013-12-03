@@ -371,18 +371,18 @@
  300              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 ustime.c
-     /tmp/ccTac8Mi.s:20     .text.get_us_time:00000000 $t
-     /tmp/ccTac8Mi.s:25     .text.get_us_time:00000000 get_us_time
-     /tmp/ccTac8Mi.s:287    .bss.t0.7203:00000000 t0.7203
-     /tmp/ccTac8Mi.s:293    .bss.tickcount.7204:00000000 tickcount.7204
-     /tmp/ccTac8Mi.s:101    .text.delay_us:00000000 $t
-     /tmp/ccTac8Mi.s:106    .text.delay_us:00000000 delay_us
-     /tmp/ccTac8Mi.s:183    .text.delay_ms:00000000 $t
-     /tmp/ccTac8Mi.s:188    .text.delay_ms:00000000 delay_ms
-     /tmp/ccTac8Mi.s:220    .text.init_us_timer:00000000 $t
-     /tmp/ccTac8Mi.s:225    .text.init_us_timer:00000000 init_us_timer
-     /tmp/ccTac8Mi.s:284    .bss.t0.7203:00000000 $d
-     /tmp/ccTac8Mi.s:290    .bss.tickcount.7204:00000000 $d
+     /tmp/ccwX1YLv.s:20     .text.get_us_time:00000000 $t
+     /tmp/ccwX1YLv.s:25     .text.get_us_time:00000000 get_us_time
+     /tmp/ccwX1YLv.s:287    .bss.t0.7203:00000000 t0.7203
+     /tmp/ccwX1YLv.s:293    .bss.tickcount.7204:00000000 tickcount.7204
+     /tmp/ccwX1YLv.s:101    .text.delay_us:00000000 $t
+     /tmp/ccwX1YLv.s:106    .text.delay_us:00000000 delay_us
+     /tmp/ccwX1YLv.s:183    .text.delay_ms:00000000 $t
+     /tmp/ccwX1YLv.s:188    .text.delay_ms:00000000 delay_ms
+     /tmp/ccwX1YLv.s:220    .text.init_us_timer:00000000 $t
+     /tmp/ccwX1YLv.s:225    .text.init_us_timer:00000000 init_us_timer
+     /tmp/ccwX1YLv.s:284    .bss.t0.7203:00000000 $d
+     /tmp/ccwX1YLv.s:290    .bss.tickcount.7204:00000000 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
