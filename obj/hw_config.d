@@ -1,6 +1,7 @@
-obj/src/main.o: src/main.c libs/Device/STM32F4xx/Include/stm32f4xx.h \
- libs/CMSIS/Include/core_cm4.h libs/CMSIS/Include/core_cmInstr.h \
- libs/CMSIS/Include/core_cmFunc.h libs/CMSIS/Include/core_cm4_simd.h \
+obj/src/hw_config.o: src/hw_config.c src/hw_config.h \
+ libs/Device/STM32F4xx/Include/stm32f4xx.h libs/CMSIS/Include/core_cm4.h \
+ libs/CMSIS/Include/core_cmInstr.h libs/CMSIS/Include/core_cmFunc.h \
+ libs/CMSIS/Include/core_cm4_simd.h \
  libs/Device/STM32F4xx/Include/system_stm32f4xx.h src/stm32f4xx_conf.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_adc.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_can.h \
@@ -27,15 +28,10 @@ obj/src/main.o: src/main.c libs/Device/STM32F4xx/Include/stm32f4xx.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h \
- libs/STM32F4xx_StdPeriph_Driver/inc/misc.h \
- FreeRTOS/Source/include/FreeRTOS.h FreeRTOS/Source/include/projdefs.h \
- FreeRTOS/Source/include/FreeRTOSConfig.h src/ustime.h \
- FreeRTOS/Source/include/portable.h \
- FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h \
- FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
- FreeRTOS/Source/include/list.h FreeRTOS/Source/include/semphr.h \
- FreeRTOS/Source/include/queue.h src/hw_config.h src/stm32f4_discovery.h \
- src/stm32f4_discovery_lis302dl.h src/main.h
+ libs/STM32F4xx_StdPeriph_Driver/inc/misc.h src/stm32f4_discovery.h \
+ src/stm32f4_discovery_lis302dl.h
+
+src/hw_config.h:
 
 libs/Device/STM32F4xx/Include/stm32f4xx.h:
 
@@ -103,32 +99,6 @@ libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h:
 
 libs/STM32F4xx_StdPeriph_Driver/inc/misc.h:
 
-FreeRTOS/Source/include/FreeRTOS.h:
-
-FreeRTOS/Source/include/projdefs.h:
-
-FreeRTOS/Source/include/FreeRTOSConfig.h:
-
-src/ustime.h:
-
-FreeRTOS/Source/include/portable.h:
-
-FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h:
-
-FreeRTOS/Source/include/mpu_wrappers.h:
-
-FreeRTOS/Source/include/task.h:
-
-FreeRTOS/Source/include/list.h:
-
-FreeRTOS/Source/include/semphr.h:
-
-FreeRTOS/Source/include/queue.h:
-
-src/hw_config.h:
-
 src/stm32f4_discovery.h:
 
 src/stm32f4_discovery_lis302dl.h:
-
-src/main.h:
