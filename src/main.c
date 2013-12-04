@@ -44,6 +44,8 @@
 #define DELAY 125     /* msec */
 #define queueSIZE	6
 
+/* angle */
+#define G 2
 /* Private macro -------------------------------------------------------------*/
 /*********************************************************************************************************/
 
@@ -271,9 +273,9 @@ int main(void)
 	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED4", configMINIMAL_STACK_SIZE, (void *)LEDS[1],tskIDLE_PRIORITY, &xLED_Tasks[1] );
 	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED5", configMINIMAL_STACK_SIZE, (void *)LEDS[2],tskIDLE_PRIORITY, &xLED_Tasks[2] );
 	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED6", configMINIMAL_STACK_SIZE, (void *)LEDS[3],tskIDLE_PRIORITY, &xLED_Tasks[3] );
-	xTaskCreate( vSWITCHTask, ( signed portCHAR * ) "SWITCH", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	//xTaskCreate( vSWITCHTask, ( signed portCHAR * ) "SWITCH", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate( vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, &xMEMS_Task );
-	xTaskCreate( vBALANCETask, ( signed portCHAR * ) "BALANCE", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, &xBALANCE_Task );
+	//xTaskCreate( vBALANCETask, ( signed portCHAR * ) "BALANCE", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, &xBALANCE_Task );
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -298,15 +300,23 @@ void vMEMSTask(void *pvParameters)
 	__IO int8_t XOffset;
 	__IO int8_t YOffset;
 
-      Buffer_x[0] = 0;
-      Buffer_y[0] = 0;
-
-  	uint8_t TempAcceleration = 0;               
-  	XOffset = Buffer_x[0];
-  	YOffset = Buffer_y[0];
 
 	int8_t temp1 = 0;
 	int8_t temp2 = 0;
+
+  	uint8_t TempAcceleration = 0;   
+
+	/* reset offset */
+
+
+  	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
+	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
+            
+  	XOffset = Buffer_x[0];
+  	YOffset = Buffer_y[0];
+	/* reset */
+
+
 
 for( ;; )
 {
@@ -326,104 +336,92 @@ for( ;; )
       temp2 = ABS((int8_t)(Buffer_y[0]));
       TempAcceleration = MAX(temp1, temp2);
 	
-   /************************************************
-	* buffer value error can work right
-
-   *****************************************************/
-
 	if(TempAcceleration != 0)
       {
 	
-        if ((int8_t)Buffer_x[0] < -2)
+        if ((int8_t)Buffer_x[0] < -G)
         {
 				STM_EVAL_LEDOn(LED4);
 
 
-                if ((int8_t)Buffer_x[0] <= 2)
+                if ((int8_t)Buffer_x[0] <= G)
                 {
                         STM_EVAL_LEDOff(LED3);
 
                 }
 
-                if ((int8_t)Buffer_y[0] <= 2)
+                if ((int8_t)Buffer_y[0] <= G)
                 {
                        STM_EVAL_LEDOff(LED6);
                 }
 
-                if ((int8_t)Buffer_y[0] >= -2)
+                if ((int8_t)Buffer_y[0] >= -G)
                 {
                         STM_EVAL_LEDOff(LED5);
                 }
 
         }
-        if ((int8_t)Buffer_x[0] > 2)
+        if ((int8_t)Buffer_x[0] > G)
         {
 				STM_EVAL_LEDOn(LED5);
 
-                                if ((int8_t)Buffer_y[0] <= 2)
+                                if ((int8_t)Buffer_y[0] <= G)
                                 {
                                 STM_EVAL_LEDOff(LED4);
                                 }
 
-                                if ((int8_t)Buffer_y[0] >= -2)
+                                if ((int8_t)Buffer_y[0] >= -G)
                                 {
                         		STM_EVAL_LEDOff(LED3);
                                 }
 
-                                if ((int8_t)Buffer_x[0] >= -2)
+                                if ((int8_t)Buffer_x[0] >= -G)
                                 {
 		                        STM_EVAL_LEDOff(LED6);
                                 }
 
         }
-        if ((int8_t)Buffer_y[0] > 2)
+        if ((int8_t)Buffer_y[0] > G)
         {
 
 				STM_EVAL_LEDOn(LED3);
 
-                                if ((int8_t)Buffer_x[0] <= 2)
+                                if ((int8_t)Buffer_x[0] <= G)
                                 {
                                         STM_EVAL_LEDOff(LED4);
                                 }
 
-                                if ((int8_t)Buffer_y[0] >= -2)
+                                if ((int8_t)Buffer_y[0] >= -G)
                                 {
                                         STM_EVAL_LEDOff(LED5);
                                 }
 
-                                if ((int8_t)Buffer_x[0] >= -2)
+                                if ((int8_t)Buffer_x[0] >= -G)
                                 {
                                         STM_EVAL_LEDOff(LED6);
                                 }
 
         }
-        if ((int8_t)Buffer_y[0] < -2)
+        if ((int8_t)Buffer_y[0] < -G)
         {
 
 			STM_EVAL_LEDOn(LED6);
 
-                                if ((int8_t)Buffer_x[0] <= 2)
+                                if ((int8_t)Buffer_x[0] <= G)
                                 {
                                         STM_EVAL_LEDOff(LED3);
                                 }
 
-                                if ((int8_t)Buffer_y[0] <= 2)
+                                if ((int8_t)Buffer_y[0] <= G)
                                 {
                                STM_EVAL_LEDOff(LED4);
                                 }
 
-                                if ((int8_t)Buffer_x[0] >= -2)
+                                if ((int8_t)Buffer_x[0] >= -G)
                                 {
                                 STM_EVAL_LEDOff(LED5);
                                 }
         }
-		else{/*
-	STM_EVAL_LEDOn(LED4);
-	STM_EVAL_LEDOn(LED3);
-	STM_EVAL_LEDOn(LED5);
-	STM_EVAL_LEDOn(LED6);
-*/
-		}
 		counter = 0x00;
 
     }
