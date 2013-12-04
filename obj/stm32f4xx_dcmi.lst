@@ -1399,42 +1399,42 @@
  901              	.LFE124:
  903              		.text
  904              	.Letext0:
- 905              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 905              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  906              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  907              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dcmi.h"
  908              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_dcmi.c
-     /tmp/ccRk6vuX.s:20     .text.DCMI_DeInit:00000000 $t
-     /tmp/ccRk6vuX.s:25     .text.DCMI_DeInit:00000000 DCMI_DeInit
-     /tmp/ccRk6vuX.s:83     .text.DCMI_Init:00000000 $t
-     /tmp/ccRk6vuX.s:88     .text.DCMI_Init:00000000 DCMI_Init
-     /tmp/ccRk6vuX.s:183    .text.DCMI_StructInit:00000000 $t
-     /tmp/ccRk6vuX.s:188    .text.DCMI_StructInit:00000000 DCMI_StructInit
-     /tmp/ccRk6vuX.s:243    .text.DCMI_CROPConfig:00000000 $t
-     /tmp/ccRk6vuX.s:248    .text.DCMI_CROPConfig:00000000 DCMI_CROPConfig
-     /tmp/ccRk6vuX.s:301    .text.DCMI_CROPCmd:00000000 $t
-     /tmp/ccRk6vuX.s:306    .text.DCMI_CROPCmd:00000000 DCMI_CROPCmd
-     /tmp/ccRk6vuX.s:357    .text.DCMI_SetEmbeddedSynchroCodes:00000000 $t
-     /tmp/ccRk6vuX.s:362    .text.DCMI_SetEmbeddedSynchroCodes:00000000 DCMI_SetEmbeddedSynchroCodes
-     /tmp/ccRk6vuX.s:414    .text.DCMI_JPEGCmd:00000000 $t
-     /tmp/ccRk6vuX.s:419    .text.DCMI_JPEGCmd:00000000 DCMI_JPEGCmd
-     /tmp/ccRk6vuX.s:470    .text.DCMI_Cmd:00000000 $t
-     /tmp/ccRk6vuX.s:475    .text.DCMI_Cmd:00000000 DCMI_Cmd
-     /tmp/ccRk6vuX.s:526    .text.DCMI_CaptureCmd:00000000 $t
-     /tmp/ccRk6vuX.s:531    .text.DCMI_CaptureCmd:00000000 DCMI_CaptureCmd
-     /tmp/ccRk6vuX.s:582    .text.DCMI_ReadData:00000000 $t
-     /tmp/ccRk6vuX.s:587    .text.DCMI_ReadData:00000000 DCMI_ReadData
-     /tmp/ccRk6vuX.s:614    .text.DCMI_ITConfig:00000000 $t
-     /tmp/ccRk6vuX.s:619    .text.DCMI_ITConfig:00000000 DCMI_ITConfig
-     /tmp/ccRk6vuX.s:676    .text.DCMI_GetFlagStatus:00000000 $t
-     /tmp/ccRk6vuX.s:681    .text.DCMI_GetFlagStatus:00000000 DCMI_GetFlagStatus
-     /tmp/ccRk6vuX.s:766    .text.DCMI_ClearFlag:00000000 $t
-     /tmp/ccRk6vuX.s:771    .text.DCMI_ClearFlag:00000000 DCMI_ClearFlag
-     /tmp/ccRk6vuX.s:804    .text.DCMI_GetITStatus:00000000 $t
-     /tmp/ccRk6vuX.s:809    .text.DCMI_GetITStatus:00000000 DCMI_GetITStatus
-     /tmp/ccRk6vuX.s:866    .text.DCMI_ClearITPendingBit:00000000 $t
-     /tmp/ccRk6vuX.s:871    .text.DCMI_ClearITPendingBit:00000000 DCMI_ClearITPendingBit
+     /tmp/cct1sum9.s:20     .text.DCMI_DeInit:00000000 $t
+     /tmp/cct1sum9.s:25     .text.DCMI_DeInit:00000000 DCMI_DeInit
+     /tmp/cct1sum9.s:83     .text.DCMI_Init:00000000 $t
+     /tmp/cct1sum9.s:88     .text.DCMI_Init:00000000 DCMI_Init
+     /tmp/cct1sum9.s:183    .text.DCMI_StructInit:00000000 $t
+     /tmp/cct1sum9.s:188    .text.DCMI_StructInit:00000000 DCMI_StructInit
+     /tmp/cct1sum9.s:243    .text.DCMI_CROPConfig:00000000 $t
+     /tmp/cct1sum9.s:248    .text.DCMI_CROPConfig:00000000 DCMI_CROPConfig
+     /tmp/cct1sum9.s:301    .text.DCMI_CROPCmd:00000000 $t
+     /tmp/cct1sum9.s:306    .text.DCMI_CROPCmd:00000000 DCMI_CROPCmd
+     /tmp/cct1sum9.s:357    .text.DCMI_SetEmbeddedSynchroCodes:00000000 $t
+     /tmp/cct1sum9.s:362    .text.DCMI_SetEmbeddedSynchroCodes:00000000 DCMI_SetEmbeddedSynchroCodes
+     /tmp/cct1sum9.s:414    .text.DCMI_JPEGCmd:00000000 $t
+     /tmp/cct1sum9.s:419    .text.DCMI_JPEGCmd:00000000 DCMI_JPEGCmd
+     /tmp/cct1sum9.s:470    .text.DCMI_Cmd:00000000 $t
+     /tmp/cct1sum9.s:475    .text.DCMI_Cmd:00000000 DCMI_Cmd
+     /tmp/cct1sum9.s:526    .text.DCMI_CaptureCmd:00000000 $t
+     /tmp/cct1sum9.s:531    .text.DCMI_CaptureCmd:00000000 DCMI_CaptureCmd
+     /tmp/cct1sum9.s:582    .text.DCMI_ReadData:00000000 $t
+     /tmp/cct1sum9.s:587    .text.DCMI_ReadData:00000000 DCMI_ReadData
+     /tmp/cct1sum9.s:614    .text.DCMI_ITConfig:00000000 $t
+     /tmp/cct1sum9.s:619    .text.DCMI_ITConfig:00000000 DCMI_ITConfig
+     /tmp/cct1sum9.s:676    .text.DCMI_GetFlagStatus:00000000 $t
+     /tmp/cct1sum9.s:681    .text.DCMI_GetFlagStatus:00000000 DCMI_GetFlagStatus
+     /tmp/cct1sum9.s:766    .text.DCMI_ClearFlag:00000000 $t
+     /tmp/cct1sum9.s:771    .text.DCMI_ClearFlag:00000000 DCMI_ClearFlag
+     /tmp/cct1sum9.s:804    .text.DCMI_GetITStatus:00000000 $t
+     /tmp/cct1sum9.s:809    .text.DCMI_GetITStatus:00000000 DCMI_GetITStatus
+     /tmp/cct1sum9.s:866    .text.DCMI_ClearITPendingBit:00000000 $t
+     /tmp/cct1sum9.s:871    .text.DCMI_ClearITPendingBit:00000000 DCMI_ClearITPendingBit
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

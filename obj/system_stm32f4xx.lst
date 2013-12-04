@@ -913,21 +913,21 @@
  498              	.LFE112:
  500 01de 00BF     		.text
  501              	.Letext0:
- 502              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 502              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  503              		.file 3 "libs/CMSIS/Include/core_cm4.h"
  504              		.file 4 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 system_stm32f4xx.c
-     /tmp/ccGWzbez.s:24     .data.SystemCoreClock:00000000 SystemCoreClock
-     /tmp/ccGWzbez.s:21     .data.SystemCoreClock:00000000 $d
-     /tmp/ccGWzbez.s:31     .data.AHBPrescTable:00000000 AHBPrescTable
-     /tmp/ccGWzbez.s:28     .data.AHBPrescTable:00000000 $d
-     /tmp/ccGWzbez.s:49     .text.SystemInit:00000000 $t
-     /tmp/ccGWzbez.s:54     .text.SystemInit:00000000 SystemInit
-     /tmp/ccGWzbez.s:296    .text.SetSysClock:00000000 SetSysClock
-     /tmp/ccGWzbez.s:123    .text.SystemCoreClockUpdate:00000000 $t
-     /tmp/ccGWzbez.s:128    .text.SystemCoreClockUpdate:00000000 SystemCoreClockUpdate
-     /tmp/ccGWzbez.s:292    .text.SetSysClock:00000000 $t
+     /tmp/cckgDQia.s:24     .data.SystemCoreClock:00000000 SystemCoreClock
+     /tmp/cckgDQia.s:21     .data.SystemCoreClock:00000000 $d
+     /tmp/cckgDQia.s:31     .data.AHBPrescTable:00000000 AHBPrescTable
+     /tmp/cckgDQia.s:28     .data.AHBPrescTable:00000000 $d
+     /tmp/cckgDQia.s:49     .text.SystemInit:00000000 $t
+     /tmp/cckgDQia.s:54     .text.SystemInit:00000000 SystemInit
+     /tmp/cckgDQia.s:296    .text.SetSysClock:00000000 SetSysClock
+     /tmp/cckgDQia.s:123    .text.SystemCoreClockUpdate:00000000 $t
+     /tmp/cckgDQia.s:128    .text.SystemCoreClockUpdate:00000000 SystemCoreClockUpdate
+     /tmp/cckgDQia.s:292    .text.SetSysClock:00000000 $t
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

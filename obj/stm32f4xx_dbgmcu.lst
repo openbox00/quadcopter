@@ -416,21 +416,21 @@
  265              	.LFE114:
  267 0052 00BF     		.text
  268              	.Letext0:
- 269              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 269              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  270              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  271              		.file 4 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_dbgmcu.c
-     /tmp/ccYs34fW.s:20     .text.DBGMCU_GetREVID:00000000 $t
-     /tmp/ccYs34fW.s:25     .text.DBGMCU_GetREVID:00000000 DBGMCU_GetREVID
-     /tmp/ccYs34fW.s:54     .text.DBGMCU_GetDEVID:00000000 $t
-     /tmp/ccYs34fW.s:59     .text.DBGMCU_GetDEVID:00000000 DBGMCU_GetDEVID
-     /tmp/ccYs34fW.s:88     .text.DBGMCU_Config:00000000 $t
-     /tmp/ccYs34fW.s:93     .text.DBGMCU_Config:00000000 DBGMCU_Config
-     /tmp/ccYs34fW.s:148    .text.DBGMCU_APB1PeriphConfig:00000000 $t
-     /tmp/ccYs34fW.s:153    .text.DBGMCU_APB1PeriphConfig:00000000 DBGMCU_APB1PeriphConfig
-     /tmp/ccYs34fW.s:208    .text.DBGMCU_APB2PeriphConfig:00000000 $t
-     /tmp/ccYs34fW.s:213    .text.DBGMCU_APB2PeriphConfig:00000000 DBGMCU_APB2PeriphConfig
+     /tmp/ccG38te8.s:20     .text.DBGMCU_GetREVID:00000000 $t
+     /tmp/ccG38te8.s:25     .text.DBGMCU_GetREVID:00000000 DBGMCU_GetREVID
+     /tmp/ccG38te8.s:54     .text.DBGMCU_GetDEVID:00000000 $t
+     /tmp/ccG38te8.s:59     .text.DBGMCU_GetDEVID:00000000 DBGMCU_GetDEVID
+     /tmp/ccG38te8.s:88     .text.DBGMCU_Config:00000000 $t
+     /tmp/ccG38te8.s:93     .text.DBGMCU_Config:00000000 DBGMCU_Config
+     /tmp/ccG38te8.s:148    .text.DBGMCU_APB1PeriphConfig:00000000 $t
+     /tmp/ccG38te8.s:153    .text.DBGMCU_APB1PeriphConfig:00000000 DBGMCU_APB1PeriphConfig
+     /tmp/ccG38te8.s:208    .text.DBGMCU_APB2PeriphConfig:00000000 $t
+     /tmp/ccG38te8.s:213    .text.DBGMCU_APB2PeriphConfig:00000000 DBGMCU_APB2PeriphConfig
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

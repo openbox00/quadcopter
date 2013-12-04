@@ -707,7 +707,7 @@
  485              	.LFE114:
  487 016a 00BF     		.text
  488              	.Letext0:
- 489              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 489              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  490              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  491              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
  492              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
@@ -717,16 +717,16 @@
  496              		.file 9 "libs/Device/STM32F4xx/Include/system_stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 hw_config.c
-     /tmp/ccUolNqn.s:20     .text.prvSetupHardware:00000000 $t
-     /tmp/ccUolNqn.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
-     /tmp/ccUolNqn.s:69     .text.prvLED_Config:00000000 prvLED_Config
-     /tmp/ccUolNqn.s:342    .text.prvTIM4_Config:00000000 prvTIM4_Config
-     /tmp/ccUolNqn.s:169    .text.prvMEMS_Config:00000000 prvMEMS_Config
-     /tmp/ccUolNqn.s:64     .text.prvLED_Config:00000000 $t
-     /tmp/ccUolNqn.s:164    .text.prvMEMS_Config:00000000 $t
-     /tmp/ccUolNqn.s:311    .text.LIS302DL_TIMEOUT_UserCallback:00000000 $t
-     /tmp/ccUolNqn.s:316    .text.LIS302DL_TIMEOUT_UserCallback:00000000 LIS302DL_TIMEOUT_UserCallback
-     /tmp/ccUolNqn.s:337    .text.prvTIM4_Config:00000000 $t
+     /tmp/ccEfD9SN.s:20     .text.prvSetupHardware:00000000 $t
+     /tmp/ccEfD9SN.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
+     /tmp/ccEfD9SN.s:69     .text.prvLED_Config:00000000 prvLED_Config
+     /tmp/ccEfD9SN.s:342    .text.prvTIM4_Config:00000000 prvTIM4_Config
+     /tmp/ccEfD9SN.s:169    .text.prvMEMS_Config:00000000 prvMEMS_Config
+     /tmp/ccEfD9SN.s:64     .text.prvLED_Config:00000000 $t
+     /tmp/ccEfD9SN.s:164    .text.prvMEMS_Config:00000000 $t
+     /tmp/ccEfD9SN.s:311    .text.LIS302DL_TIMEOUT_UserCallback:00000000 $t
+     /tmp/ccEfD9SN.s:316    .text.LIS302DL_TIMEOUT_UserCallback:00000000 LIS302DL_TIMEOUT_UserCallback
+     /tmp/ccEfD9SN.s:337    .text.prvTIM4_Config:00000000 $t
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

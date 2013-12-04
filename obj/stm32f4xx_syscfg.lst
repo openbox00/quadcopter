@@ -483,23 +483,23 @@
  304              	.LFE115:
  306 003a 00BF     		.text
  307              	.Letext0:
- 308              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 308              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  309              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  310              		.file 4 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_syscfg.c
-     /tmp/cc5S4Wef.s:20     .text.SYSCFG_DeInit:00000000 $t
-     /tmp/cc5S4Wef.s:25     .text.SYSCFG_DeInit:00000000 SYSCFG_DeInit
-     /tmp/cc5S4Wef.s:54     .text.SYSCFG_MemoryRemapConfig:00000000 $t
-     /tmp/cc5S4Wef.s:59     .text.SYSCFG_MemoryRemapConfig:00000000 SYSCFG_MemoryRemapConfig
-     /tmp/cc5S4Wef.s:92     .text.SYSCFG_EXTILineConfig:00000000 $t
-     /tmp/cc5S4Wef.s:97     .text.SYSCFG_EXTILineConfig:00000000 SYSCFG_EXTILineConfig
-     /tmp/cc5S4Wef.s:179    .text.SYSCFG_ETH_MediaInterfaceConfig:00000000 $t
-     /tmp/cc5S4Wef.s:184    .text.SYSCFG_ETH_MediaInterfaceConfig:00000000 SYSCFG_ETH_MediaInterfaceConfig
-     /tmp/cc5S4Wef.s:216    .text.SYSCFG_CompensationCellCmd:00000000 $t
-     /tmp/cc5S4Wef.s:221    .text.SYSCFG_CompensationCellCmd:00000000 SYSCFG_CompensationCellCmd
-     /tmp/cc5S4Wef.s:254    .text.SYSCFG_GetCompensationCellStatus:00000000 $t
-     /tmp/cc5S4Wef.s:259    .text.SYSCFG_GetCompensationCellStatus:00000000 SYSCFG_GetCompensationCellStatus
+     /tmp/cciFhsrE.s:20     .text.SYSCFG_DeInit:00000000 $t
+     /tmp/cciFhsrE.s:25     .text.SYSCFG_DeInit:00000000 SYSCFG_DeInit
+     /tmp/cciFhsrE.s:54     .text.SYSCFG_MemoryRemapConfig:00000000 $t
+     /tmp/cciFhsrE.s:59     .text.SYSCFG_MemoryRemapConfig:00000000 SYSCFG_MemoryRemapConfig
+     /tmp/cciFhsrE.s:92     .text.SYSCFG_EXTILineConfig:00000000 $t
+     /tmp/cciFhsrE.s:97     .text.SYSCFG_EXTILineConfig:00000000 SYSCFG_EXTILineConfig
+     /tmp/cciFhsrE.s:179    .text.SYSCFG_ETH_MediaInterfaceConfig:00000000 $t
+     /tmp/cciFhsrE.s:184    .text.SYSCFG_ETH_MediaInterfaceConfig:00000000 SYSCFG_ETH_MediaInterfaceConfig
+     /tmp/cciFhsrE.s:216    .text.SYSCFG_CompensationCellCmd:00000000 $t
+     /tmp/cciFhsrE.s:221    .text.SYSCFG_CompensationCellCmd:00000000 SYSCFG_CompensationCellCmd
+     /tmp/cciFhsrE.s:254    .text.SYSCFG_GetCompensationCellStatus:00000000 $t
+     /tmp/cciFhsrE.s:259    .text.SYSCFG_GetCompensationCellStatus:00000000 SYSCFG_GetCompensationCellStatus
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

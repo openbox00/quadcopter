@@ -1484,40 +1484,40 @@
  966              	.LFE123:
  968              		.text
  969              	.Letext0:
- 970              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 970              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  971              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  972              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
  973              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_gpio.c
-     /tmp/cctFqPBd.s:20     .text.GPIO_DeInit:00000000 $t
-     /tmp/cctFqPBd.s:25     .text.GPIO_DeInit:00000000 GPIO_DeInit
-     /tmp/cctFqPBd.s:195    .text.GPIO_Init:00000000 $t
-     /tmp/cctFqPBd.s:200    .text.GPIO_Init:00000000 GPIO_Init
-     /tmp/cctFqPBd.s:372    .text.GPIO_StructInit:00000000 $t
-     /tmp/cctFqPBd.s:377    .text.GPIO_StructInit:00000000 GPIO_StructInit
-     /tmp/cctFqPBd.s:424    .text.GPIO_PinLockConfig:00000000 $t
-     /tmp/cctFqPBd.s:429    .text.GPIO_PinLockConfig:00000000 GPIO_PinLockConfig
-     /tmp/cctFqPBd.s:486    .text.GPIO_ReadInputDataBit:00000000 $t
-     /tmp/cctFqPBd.s:491    .text.GPIO_ReadInputDataBit:00000000 GPIO_ReadInputDataBit
-     /tmp/cctFqPBd.s:542    .text.GPIO_ReadInputData:00000000 $t
-     /tmp/cctFqPBd.s:547    .text.GPIO_ReadInputData:00000000 GPIO_ReadInputData
-     /tmp/cctFqPBd.s:579    .text.GPIO_ReadOutputDataBit:00000000 $t
-     /tmp/cctFqPBd.s:584    .text.GPIO_ReadOutputDataBit:00000000 GPIO_ReadOutputDataBit
-     /tmp/cctFqPBd.s:635    .text.GPIO_ReadOutputData:00000000 $t
-     /tmp/cctFqPBd.s:640    .text.GPIO_ReadOutputData:00000000 GPIO_ReadOutputData
-     /tmp/cctFqPBd.s:672    .text.GPIO_SetBits:00000000 $t
-     /tmp/cctFqPBd.s:677    .text.GPIO_SetBits:00000000 GPIO_SetBits
-     /tmp/cctFqPBd.s:710    .text.GPIO_ResetBits:00000000 $t
-     /tmp/cctFqPBd.s:715    .text.GPIO_ResetBits:00000000 GPIO_ResetBits
-     /tmp/cctFqPBd.s:748    .text.GPIO_WriteBit:00000000 $t
-     /tmp/cctFqPBd.s:753    .text.GPIO_WriteBit:00000000 GPIO_WriteBit
-     /tmp/cctFqPBd.s:799    .text.GPIO_Write:00000000 $t
-     /tmp/cctFqPBd.s:804    .text.GPIO_Write:00000000 GPIO_Write
-     /tmp/cctFqPBd.s:837    .text.GPIO_ToggleBits:00000000 $t
-     /tmp/cctFqPBd.s:842    .text.GPIO_ToggleBits:00000000 GPIO_ToggleBits
-     /tmp/cctFqPBd.s:878    .text.GPIO_PinAFConfig:00000000 $t
-     /tmp/cctFqPBd.s:883    .text.GPIO_PinAFConfig:00000000 GPIO_PinAFConfig
+     /tmp/cctmsvNt.s:20     .text.GPIO_DeInit:00000000 $t
+     /tmp/cctmsvNt.s:25     .text.GPIO_DeInit:00000000 GPIO_DeInit
+     /tmp/cctmsvNt.s:195    .text.GPIO_Init:00000000 $t
+     /tmp/cctmsvNt.s:200    .text.GPIO_Init:00000000 GPIO_Init
+     /tmp/cctmsvNt.s:372    .text.GPIO_StructInit:00000000 $t
+     /tmp/cctmsvNt.s:377    .text.GPIO_StructInit:00000000 GPIO_StructInit
+     /tmp/cctmsvNt.s:424    .text.GPIO_PinLockConfig:00000000 $t
+     /tmp/cctmsvNt.s:429    .text.GPIO_PinLockConfig:00000000 GPIO_PinLockConfig
+     /tmp/cctmsvNt.s:486    .text.GPIO_ReadInputDataBit:00000000 $t
+     /tmp/cctmsvNt.s:491    .text.GPIO_ReadInputDataBit:00000000 GPIO_ReadInputDataBit
+     /tmp/cctmsvNt.s:542    .text.GPIO_ReadInputData:00000000 $t
+     /tmp/cctmsvNt.s:547    .text.GPIO_ReadInputData:00000000 GPIO_ReadInputData
+     /tmp/cctmsvNt.s:579    .text.GPIO_ReadOutputDataBit:00000000 $t
+     /tmp/cctmsvNt.s:584    .text.GPIO_ReadOutputDataBit:00000000 GPIO_ReadOutputDataBit
+     /tmp/cctmsvNt.s:635    .text.GPIO_ReadOutputData:00000000 $t
+     /tmp/cctmsvNt.s:640    .text.GPIO_ReadOutputData:00000000 GPIO_ReadOutputData
+     /tmp/cctmsvNt.s:672    .text.GPIO_SetBits:00000000 $t
+     /tmp/cctmsvNt.s:677    .text.GPIO_SetBits:00000000 GPIO_SetBits
+     /tmp/cctmsvNt.s:710    .text.GPIO_ResetBits:00000000 $t
+     /tmp/cctmsvNt.s:715    .text.GPIO_ResetBits:00000000 GPIO_ResetBits
+     /tmp/cctmsvNt.s:748    .text.GPIO_WriteBit:00000000 $t
+     /tmp/cctmsvNt.s:753    .text.GPIO_WriteBit:00000000 GPIO_WriteBit
+     /tmp/cctmsvNt.s:799    .text.GPIO_Write:00000000 $t
+     /tmp/cctmsvNt.s:804    .text.GPIO_Write:00000000 GPIO_Write
+     /tmp/cctmsvNt.s:837    .text.GPIO_ToggleBits:00000000 $t
+     /tmp/cctmsvNt.s:842    .text.GPIO_ToggleBits:00000000 GPIO_ToggleBits
+     /tmp/cctmsvNt.s:878    .text.GPIO_PinAFConfig:00000000 $t
+     /tmp/cctmsvNt.s:883    .text.GPIO_PinAFConfig:00000000 GPIO_PinAFConfig
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

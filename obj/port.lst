@@ -884,46 +884,46 @@
  567 000e 0000     		.text
  568              	.Letext0:
  569              		.file 2 "FreeRTOS/Source/include/projdefs.h"
- 570              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 570              		.file 3 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  571              		.file 4 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
  572              		.file 5 "libs/CMSIS/Include/core_cm4.h"
  573              		.file 6 "libs/Device/STM32F4xx/Include/system_stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 port.c
-     /tmp/ccvX1Rai.s:24     .rodata.ulKernelPriority:00000000 ulKernelPriority
-     /tmp/ccvX1Rai.s:21     .rodata.ulKernelPriority:00000000 $d
-     /tmp/ccvX1Rai.s:27     .data.uxCriticalNesting:00000000 $d
-     /tmp/ccvX1Rai.s:30     .data.uxCriticalNesting:00000000 uxCriticalNesting
-     /tmp/ccvX1Rai.s:33     .text.pxPortInitialiseStack:00000000 $t
-     /tmp/ccvX1Rai.s:38     .text.pxPortInitialiseStack:00000000 pxPortInitialiseStack
-     /tmp/ccvX1Rai.s:115    .text.SVC_Handler:00000000 $t
-     /tmp/ccvX1Rai.s:120    .text.SVC_Handler:00000000 SVC_Handler
-     /tmp/ccvX1Rai.s:139    .text.SVC_Handler:00000018 pxCurrentTCBConst2
-     /tmp/ccvX1Rai.s:139    .text.SVC_Handler:00000018 $d
-     /tmp/ccvX1Rai.s:148    .text.vPortStartFirstTask:00000000 $t
-     /tmp/ccvX1Rai.s:152    .text.vPortStartFirstTask:00000000 vPortStartFirstTask
-     /tmp/ccvX1Rai.s:176    .text.xPortStartScheduler:00000000 $t
-     /tmp/ccvX1Rai.s:181    .text.xPortStartScheduler:00000000 xPortStartScheduler
-     /tmp/ccvX1Rai.s:503    .text.prvSetupTimerInterrupt:00000000 prvSetupTimerInterrupt
-     /tmp/ccvX1Rai.s:546    .text.vPortEnableVFP:00000000 vPortEnableVFP
-     /tmp/ccvX1Rai.s:239    .text.vPortEndScheduler:00000000 $t
-     /tmp/ccvX1Rai.s:244    .text.vPortEndScheduler:00000000 vPortEndScheduler
-     /tmp/ccvX1Rai.s:266    .text.vPortYieldFromISR:00000000 $t
-     /tmp/ccvX1Rai.s:271    .text.vPortYieldFromISR:00000000 vPortYieldFromISR
-     /tmp/ccvX1Rai.s:298    .text.vPortEnterCritical:00000000 $t
-     /tmp/ccvX1Rai.s:303    .text.vPortEnterCritical:00000000 vPortEnterCritical
-     /tmp/ccvX1Rai.s:340    .text.vPortExitCritical:00000000 $t
-     /tmp/ccvX1Rai.s:345    .text.vPortExitCritical:00000000 vPortExitCritical
-     /tmp/ccvX1Rai.s:389    .text.PendSV_Handler:00000000 $t
-     /tmp/ccvX1Rai.s:394    .text.PendSV_Handler:00000000 PendSV_Handler
-     /tmp/ccvX1Rai.s:437    .text.PendSV_Handler:0000004c pxCurrentTCBConst
-     /tmp/ccvX1Rai.s:437    .text.PendSV_Handler:0000004c $d
-     /tmp/ccvX1Rai.s:446    .text.SysTick_Handler:00000000 $t
-     /tmp/ccvX1Rai.s:451    .text.SysTick_Handler:00000000 SysTick_Handler
-     /tmp/ccvX1Rai.s:499    .text.prvSetupTimerInterrupt:00000000 $t
-     /tmp/ccvX1Rai.s:542    .text.vPortEnableVFP:00000000 $t
-     /tmp/ccvX1Rai.s:567    .text.vPortEnableVFP:0000000e $d
-     /tmp/ccvX1Rai.s:175    .text.vPortStartFirstTask:00000010 $d
+     /tmp/cckfyXsc.s:24     .rodata.ulKernelPriority:00000000 ulKernelPriority
+     /tmp/cckfyXsc.s:21     .rodata.ulKernelPriority:00000000 $d
+     /tmp/cckfyXsc.s:27     .data.uxCriticalNesting:00000000 $d
+     /tmp/cckfyXsc.s:30     .data.uxCriticalNesting:00000000 uxCriticalNesting
+     /tmp/cckfyXsc.s:33     .text.pxPortInitialiseStack:00000000 $t
+     /tmp/cckfyXsc.s:38     .text.pxPortInitialiseStack:00000000 pxPortInitialiseStack
+     /tmp/cckfyXsc.s:115    .text.SVC_Handler:00000000 $t
+     /tmp/cckfyXsc.s:120    .text.SVC_Handler:00000000 SVC_Handler
+     /tmp/cckfyXsc.s:139    .text.SVC_Handler:00000018 pxCurrentTCBConst2
+     /tmp/cckfyXsc.s:139    .text.SVC_Handler:00000018 $d
+     /tmp/cckfyXsc.s:148    .text.vPortStartFirstTask:00000000 $t
+     /tmp/cckfyXsc.s:152    .text.vPortStartFirstTask:00000000 vPortStartFirstTask
+     /tmp/cckfyXsc.s:176    .text.xPortStartScheduler:00000000 $t
+     /tmp/cckfyXsc.s:181    .text.xPortStartScheduler:00000000 xPortStartScheduler
+     /tmp/cckfyXsc.s:503    .text.prvSetupTimerInterrupt:00000000 prvSetupTimerInterrupt
+     /tmp/cckfyXsc.s:546    .text.vPortEnableVFP:00000000 vPortEnableVFP
+     /tmp/cckfyXsc.s:239    .text.vPortEndScheduler:00000000 $t
+     /tmp/cckfyXsc.s:244    .text.vPortEndScheduler:00000000 vPortEndScheduler
+     /tmp/cckfyXsc.s:266    .text.vPortYieldFromISR:00000000 $t
+     /tmp/cckfyXsc.s:271    .text.vPortYieldFromISR:00000000 vPortYieldFromISR
+     /tmp/cckfyXsc.s:298    .text.vPortEnterCritical:00000000 $t
+     /tmp/cckfyXsc.s:303    .text.vPortEnterCritical:00000000 vPortEnterCritical
+     /tmp/cckfyXsc.s:340    .text.vPortExitCritical:00000000 $t
+     /tmp/cckfyXsc.s:345    .text.vPortExitCritical:00000000 vPortExitCritical
+     /tmp/cckfyXsc.s:389    .text.PendSV_Handler:00000000 $t
+     /tmp/cckfyXsc.s:394    .text.PendSV_Handler:00000000 PendSV_Handler
+     /tmp/cckfyXsc.s:437    .text.PendSV_Handler:0000004c pxCurrentTCBConst
+     /tmp/cckfyXsc.s:437    .text.PendSV_Handler:0000004c $d
+     /tmp/cckfyXsc.s:446    .text.SysTick_Handler:00000000 $t
+     /tmp/cckfyXsc.s:451    .text.SysTick_Handler:00000000 SysTick_Handler
+     /tmp/cckfyXsc.s:499    .text.prvSetupTimerInterrupt:00000000 $t
+     /tmp/cckfyXsc.s:542    .text.vPortEnableVFP:00000000 $t
+     /tmp/cckfyXsc.s:567    .text.vPortEnableVFP:0000000e $d
+     /tmp/cckfyXsc.s:175    .text.vPortStartFirstTask:00000010 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

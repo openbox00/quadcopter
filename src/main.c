@@ -264,9 +264,12 @@ int main(void)
 
 	/* ...and clean them up */
 	if(xSemaphoreTake(xSemaphoreSW, ( portTickType ) 0) == pdTRUE);
-
+	
 	/* initialize hardware... */
 	prvSetupHardware();
+	RCC_Configuration();
+	TIM_Configuration();
+	GPIO_Configuration();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED3", configMINIMAL_STACK_SIZE, (void *)LEDS[0],tskIDLE_PRIORITY, &xLED_Tasks[0] );
@@ -315,7 +318,7 @@ void vMEMSTask(void *pvParameters)
   	XOffset = Buffer_x[0];
   	YOffset = Buffer_y[0];
 	/* reset */
-
+	
 
 
 for( ;; )
@@ -330,102 +333,21 @@ for( ;; )
       /* Remove the offsets values from data */
       Buffer_x[0] -= XOffset;
       Buffer_y[0] -= YOffset;
-
-      /* Update autoreload and capture compare registers value*/
-      temp1 = ABS((int8_t)(Buffer_x[0]));
-      temp2 = ABS((int8_t)(Buffer_y[0]));
-      TempAcceleration = MAX(temp1, temp2);
-	
-	if(TempAcceleration != 0)
-      {
-	
-        if ((int8_t)Buffer_x[0] < -G)
-        {
-				STM_EVAL_LEDOn(LED4);
-
-
-                if ((int8_t)Buffer_x[0] <= G)
-                {
-                        STM_EVAL_LEDOff(LED3);
-
-                }
-
-                if ((int8_t)Buffer_y[0] <= G)
-                {
-                       STM_EVAL_LEDOff(LED6);
-                }
-
-                if ((int8_t)Buffer_y[0] >= -G)
-                {
-                        STM_EVAL_LEDOff(LED5);
-                }
-
-        }
-        if ((int8_t)Buffer_x[0] > G)
-        {
-				STM_EVAL_LEDOn(LED5);
-
-                                if ((int8_t)Buffer_y[0] <= G)
-                                {
-                                STM_EVAL_LEDOff(LED4);
-                                }
-
-                                if ((int8_t)Buffer_y[0] >= -G)
-                                {
-                        		STM_EVAL_LEDOff(LED3);
-                                }
-
-                                if ((int8_t)Buffer_x[0] >= -G)
-                                {
-		                        STM_EVAL_LEDOff(LED6);
-                                }
-
-        }
-        if ((int8_t)Buffer_y[0] > G)
-        {
-
-				STM_EVAL_LEDOn(LED3);
-
-                                if ((int8_t)Buffer_x[0] <= G)
-                                {
-                                        STM_EVAL_LEDOff(LED4);
-                                }
-
-                                if ((int8_t)Buffer_y[0] >= -G)
-                                {
-                                        STM_EVAL_LEDOff(LED5);
-                                }
-
-                                if ((int8_t)Buffer_x[0] >= -G)
-                                {
-                                        STM_EVAL_LEDOff(LED6);
-                                }
-
-        }
-        if ((int8_t)Buffer_y[0] < -G)
-        {
-
-			STM_EVAL_LEDOn(LED6);
-
-                                if ((int8_t)Buffer_x[0] <= G)
-                                {
-                                        STM_EVAL_LEDOff(LED3);
-                                }
-
-                                if ((int8_t)Buffer_y[0] <= G)
-                                {
-                               STM_EVAL_LEDOff(LED4);
-                                }
-
-                                if ((int8_t)Buffer_x[0] >= -G)
-                                {
-                                STM_EVAL_LEDOff(LED5);
-                                }
-        }
-		counter = 0x00;
-
-    }
-  }
+		if ((int8_t)Buffer_x[0] > 2 && (int8_t)Buffer_y[0] > 2)
+		{
+		PWM_Motor1 = 0*(int8_t)Buffer_x[0];//left
+		PWM_Motor2 = 10*(int8_t)Buffer_y[0];//up
+		PWM_Motor3 = 10*(int8_t)Buffer_x[0];//right
+		PWM_Motor4 = 0*(int8_t)Buffer_y[0];//dowm
+		}
+		else if((int8_t)Buffer_x[0] < -2 && (int8_t)Buffer_y[0] < -2)
+		{
+		PWM_Motor1 = -10*(int8_t)Buffer_x[0];//left
+		PWM_Motor2 = 0;//up
+		PWM_Motor3 = 0;//right
+		PWM_Motor4 = -10*(int8_t)Buffer_y[0];//dowm		
+		}
+	}
 }
 }
 

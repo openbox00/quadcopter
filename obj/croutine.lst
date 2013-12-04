@@ -1264,49 +1264,49 @@
  901              	.LFE116:
  903 005e 00BF     		.text
  904              	.Letext0:
- 905              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 905              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  906              		.file 3 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
  907              		.file 4 "FreeRTOS/Source/include/list.h"
  908              		.file 5 "FreeRTOS/Source/include/croutine.h"
  909              		.file 6 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 croutine.c
-     /tmp/ccz8UJKd.s:20     .bss.pxReadyCoRoutineLists:00000000 $d
-     /tmp/ccz8UJKd.s:23     .bss.pxReadyCoRoutineLists:00000000 pxReadyCoRoutineLists
-     /tmp/ccz8UJKd.s:26     .bss.xDelayedCoRoutineList1:00000000 $d
-     /tmp/ccz8UJKd.s:29     .bss.xDelayedCoRoutineList1:00000000 xDelayedCoRoutineList1
-     /tmp/ccz8UJKd.s:32     .bss.xDelayedCoRoutineList2:00000000 $d
-     /tmp/ccz8UJKd.s:35     .bss.xDelayedCoRoutineList2:00000000 xDelayedCoRoutineList2
-     /tmp/ccz8UJKd.s:38     .bss.pxDelayedCoRoutineList:00000000 $d
-     /tmp/ccz8UJKd.s:41     .bss.pxDelayedCoRoutineList:00000000 pxDelayedCoRoutineList
-     /tmp/ccz8UJKd.s:44     .bss.pxOverflowDelayedCoRoutineList:00000000 $d
-     /tmp/ccz8UJKd.s:47     .bss.pxOverflowDelayedCoRoutineList:00000000 pxOverflowDelayedCoRoutineList
-     /tmp/ccz8UJKd.s:50     .bss.xPendingReadyCoRoutineList:00000000 $d
-     /tmp/ccz8UJKd.s:53     .bss.xPendingReadyCoRoutineList:00000000 xPendingReadyCoRoutineList
-     /tmp/ccz8UJKd.s:60     .bss.pxCurrentCoRoutine:00000000 pxCurrentCoRoutine
-     /tmp/ccz8UJKd.s:57     .bss.pxCurrentCoRoutine:00000000 $d
-     /tmp/ccz8UJKd.s:63     .bss.uxTopCoRoutineReadyPriority:00000000 $d
-     /tmp/ccz8UJKd.s:66     .bss.uxTopCoRoutineReadyPriority:00000000 uxTopCoRoutineReadyPriority
-     /tmp/ccz8UJKd.s:69     .bss.xCoRoutineTickCount:00000000 $d
-     /tmp/ccz8UJKd.s:72     .bss.xCoRoutineTickCount:00000000 xCoRoutineTickCount
-     /tmp/ccz8UJKd.s:75     .bss.xLastTickCount:00000000 $d
-     /tmp/ccz8UJKd.s:78     .bss.xLastTickCount:00000000 xLastTickCount
-     /tmp/ccz8UJKd.s:81     .bss.xPassedTicks:00000000 $d
-     /tmp/ccz8UJKd.s:84     .bss.xPassedTicks:00000000 xPassedTicks
-     /tmp/ccz8UJKd.s:87     .text.xCoRoutineCreate:00000000 $t
-     /tmp/ccz8UJKd.s:92     .text.xCoRoutineCreate:00000000 xCoRoutineCreate
-     /tmp/ccz8UJKd.s:760    .text.prvInitialiseCoRoutineLists:00000000 prvInitialiseCoRoutineLists
-     /tmp/ccz8UJKd.s:234    .text.vCoRoutineAddToDelayedList:00000000 $t
-     /tmp/ccz8UJKd.s:239    .text.vCoRoutineAddToDelayedList:00000000 vCoRoutineAddToDelayedList
-     /tmp/ccz8UJKd.s:331    .text.prvCheckPendingReadyList:00000000 $t
-     /tmp/ccz8UJKd.s:335    .text.prvCheckPendingReadyList:00000000 prvCheckPendingReadyList
-     /tmp/ccz8UJKd.s:433    .text.prvCheckDelayedList:00000000 $t
-     /tmp/ccz8UJKd.s:437    .text.prvCheckDelayedList:00000000 prvCheckDelayedList
-     /tmp/ccz8UJKd.s:626    .text.vCoRoutineSchedule:00000000 $t
-     /tmp/ccz8UJKd.s:631    .text.vCoRoutineSchedule:00000000 vCoRoutineSchedule
-     /tmp/ccz8UJKd.s:756    .text.prvInitialiseCoRoutineLists:00000000 $t
-     /tmp/ccz8UJKd.s:835    .text.xCoRoutineRemoveFromEventList:00000000 $t
-     /tmp/ccz8UJKd.s:840    .text.xCoRoutineRemoveFromEventList:00000000 xCoRoutineRemoveFromEventList
+     /tmp/cccl094d.s:20     .bss.pxReadyCoRoutineLists:00000000 $d
+     /tmp/cccl094d.s:23     .bss.pxReadyCoRoutineLists:00000000 pxReadyCoRoutineLists
+     /tmp/cccl094d.s:26     .bss.xDelayedCoRoutineList1:00000000 $d
+     /tmp/cccl094d.s:29     .bss.xDelayedCoRoutineList1:00000000 xDelayedCoRoutineList1
+     /tmp/cccl094d.s:32     .bss.xDelayedCoRoutineList2:00000000 $d
+     /tmp/cccl094d.s:35     .bss.xDelayedCoRoutineList2:00000000 xDelayedCoRoutineList2
+     /tmp/cccl094d.s:38     .bss.pxDelayedCoRoutineList:00000000 $d
+     /tmp/cccl094d.s:41     .bss.pxDelayedCoRoutineList:00000000 pxDelayedCoRoutineList
+     /tmp/cccl094d.s:44     .bss.pxOverflowDelayedCoRoutineList:00000000 $d
+     /tmp/cccl094d.s:47     .bss.pxOverflowDelayedCoRoutineList:00000000 pxOverflowDelayedCoRoutineList
+     /tmp/cccl094d.s:50     .bss.xPendingReadyCoRoutineList:00000000 $d
+     /tmp/cccl094d.s:53     .bss.xPendingReadyCoRoutineList:00000000 xPendingReadyCoRoutineList
+     /tmp/cccl094d.s:60     .bss.pxCurrentCoRoutine:00000000 pxCurrentCoRoutine
+     /tmp/cccl094d.s:57     .bss.pxCurrentCoRoutine:00000000 $d
+     /tmp/cccl094d.s:63     .bss.uxTopCoRoutineReadyPriority:00000000 $d
+     /tmp/cccl094d.s:66     .bss.uxTopCoRoutineReadyPriority:00000000 uxTopCoRoutineReadyPriority
+     /tmp/cccl094d.s:69     .bss.xCoRoutineTickCount:00000000 $d
+     /tmp/cccl094d.s:72     .bss.xCoRoutineTickCount:00000000 xCoRoutineTickCount
+     /tmp/cccl094d.s:75     .bss.xLastTickCount:00000000 $d
+     /tmp/cccl094d.s:78     .bss.xLastTickCount:00000000 xLastTickCount
+     /tmp/cccl094d.s:81     .bss.xPassedTicks:00000000 $d
+     /tmp/cccl094d.s:84     .bss.xPassedTicks:00000000 xPassedTicks
+     /tmp/cccl094d.s:87     .text.xCoRoutineCreate:00000000 $t
+     /tmp/cccl094d.s:92     .text.xCoRoutineCreate:00000000 xCoRoutineCreate
+     /tmp/cccl094d.s:760    .text.prvInitialiseCoRoutineLists:00000000 prvInitialiseCoRoutineLists
+     /tmp/cccl094d.s:234    .text.vCoRoutineAddToDelayedList:00000000 $t
+     /tmp/cccl094d.s:239    .text.vCoRoutineAddToDelayedList:00000000 vCoRoutineAddToDelayedList
+     /tmp/cccl094d.s:331    .text.prvCheckPendingReadyList:00000000 $t
+     /tmp/cccl094d.s:335    .text.prvCheckPendingReadyList:00000000 prvCheckPendingReadyList
+     /tmp/cccl094d.s:433    .text.prvCheckDelayedList:00000000 $t
+     /tmp/cccl094d.s:437    .text.prvCheckDelayedList:00000000 prvCheckDelayedList
+     /tmp/cccl094d.s:626    .text.vCoRoutineSchedule:00000000 $t
+     /tmp/cccl094d.s:631    .text.vCoRoutineSchedule:00000000 vCoRoutineSchedule
+     /tmp/cccl094d.s:756    .text.prvInitialiseCoRoutineLists:00000000 $t
+     /tmp/cccl094d.s:835    .text.xCoRoutineRemoveFromEventList:00000000 $t
+     /tmp/cccl094d.s:840    .text.xCoRoutineRemoveFromEventList:00000000 xCoRoutineRemoveFromEventList
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

@@ -2895,50 +2895,50 @@
  1916              	.LFE128:
  1918 0086 00BF     		.text
  1919              	.Letext0:
- 1920              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 1920              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  1921              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  1922              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_fsmc.h"
  1923              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_fsmc.c
-     /tmp/ccn5wu9g.s:20     .text.FSMC_NORSRAMDeInit:00000000 $t
-     /tmp/ccn5wu9g.s:25     .text.FSMC_NORSRAMDeInit:00000000 FSMC_NORSRAMDeInit
-     /tmp/ccn5wu9g.s:83     .text.FSMC_NORSRAMInit:00000000 $t
-     /tmp/ccn5wu9g.s:88     .text.FSMC_NORSRAMInit:00000000 FSMC_NORSRAMInit
-     /tmp/ccn5wu9g.s:312    .text.FSMC_NORSRAMStructInit:00000000 $t
-     /tmp/ccn5wu9g.s:317    .text.FSMC_NORSRAMStructInit:00000000 FSMC_NORSRAMStructInit
-     /tmp/ccn5wu9g.s:466    .text.FSMC_NORSRAMCmd:00000000 $t
-     /tmp/ccn5wu9g.s:471    .text.FSMC_NORSRAMCmd:00000000 FSMC_NORSRAMCmd
-     /tmp/ccn5wu9g.s:527    .text.FSMC_NANDDeInit:00000000 $t
-     /tmp/ccn5wu9g.s:532    .text.FSMC_NANDDeInit:00000000 FSMC_NANDDeInit
-     /tmp/ccn5wu9g.s:606    .text.FSMC_NANDInit:00000000 $t
-     /tmp/ccn5wu9g.s:611    .text.FSMC_NANDInit:00000000 FSMC_NANDInit
-     /tmp/ccn5wu9g.s:768    .text.FSMC_NANDStructInit:00000000 $t
-     /tmp/ccn5wu9g.s:773    .text.FSMC_NANDStructInit:00000000 FSMC_NANDStructInit
-     /tmp/ccn5wu9g.s:868    .text.FSMC_NANDCmd:00000000 $t
-     /tmp/ccn5wu9g.s:873    .text.FSMC_NANDCmd:00000000 FSMC_NANDCmd
-     /tmp/ccn5wu9g.s:957    .text.FSMC_NANDECCCmd:00000000 $t
-     /tmp/ccn5wu9g.s:962    .text.FSMC_NANDECCCmd:00000000 FSMC_NANDECCCmd
-     /tmp/ccn5wu9g.s:1046   .text.FSMC_GetECC:00000000 $t
-     /tmp/ccn5wu9g.s:1051   .text.FSMC_GetECC:00000000 FSMC_GetECC
-     /tmp/ccn5wu9g.s:1101   .text.FSMC_PCCARDDeInit:00000000 $t
-     /tmp/ccn5wu9g.s:1106   .text.FSMC_PCCARDDeInit:00000000 FSMC_PCCARDDeInit
-     /tmp/ccn5wu9g.s:1153   .text.FSMC_PCCARDInit:00000000 $t
-     /tmp/ccn5wu9g.s:1158   .text.FSMC_PCCARDInit:00000000 FSMC_PCCARDInit
-     /tmp/ccn5wu9g.s:1292   .text.FSMC_PCCARDStructInit:00000000 $t
-     /tmp/ccn5wu9g.s:1297   .text.FSMC_PCCARDStructInit:00000000 FSMC_PCCARDStructInit
-     /tmp/ccn5wu9g.s:1396   .text.FSMC_PCCARDCmd:00000000 $t
-     /tmp/ccn5wu9g.s:1401   .text.FSMC_PCCARDCmd:00000000 FSMC_PCCARDCmd
-     /tmp/ccn5wu9g.s:1454   .text.FSMC_ITConfig:00000000 $t
-     /tmp/ccn5wu9g.s:1459   .text.FSMC_ITConfig:00000000 FSMC_ITConfig
-     /tmp/ccn5wu9g.s:1577   .text.FSMC_GetFlagStatus:00000000 $t
-     /tmp/ccn5wu9g.s:1582   .text.FSMC_GetFlagStatus:00000000 FSMC_GetFlagStatus
-     /tmp/ccn5wu9g.s:1662   .text.FSMC_ClearFlag:00000000 $t
-     /tmp/ccn5wu9g.s:1667   .text.FSMC_ClearFlag:00000000 FSMC_ClearFlag
-     /tmp/ccn5wu9g.s:1738   .text.FSMC_GetITStatus:00000000 $t
-     /tmp/ccn5wu9g.s:1743   .text.FSMC_GetITStatus:00000000 FSMC_GetITStatus
-     /tmp/ccn5wu9g.s:1840   .text.FSMC_ClearITPendingBit:00000000 $t
-     /tmp/ccn5wu9g.s:1845   .text.FSMC_ClearITPendingBit:00000000 FSMC_ClearITPendingBit
+     /tmp/cciNTnwm.s:20     .text.FSMC_NORSRAMDeInit:00000000 $t
+     /tmp/cciNTnwm.s:25     .text.FSMC_NORSRAMDeInit:00000000 FSMC_NORSRAMDeInit
+     /tmp/cciNTnwm.s:83     .text.FSMC_NORSRAMInit:00000000 $t
+     /tmp/cciNTnwm.s:88     .text.FSMC_NORSRAMInit:00000000 FSMC_NORSRAMInit
+     /tmp/cciNTnwm.s:312    .text.FSMC_NORSRAMStructInit:00000000 $t
+     /tmp/cciNTnwm.s:317    .text.FSMC_NORSRAMStructInit:00000000 FSMC_NORSRAMStructInit
+     /tmp/cciNTnwm.s:466    .text.FSMC_NORSRAMCmd:00000000 $t
+     /tmp/cciNTnwm.s:471    .text.FSMC_NORSRAMCmd:00000000 FSMC_NORSRAMCmd
+     /tmp/cciNTnwm.s:527    .text.FSMC_NANDDeInit:00000000 $t
+     /tmp/cciNTnwm.s:532    .text.FSMC_NANDDeInit:00000000 FSMC_NANDDeInit
+     /tmp/cciNTnwm.s:606    .text.FSMC_NANDInit:00000000 $t
+     /tmp/cciNTnwm.s:611    .text.FSMC_NANDInit:00000000 FSMC_NANDInit
+     /tmp/cciNTnwm.s:768    .text.FSMC_NANDStructInit:00000000 $t
+     /tmp/cciNTnwm.s:773    .text.FSMC_NANDStructInit:00000000 FSMC_NANDStructInit
+     /tmp/cciNTnwm.s:868    .text.FSMC_NANDCmd:00000000 $t
+     /tmp/cciNTnwm.s:873    .text.FSMC_NANDCmd:00000000 FSMC_NANDCmd
+     /tmp/cciNTnwm.s:957    .text.FSMC_NANDECCCmd:00000000 $t
+     /tmp/cciNTnwm.s:962    .text.FSMC_NANDECCCmd:00000000 FSMC_NANDECCCmd
+     /tmp/cciNTnwm.s:1046   .text.FSMC_GetECC:00000000 $t
+     /tmp/cciNTnwm.s:1051   .text.FSMC_GetECC:00000000 FSMC_GetECC
+     /tmp/cciNTnwm.s:1101   .text.FSMC_PCCARDDeInit:00000000 $t
+     /tmp/cciNTnwm.s:1106   .text.FSMC_PCCARDDeInit:00000000 FSMC_PCCARDDeInit
+     /tmp/cciNTnwm.s:1153   .text.FSMC_PCCARDInit:00000000 $t
+     /tmp/cciNTnwm.s:1158   .text.FSMC_PCCARDInit:00000000 FSMC_PCCARDInit
+     /tmp/cciNTnwm.s:1292   .text.FSMC_PCCARDStructInit:00000000 $t
+     /tmp/cciNTnwm.s:1297   .text.FSMC_PCCARDStructInit:00000000 FSMC_PCCARDStructInit
+     /tmp/cciNTnwm.s:1396   .text.FSMC_PCCARDCmd:00000000 $t
+     /tmp/cciNTnwm.s:1401   .text.FSMC_PCCARDCmd:00000000 FSMC_PCCARDCmd
+     /tmp/cciNTnwm.s:1454   .text.FSMC_ITConfig:00000000 $t
+     /tmp/cciNTnwm.s:1459   .text.FSMC_ITConfig:00000000 FSMC_ITConfig
+     /tmp/cciNTnwm.s:1577   .text.FSMC_GetFlagStatus:00000000 $t
+     /tmp/cciNTnwm.s:1582   .text.FSMC_GetFlagStatus:00000000 FSMC_GetFlagStatus
+     /tmp/cciNTnwm.s:1662   .text.FSMC_ClearFlag:00000000 $t
+     /tmp/cciNTnwm.s:1667   .text.FSMC_ClearFlag:00000000 FSMC_ClearFlag
+     /tmp/cciNTnwm.s:1738   .text.FSMC_GetITStatus:00000000 $t
+     /tmp/cciNTnwm.s:1743   .text.FSMC_GetITStatus:00000000 FSMC_GetITStatus
+     /tmp/cciNTnwm.s:1840   .text.FSMC_ClearITPendingBit:00000000 $t
+     /tmp/cciNTnwm.s:1845   .text.FSMC_ClearITPendingBit:00000000 FSMC_ClearITPendingBit
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

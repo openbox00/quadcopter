@@ -2746,50 +2746,50 @@
  1513              	.LFE128:
  1515              		.text
  1516              	.Letext0:
- 1517              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 1517              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  1518              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  1519              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dma.h"
  1520              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_dma.c
-     /tmp/ccGySoy2.s:20     .text.DMA_DeInit:00000000 $t
-     /tmp/ccGySoy2.s:25     .text.DMA_DeInit:00000000 DMA_DeInit
-     /tmp/ccGySoy2.s:296    .text.DMA_Init:00000000 $t
-     /tmp/ccGySoy2.s:301    .text.DMA_Init:00000000 DMA_Init
-     /tmp/ccGySoy2.s:428    .text.DMA_StructInit:00000000 $t
-     /tmp/ccGySoy2.s:433    .text.DMA_StructInit:00000000 DMA_StructInit
-     /tmp/ccGySoy2.s:520    .text.DMA_Cmd:00000000 $t
-     /tmp/ccGySoy2.s:525    .text.DMA_Cmd:00000000 DMA_Cmd
-     /tmp/ccGySoy2.s:573    .text.DMA_PeriphIncOffsetSizeConfig:00000000 $t
-     /tmp/ccGySoy2.s:578    .text.DMA_PeriphIncOffsetSizeConfig:00000000 DMA_PeriphIncOffsetSizeConfig
-     /tmp/ccGySoy2.s:625    .text.DMA_FlowControllerConfig:00000000 $t
-     /tmp/ccGySoy2.s:630    .text.DMA_FlowControllerConfig:00000000 DMA_FlowControllerConfig
-     /tmp/ccGySoy2.s:677    .text.DMA_SetCurrDataCounter:00000000 $t
-     /tmp/ccGySoy2.s:682    .text.DMA_SetCurrDataCounter:00000000 DMA_SetCurrDataCounter
-     /tmp/ccGySoy2.s:715    .text.DMA_GetCurrDataCounter:00000000 $t
-     /tmp/ccGySoy2.s:720    .text.DMA_GetCurrDataCounter:00000000 DMA_GetCurrDataCounter
-     /tmp/ccGySoy2.s:752    .text.DMA_DoubleBufferModeConfig:00000000 $t
-     /tmp/ccGySoy2.s:757    .text.DMA_DoubleBufferModeConfig:00000000 DMA_DoubleBufferModeConfig
-     /tmp/ccGySoy2.s:809    .text.DMA_DoubleBufferModeCmd:00000000 $t
-     /tmp/ccGySoy2.s:814    .text.DMA_DoubleBufferModeCmd:00000000 DMA_DoubleBufferModeCmd
-     /tmp/ccGySoy2.s:862    .text.DMA_MemoryTargetConfig:00000000 $t
-     /tmp/ccGySoy2.s:867    .text.DMA_MemoryTargetConfig:00000000 DMA_MemoryTargetConfig
-     /tmp/ccGySoy2.s:911    .text.DMA_GetCurrentMemoryTarget:00000000 $t
-     /tmp/ccGySoy2.s:916    .text.DMA_GetCurrentMemoryTarget:00000000 DMA_GetCurrentMemoryTarget
-     /tmp/ccGySoy2.s:964    .text.DMA_GetCmdStatus:00000000 $t
-     /tmp/ccGySoy2.s:969    .text.DMA_GetCmdStatus:00000000 DMA_GetCmdStatus
-     /tmp/ccGySoy2.s:1018   .text.DMA_GetFIFOStatus:00000000 $t
-     /tmp/ccGySoy2.s:1023   .text.DMA_GetFIFOStatus:00000000 DMA_GetFIFOStatus
-     /tmp/ccGySoy2.s:1061   .text.DMA_GetFlagStatus:00000000 $t
-     /tmp/ccGySoy2.s:1066   .text.DMA_GetFlagStatus:00000000 DMA_GetFlagStatus
-     /tmp/ccGySoy2.s:1157   .text.DMA_ClearFlag:00000000 $t
-     /tmp/ccGySoy2.s:1162   .text.DMA_ClearFlag:00000000 DMA_ClearFlag
-     /tmp/ccGySoy2.s:1229   .text.DMA_ITConfig:00000000 $t
-     /tmp/ccGySoy2.s:1234   .text.DMA_ITConfig:00000000 DMA_ITConfig
-     /tmp/ccGySoy2.s:1316   .text.DMA_GetITStatus:00000000 $t
-     /tmp/ccGySoy2.s:1321   .text.DMA_GetITStatus:00000000 DMA_GetITStatus
-     /tmp/ccGySoy2.s:1444   .text.DMA_ClearITPendingBit:00000000 $t
-     /tmp/ccGySoy2.s:1449   .text.DMA_ClearITPendingBit:00000000 DMA_ClearITPendingBit
+     /tmp/ccs5ZZoe.s:20     .text.DMA_DeInit:00000000 $t
+     /tmp/ccs5ZZoe.s:25     .text.DMA_DeInit:00000000 DMA_DeInit
+     /tmp/ccs5ZZoe.s:296    .text.DMA_Init:00000000 $t
+     /tmp/ccs5ZZoe.s:301    .text.DMA_Init:00000000 DMA_Init
+     /tmp/ccs5ZZoe.s:428    .text.DMA_StructInit:00000000 $t
+     /tmp/ccs5ZZoe.s:433    .text.DMA_StructInit:00000000 DMA_StructInit
+     /tmp/ccs5ZZoe.s:520    .text.DMA_Cmd:00000000 $t
+     /tmp/ccs5ZZoe.s:525    .text.DMA_Cmd:00000000 DMA_Cmd
+     /tmp/ccs5ZZoe.s:573    .text.DMA_PeriphIncOffsetSizeConfig:00000000 $t
+     /tmp/ccs5ZZoe.s:578    .text.DMA_PeriphIncOffsetSizeConfig:00000000 DMA_PeriphIncOffsetSizeConfig
+     /tmp/ccs5ZZoe.s:625    .text.DMA_FlowControllerConfig:00000000 $t
+     /tmp/ccs5ZZoe.s:630    .text.DMA_FlowControllerConfig:00000000 DMA_FlowControllerConfig
+     /tmp/ccs5ZZoe.s:677    .text.DMA_SetCurrDataCounter:00000000 $t
+     /tmp/ccs5ZZoe.s:682    .text.DMA_SetCurrDataCounter:00000000 DMA_SetCurrDataCounter
+     /tmp/ccs5ZZoe.s:715    .text.DMA_GetCurrDataCounter:00000000 $t
+     /tmp/ccs5ZZoe.s:720    .text.DMA_GetCurrDataCounter:00000000 DMA_GetCurrDataCounter
+     /tmp/ccs5ZZoe.s:752    .text.DMA_DoubleBufferModeConfig:00000000 $t
+     /tmp/ccs5ZZoe.s:757    .text.DMA_DoubleBufferModeConfig:00000000 DMA_DoubleBufferModeConfig
+     /tmp/ccs5ZZoe.s:809    .text.DMA_DoubleBufferModeCmd:00000000 $t
+     /tmp/ccs5ZZoe.s:814    .text.DMA_DoubleBufferModeCmd:00000000 DMA_DoubleBufferModeCmd
+     /tmp/ccs5ZZoe.s:862    .text.DMA_MemoryTargetConfig:00000000 $t
+     /tmp/ccs5ZZoe.s:867    .text.DMA_MemoryTargetConfig:00000000 DMA_MemoryTargetConfig
+     /tmp/ccs5ZZoe.s:911    .text.DMA_GetCurrentMemoryTarget:00000000 $t
+     /tmp/ccs5ZZoe.s:916    .text.DMA_GetCurrentMemoryTarget:00000000 DMA_GetCurrentMemoryTarget
+     /tmp/ccs5ZZoe.s:964    .text.DMA_GetCmdStatus:00000000 $t
+     /tmp/ccs5ZZoe.s:969    .text.DMA_GetCmdStatus:00000000 DMA_GetCmdStatus
+     /tmp/ccs5ZZoe.s:1018   .text.DMA_GetFIFOStatus:00000000 $t
+     /tmp/ccs5ZZoe.s:1023   .text.DMA_GetFIFOStatus:00000000 DMA_GetFIFOStatus
+     /tmp/ccs5ZZoe.s:1061   .text.DMA_GetFlagStatus:00000000 $t
+     /tmp/ccs5ZZoe.s:1066   .text.DMA_GetFlagStatus:00000000 DMA_GetFlagStatus
+     /tmp/ccs5ZZoe.s:1157   .text.DMA_ClearFlag:00000000 $t
+     /tmp/ccs5ZZoe.s:1162   .text.DMA_ClearFlag:00000000 DMA_ClearFlag
+     /tmp/ccs5ZZoe.s:1229   .text.DMA_ITConfig:00000000 $t
+     /tmp/ccs5ZZoe.s:1234   .text.DMA_ITConfig:00000000 DMA_ITConfig
+     /tmp/ccs5ZZoe.s:1316   .text.DMA_GetITStatus:00000000 $t
+     /tmp/ccs5ZZoe.s:1321   .text.DMA_GetITStatus:00000000 DMA_GetITStatus
+     /tmp/ccs5ZZoe.s:1444   .text.DMA_ClearITPendingBit:00000000 $t
+     /tmp/ccs5ZZoe.s:1449   .text.DMA_ClearITPendingBit:00000000 DMA_ClearITPendingBit
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

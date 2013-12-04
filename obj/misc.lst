@@ -560,22 +560,22 @@
  338              	.LFE114:
  340 004a 00BF     		.text
  341              	.Letext0:
- 342              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 342              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  343              		.file 3 "libs/CMSIS/Include/core_cm4.h"
  344              		.file 4 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  345              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/misc.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 misc.c
-     /tmp/cc5yIHca.s:20     .text.NVIC_PriorityGroupConfig:00000000 $t
-     /tmp/cc5yIHca.s:25     .text.NVIC_PriorityGroupConfig:00000000 NVIC_PriorityGroupConfig
-     /tmp/cc5yIHca.s:60     .text.NVIC_Init:00000000 $t
-     /tmp/cc5yIHca.s:65     .text.NVIC_Init:00000000 NVIC_Init
-     /tmp/cc5yIHca.s:183    .text.NVIC_SetVectorTable:00000000 $t
-     /tmp/cc5yIHca.s:188    .text.NVIC_SetVectorTable:00000000 NVIC_SetVectorTable
-     /tmp/cc5yIHca.s:225    .text.NVIC_SystemLPConfig:00000000 $t
-     /tmp/cc5yIHca.s:230    .text.NVIC_SystemLPConfig:00000000 NVIC_SystemLPConfig
-     /tmp/cc5yIHca.s:286    .text.SysTick_CLKSourceConfig:00000000 $t
-     /tmp/cc5yIHca.s:291    .text.SysTick_CLKSourceConfig:00000000 SysTick_CLKSourceConfig
+     /tmp/ccts6D1g.s:20     .text.NVIC_PriorityGroupConfig:00000000 $t
+     /tmp/ccts6D1g.s:25     .text.NVIC_PriorityGroupConfig:00000000 NVIC_PriorityGroupConfig
+     /tmp/ccts6D1g.s:60     .text.NVIC_Init:00000000 $t
+     /tmp/ccts6D1g.s:65     .text.NVIC_Init:00000000 NVIC_Init
+     /tmp/ccts6D1g.s:183    .text.NVIC_SetVectorTable:00000000 $t
+     /tmp/ccts6D1g.s:188    .text.NVIC_SetVectorTable:00000000 NVIC_SetVectorTable
+     /tmp/ccts6D1g.s:225    .text.NVIC_SystemLPConfig:00000000 $t
+     /tmp/ccts6D1g.s:230    .text.NVIC_SystemLPConfig:00000000 NVIC_SystemLPConfig
+     /tmp/ccts6D1g.s:286    .text.SysTick_CLKSourceConfig:00000000 $t
+     /tmp/ccts6D1g.s:291    .text.SysTick_CLKSourceConfig:00000000 SysTick_CLKSourceConfig
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS

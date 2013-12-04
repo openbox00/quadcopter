@@ -1287,31 +1287,31 @@
  1137 005a 00BF     		.text
  1138              	.Letext0:
  1139              		.file 2 "src/modbus.h"
- 1140              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 1140              		.file 3 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
 DEFINED SYMBOLS
                             *ABS*:00000000 test.c
-     /tmp/ccfUf2EP.s:20     .rodata.crcHi:00000000 $d
-     /tmp/ccfUf2EP.s:23     .rodata.crcHi:00000000 crcHi
-     /tmp/ccfUf2EP.s:281    .rodata.crcLo:00000000 $d
-     /tmp/ccfUf2EP.s:284    .rodata.crcLo:00000000 crcLo
-     /tmp/ccfUf2EP.s:542    .text.storeReadCoilData:00000000 $t
-     /tmp/ccfUf2EP.s:547    .text.storeReadCoilData:00000000 storeReadCoilData
-     /tmp/ccfUf2EP.s:608    .text.storeReadDiscreteInputsData:00000000 $t
-     /tmp/ccfUf2EP.s:613    .text.storeReadDiscreteInputsData:00000000 storeReadDiscreteInputsData
-     /tmp/ccfUf2EP.s:675    .text.storeReadHoldingRegistersData:00000000 $t
-     /tmp/ccfUf2EP.s:680    .text.storeReadHoldingRegistersData:00000000 storeReadHoldingRegistersData
-     /tmp/ccfUf2EP.s:742    .text.storeReadInputRegistersData:00000000 $t
-     /tmp/ccfUf2EP.s:747    .text.storeReadInputRegistersData:00000000 storeReadInputRegistersData
-     /tmp/ccfUf2EP.s:809    .text.storeWriteSingleCoilData:00000000 $t
-     /tmp/ccfUf2EP.s:814    .text.storeWriteSingleCoilData:00000000 storeWriteSingleCoilData
-     /tmp/ccfUf2EP.s:874    .text.storeWriteSingleRegisterData:00000000 $t
-     /tmp/ccfUf2EP.s:879    .text.storeWriteSingleRegisterData:00000000 storeWriteSingleRegisterData
-     /tmp/ccfUf2EP.s:941    .text.storeReadExceptionStatusData:00000000 $t
-     /tmp/ccfUf2EP.s:946    .text.storeReadExceptionStatusData:00000000 storeReadExceptionStatusData
-     /tmp/ccfUf2EP.s:1006   .text.storeWriteMultipleCoilsData:00000000 $t
-     /tmp/ccfUf2EP.s:1011   .text.storeWriteMultipleCoilsData:00000000 storeWriteMultipleCoilsData
-     /tmp/ccfUf2EP.s:1071   .text.storeWriteMultipleRegistersData:00000000 $t
-     /tmp/ccfUf2EP.s:1076   .text.storeWriteMultipleRegistersData:00000000 storeWriteMultipleRegistersData
+     /tmp/ccN5vhiw.s:20     .rodata.crcHi:00000000 $d
+     /tmp/ccN5vhiw.s:23     .rodata.crcHi:00000000 crcHi
+     /tmp/ccN5vhiw.s:281    .rodata.crcLo:00000000 $d
+     /tmp/ccN5vhiw.s:284    .rodata.crcLo:00000000 crcLo
+     /tmp/ccN5vhiw.s:542    .text.storeReadCoilData:00000000 $t
+     /tmp/ccN5vhiw.s:547    .text.storeReadCoilData:00000000 storeReadCoilData
+     /tmp/ccN5vhiw.s:608    .text.storeReadDiscreteInputsData:00000000 $t
+     /tmp/ccN5vhiw.s:613    .text.storeReadDiscreteInputsData:00000000 storeReadDiscreteInputsData
+     /tmp/ccN5vhiw.s:675    .text.storeReadHoldingRegistersData:00000000 $t
+     /tmp/ccN5vhiw.s:680    .text.storeReadHoldingRegistersData:00000000 storeReadHoldingRegistersData
+     /tmp/ccN5vhiw.s:742    .text.storeReadInputRegistersData:00000000 $t
+     /tmp/ccN5vhiw.s:747    .text.storeReadInputRegistersData:00000000 storeReadInputRegistersData
+     /tmp/ccN5vhiw.s:809    .text.storeWriteSingleCoilData:00000000 $t
+     /tmp/ccN5vhiw.s:814    .text.storeWriteSingleCoilData:00000000 storeWriteSingleCoilData
+     /tmp/ccN5vhiw.s:874    .text.storeWriteSingleRegisterData:00000000 $t
+     /tmp/ccN5vhiw.s:879    .text.storeWriteSingleRegisterData:00000000 storeWriteSingleRegisterData
+     /tmp/ccN5vhiw.s:941    .text.storeReadExceptionStatusData:00000000 $t
+     /tmp/ccN5vhiw.s:946    .text.storeReadExceptionStatusData:00000000 storeReadExceptionStatusData
+     /tmp/ccN5vhiw.s:1006   .text.storeWriteMultipleCoilsData:00000000 $t
+     /tmp/ccN5vhiw.s:1011   .text.storeWriteMultipleCoilsData:00000000 storeWriteMultipleCoilsData
+     /tmp/ccN5vhiw.s:1071   .text.storeWriteMultipleRegistersData:00000000 $t
+     /tmp/ccN5vhiw.s:1076   .text.storeWriteMultipleRegistersData:00000000 storeWriteMultipleRegistersData
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

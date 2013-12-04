@@ -1479,35 +1479,35 @@
  588              	.LFE121:
  590 002e 00BF     		.text
  591              	.Letext0:
- 592              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 592              		.file 3 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  593              		.file 4 "libs/CMSIS/Include/core_cm4.h"
  594              		.file 5 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_pwr.c
-     /tmp/ccpYlJqG.s:20     .text.PWR_DeInit:00000000 $t
-     /tmp/ccpYlJqG.s:25     .text.PWR_DeInit:00000000 PWR_DeInit
-     /tmp/ccpYlJqG.s:54     .text.PWR_BackupAccessCmd:00000000 $t
-     /tmp/ccpYlJqG.s:59     .text.PWR_BackupAccessCmd:00000000 PWR_BackupAccessCmd
-     /tmp/ccpYlJqG.s:92     .text.PWR_PVDLevelConfig:00000000 $t
-     /tmp/ccpYlJqG.s:97     .text.PWR_PVDLevelConfig:00000000 PWR_PVDLevelConfig
-     /tmp/ccpYlJqG.s:146    .text.PWR_PVDCmd:00000000 $t
-     /tmp/ccpYlJqG.s:151    .text.PWR_PVDCmd:00000000 PWR_PVDCmd
-     /tmp/ccpYlJqG.s:184    .text.PWR_WakeUpPinCmd:00000000 $t
-     /tmp/ccpYlJqG.s:189    .text.PWR_WakeUpPinCmd:00000000 PWR_WakeUpPinCmd
-     /tmp/ccpYlJqG.s:222    .text.PWR_BackupRegulatorCmd:00000000 $t
-     /tmp/ccpYlJqG.s:227    .text.PWR_BackupRegulatorCmd:00000000 PWR_BackupRegulatorCmd
-     /tmp/ccpYlJqG.s:260    .text.PWR_HighPerformanceModeCmd:00000000 $t
-     /tmp/ccpYlJqG.s:265    .text.PWR_HighPerformanceModeCmd:00000000 PWR_HighPerformanceModeCmd
-     /tmp/ccpYlJqG.s:298    .text.PWR_FlashPowerDownCmd:00000000 $t
-     /tmp/ccpYlJqG.s:303    .text.PWR_FlashPowerDownCmd:00000000 PWR_FlashPowerDownCmd
-     /tmp/ccpYlJqG.s:336    .text.PWR_EnterSTOPMode:00000000 $t
-     /tmp/ccpYlJqG.s:341    .text.PWR_EnterSTOPMode:00000000 PWR_EnterSTOPMode
-     /tmp/ccpYlJqG.s:434    .text.PWR_EnterSTANDBYMode:00000000 $t
-     /tmp/ccpYlJqG.s:439    .text.PWR_EnterSTANDBYMode:00000000 PWR_EnterSTANDBYMode
-     /tmp/ccpYlJqG.s:494    .text.PWR_GetFlagStatus:00000000 $t
-     /tmp/ccpYlJqG.s:499    .text.PWR_GetFlagStatus:00000000 PWR_GetFlagStatus
-     /tmp/ccpYlJqG.s:549    .text.PWR_ClearFlag:00000000 $t
-     /tmp/ccpYlJqG.s:554    .text.PWR_ClearFlag:00000000 PWR_ClearFlag
+     /tmp/ccPEgWO6.s:20     .text.PWR_DeInit:00000000 $t
+     /tmp/ccPEgWO6.s:25     .text.PWR_DeInit:00000000 PWR_DeInit
+     /tmp/ccPEgWO6.s:54     .text.PWR_BackupAccessCmd:00000000 $t
+     /tmp/ccPEgWO6.s:59     .text.PWR_BackupAccessCmd:00000000 PWR_BackupAccessCmd
+     /tmp/ccPEgWO6.s:92     .text.PWR_PVDLevelConfig:00000000 $t
+     /tmp/ccPEgWO6.s:97     .text.PWR_PVDLevelConfig:00000000 PWR_PVDLevelConfig
+     /tmp/ccPEgWO6.s:146    .text.PWR_PVDCmd:00000000 $t
+     /tmp/ccPEgWO6.s:151    .text.PWR_PVDCmd:00000000 PWR_PVDCmd
+     /tmp/ccPEgWO6.s:184    .text.PWR_WakeUpPinCmd:00000000 $t
+     /tmp/ccPEgWO6.s:189    .text.PWR_WakeUpPinCmd:00000000 PWR_WakeUpPinCmd
+     /tmp/ccPEgWO6.s:222    .text.PWR_BackupRegulatorCmd:00000000 $t
+     /tmp/ccPEgWO6.s:227    .text.PWR_BackupRegulatorCmd:00000000 PWR_BackupRegulatorCmd
+     /tmp/ccPEgWO6.s:260    .text.PWR_HighPerformanceModeCmd:00000000 $t
+     /tmp/ccPEgWO6.s:265    .text.PWR_HighPerformanceModeCmd:00000000 PWR_HighPerformanceModeCmd
+     /tmp/ccPEgWO6.s:298    .text.PWR_FlashPowerDownCmd:00000000 $t
+     /tmp/ccPEgWO6.s:303    .text.PWR_FlashPowerDownCmd:00000000 PWR_FlashPowerDownCmd
+     /tmp/ccPEgWO6.s:336    .text.PWR_EnterSTOPMode:00000000 $t
+     /tmp/ccPEgWO6.s:341    .text.PWR_EnterSTOPMode:00000000 PWR_EnterSTOPMode
+     /tmp/ccPEgWO6.s:434    .text.PWR_EnterSTANDBYMode:00000000 $t
+     /tmp/ccPEgWO6.s:439    .text.PWR_EnterSTANDBYMode:00000000 PWR_EnterSTANDBYMode
+     /tmp/ccPEgWO6.s:494    .text.PWR_GetFlagStatus:00000000 $t
+     /tmp/ccPEgWO6.s:499    .text.PWR_GetFlagStatus:00000000 PWR_GetFlagStatus
+     /tmp/ccPEgWO6.s:549    .text.PWR_ClearFlag:00000000 $t
+     /tmp/ccPEgWO6.s:554    .text.PWR_ClearFlag:00000000 PWR_ClearFlag
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

@@ -1512,7 +1512,7 @@
  1054              	.LFE121:
  1056 00e2 00BF     		.text
  1057              	.Letext0:
- 1058              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 1058              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  1059              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  1060              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
  1061              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_spi.h"
@@ -1520,32 +1520,32 @@
  1063              		.file 7 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4_discovery_lis302dl.c
-     /tmp/ccJ5FnJs.s:24     .data.LIS302DLTimeout:00000000 LIS302DLTimeout
-     /tmp/ccJ5FnJs.s:21     .data.LIS302DLTimeout:00000000 $d
-     /tmp/ccJ5FnJs.s:27     .text.LIS302DL_Init:00000000 $t
-     /tmp/ccJ5FnJs.s:32     .text.LIS302DL_Init:00000000 LIS302DL_Init
-     /tmp/ccJ5FnJs.s:740    .text.LIS302DL_LowLevel_Init:00000000 LIS302DL_LowLevel_Init
-     /tmp/ccJ5FnJs.s:445    .text.LIS302DL_Write:00000000 LIS302DL_Write
-     /tmp/ccJ5FnJs.s:96     .text.LIS302DL_FilterConfig:00000000 $t
-     /tmp/ccJ5FnJs.s:101    .text.LIS302DL_FilterConfig:00000000 LIS302DL_FilterConfig
-     /tmp/ccJ5FnJs.s:524    .text.LIS302DL_Read:00000000 LIS302DL_Read
-     /tmp/ccJ5FnJs.s:166    .text.LIS302DL_InterruptConfig:00000000 $t
-     /tmp/ccJ5FnJs.s:171    .text.LIS302DL_InterruptConfig:00000000 LIS302DL_InterruptConfig
-     /tmp/ccJ5FnJs.s:228    .text.LIS302DL_LowpowerCmd:00000000 $t
-     /tmp/ccJ5FnJs.s:233    .text.LIS302DL_LowpowerCmd:00000000 LIS302DL_LowpowerCmd
-     /tmp/ccJ5FnJs.s:283    .text.LIS302DL_DataRateCmd:00000000 $t
-     /tmp/ccJ5FnJs.s:288    .text.LIS302DL_DataRateCmd:00000000 LIS302DL_DataRateCmd
-     /tmp/ccJ5FnJs.s:338    .text.LIS302DL_FullScaleCmd:00000000 $t
-     /tmp/ccJ5FnJs.s:343    .text.LIS302DL_FullScaleCmd:00000000 LIS302DL_FullScaleCmd
-     /tmp/ccJ5FnJs.s:393    .text.LIS302DL_RebootCmd:00000000 $t
-     /tmp/ccJ5FnJs.s:398    .text.LIS302DL_RebootCmd:00000000 LIS302DL_RebootCmd
-     /tmp/ccJ5FnJs.s:440    .text.LIS302DL_Write:00000000 $t
-     /tmp/ccJ5FnJs.s:941    .text.LIS302DL_SendByte:00000000 LIS302DL_SendByte
-     /tmp/ccJ5FnJs.s:519    .text.LIS302DL_Read:00000000 $t
-     /tmp/ccJ5FnJs.s:606    .text.LIS302DL_ReadACC:00000000 $t
-     /tmp/ccJ5FnJs.s:611    .text.LIS302DL_ReadACC:00000000 LIS302DL_ReadACC
-     /tmp/ccJ5FnJs.s:736    .text.LIS302DL_LowLevel_Init:00000000 $t
-     /tmp/ccJ5FnJs.s:937    .text.LIS302DL_SendByte:00000000 $t
+     /tmp/ccbvngAF.s:24     .data.LIS302DLTimeout:00000000 LIS302DLTimeout
+     /tmp/ccbvngAF.s:21     .data.LIS302DLTimeout:00000000 $d
+     /tmp/ccbvngAF.s:27     .text.LIS302DL_Init:00000000 $t
+     /tmp/ccbvngAF.s:32     .text.LIS302DL_Init:00000000 LIS302DL_Init
+     /tmp/ccbvngAF.s:740    .text.LIS302DL_LowLevel_Init:00000000 LIS302DL_LowLevel_Init
+     /tmp/ccbvngAF.s:445    .text.LIS302DL_Write:00000000 LIS302DL_Write
+     /tmp/ccbvngAF.s:96     .text.LIS302DL_FilterConfig:00000000 $t
+     /tmp/ccbvngAF.s:101    .text.LIS302DL_FilterConfig:00000000 LIS302DL_FilterConfig
+     /tmp/ccbvngAF.s:524    .text.LIS302DL_Read:00000000 LIS302DL_Read
+     /tmp/ccbvngAF.s:166    .text.LIS302DL_InterruptConfig:00000000 $t
+     /tmp/ccbvngAF.s:171    .text.LIS302DL_InterruptConfig:00000000 LIS302DL_InterruptConfig
+     /tmp/ccbvngAF.s:228    .text.LIS302DL_LowpowerCmd:00000000 $t
+     /tmp/ccbvngAF.s:233    .text.LIS302DL_LowpowerCmd:00000000 LIS302DL_LowpowerCmd
+     /tmp/ccbvngAF.s:283    .text.LIS302DL_DataRateCmd:00000000 $t
+     /tmp/ccbvngAF.s:288    .text.LIS302DL_DataRateCmd:00000000 LIS302DL_DataRateCmd
+     /tmp/ccbvngAF.s:338    .text.LIS302DL_FullScaleCmd:00000000 $t
+     /tmp/ccbvngAF.s:343    .text.LIS302DL_FullScaleCmd:00000000 LIS302DL_FullScaleCmd
+     /tmp/ccbvngAF.s:393    .text.LIS302DL_RebootCmd:00000000 $t
+     /tmp/ccbvngAF.s:398    .text.LIS302DL_RebootCmd:00000000 LIS302DL_RebootCmd
+     /tmp/ccbvngAF.s:440    .text.LIS302DL_Write:00000000 $t
+     /tmp/ccbvngAF.s:941    .text.LIS302DL_SendByte:00000000 LIS302DL_SendByte
+     /tmp/ccbvngAF.s:519    .text.LIS302DL_Read:00000000 $t
+     /tmp/ccbvngAF.s:606    .text.LIS302DL_ReadACC:00000000 $t
+     /tmp/ccbvngAF.s:611    .text.LIS302DL_ReadACC:00000000 LIS302DL_ReadACC
+     /tmp/ccbvngAF.s:736    .text.LIS302DL_LowLevel_Init:00000000 $t
+     /tmp/ccbvngAF.s:937    .text.LIS302DL_SendByte:00000000 $t
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

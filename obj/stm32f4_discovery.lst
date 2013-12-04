@@ -672,7 +672,7 @@
  468              	.LFE115:
  470 003a 00BF     		.text
  471              	.Letext0:
- 472              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 472              		.file 2 "/home/joyshu/tmp/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../..
  473              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
  474              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_exti.h"
  475              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
@@ -681,39 +681,39 @@
  478              		.file 8 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4_discovery.c
-     /tmp/cci3til7.s:24     .data.GPIO_PORT:00000000 GPIO_PORT
-     /tmp/cci3til7.s:21     .data.GPIO_PORT:00000000 $d
-     /tmp/cci3til7.s:34     .rodata.GPIO_PIN:00000000 GPIO_PIN
-     /tmp/cci3til7.s:31     .rodata.GPIO_PIN:00000000 $d
-     /tmp/cci3til7.s:44     .rodata.GPIO_CLK:00000000 GPIO_CLK
-     /tmp/cci3til7.s:41     .rodata.GPIO_CLK:00000000 $d
-     /tmp/cci3til7.s:54     .data.BUTTON_PORT:00000000 BUTTON_PORT
-     /tmp/cci3til7.s:51     .data.BUTTON_PORT:00000000 $d
-     /tmp/cci3til7.s:61     .rodata.BUTTON_PIN:00000000 BUTTON_PIN
-     /tmp/cci3til7.s:58     .rodata.BUTTON_PIN:00000000 $d
-     /tmp/cci3til7.s:68     .rodata.BUTTON_CLK:00000000 BUTTON_CLK
-     /tmp/cci3til7.s:65     .rodata.BUTTON_CLK:00000000 $d
-     /tmp/cci3til7.s:75     .rodata.BUTTON_EXTI_LINE:00000000 BUTTON_EXTI_LINE
-     /tmp/cci3til7.s:72     .rodata.BUTTON_EXTI_LINE:00000000 $d
-     /tmp/cci3til7.s:82     .rodata.BUTTON_PORT_SOURCE:00000000 BUTTON_PORT_SOURCE
-     /tmp/cci3til7.s:79     .rodata.BUTTON_PORT_SOURCE:00000000 $d
-     /tmp/cci3til7.s:89     .rodata.BUTTON_PIN_SOURCE:00000000 BUTTON_PIN_SOURCE
-     /tmp/cci3til7.s:86     .rodata.BUTTON_PIN_SOURCE:00000000 $d
-     /tmp/cci3til7.s:96     .rodata.BUTTON_IRQn:00000000 BUTTON_IRQn
-     /tmp/cci3til7.s:93     .rodata.BUTTON_IRQn:00000000 $d
+     /tmp/ccY0bVaC.s:24     .data.GPIO_PORT:00000000 GPIO_PORT
+     /tmp/ccY0bVaC.s:21     .data.GPIO_PORT:00000000 $d
+     /tmp/ccY0bVaC.s:34     .rodata.GPIO_PIN:00000000 GPIO_PIN
+     /tmp/ccY0bVaC.s:31     .rodata.GPIO_PIN:00000000 $d
+     /tmp/ccY0bVaC.s:44     .rodata.GPIO_CLK:00000000 GPIO_CLK
+     /tmp/ccY0bVaC.s:41     .rodata.GPIO_CLK:00000000 $d
+     /tmp/ccY0bVaC.s:54     .data.BUTTON_PORT:00000000 BUTTON_PORT
+     /tmp/ccY0bVaC.s:51     .data.BUTTON_PORT:00000000 $d
+     /tmp/ccY0bVaC.s:61     .rodata.BUTTON_PIN:00000000 BUTTON_PIN
+     /tmp/ccY0bVaC.s:58     .rodata.BUTTON_PIN:00000000 $d
+     /tmp/ccY0bVaC.s:68     .rodata.BUTTON_CLK:00000000 BUTTON_CLK
+     /tmp/ccY0bVaC.s:65     .rodata.BUTTON_CLK:00000000 $d
+     /tmp/ccY0bVaC.s:75     .rodata.BUTTON_EXTI_LINE:00000000 BUTTON_EXTI_LINE
+     /tmp/ccY0bVaC.s:72     .rodata.BUTTON_EXTI_LINE:00000000 $d
+     /tmp/ccY0bVaC.s:82     .rodata.BUTTON_PORT_SOURCE:00000000 BUTTON_PORT_SOURCE
+     /tmp/ccY0bVaC.s:79     .rodata.BUTTON_PORT_SOURCE:00000000 $d
+     /tmp/ccY0bVaC.s:89     .rodata.BUTTON_PIN_SOURCE:00000000 BUTTON_PIN_SOURCE
+     /tmp/ccY0bVaC.s:86     .rodata.BUTTON_PIN_SOURCE:00000000 $d
+     /tmp/ccY0bVaC.s:96     .rodata.BUTTON_IRQn:00000000 BUTTON_IRQn
+     /tmp/ccY0bVaC.s:93     .rodata.BUTTON_IRQn:00000000 $d
                             *COM*:00000004 NVIC_InitStructure
-     /tmp/cci3til7.s:100    .text.STM_EVAL_LEDInit:00000000 $t
-     /tmp/cci3til7.s:105    .text.STM_EVAL_LEDInit:00000000 STM_EVAL_LEDInit
-     /tmp/cci3til7.s:168    .text.STM_EVAL_LEDOn:00000000 $t
-     /tmp/cci3til7.s:173    .text.STM_EVAL_LEDOn:00000000 STM_EVAL_LEDOn
-     /tmp/cci3til7.s:211    .text.STM_EVAL_LEDOff:00000000 $t
-     /tmp/cci3til7.s:216    .text.STM_EVAL_LEDOff:00000000 STM_EVAL_LEDOff
-     /tmp/cci3til7.s:254    .text.STM_EVAL_LEDToggle:00000000 $t
-     /tmp/cci3til7.s:259    .text.STM_EVAL_LEDToggle:00000000 STM_EVAL_LEDToggle
-     /tmp/cci3til7.s:303    .text.STM_EVAL_PBInit:00000000 $t
-     /tmp/cci3til7.s:308    .text.STM_EVAL_PBInit:00000000 STM_EVAL_PBInit
-     /tmp/cci3til7.s:425    .text.STM_EVAL_PBGetState:00000000 $t
-     /tmp/cci3til7.s:430    .text.STM_EVAL_PBGetState:00000000 STM_EVAL_PBGetState
+     /tmp/ccY0bVaC.s:100    .text.STM_EVAL_LEDInit:00000000 $t
+     /tmp/ccY0bVaC.s:105    .text.STM_EVAL_LEDInit:00000000 STM_EVAL_LEDInit
+     /tmp/ccY0bVaC.s:168    .text.STM_EVAL_LEDOn:00000000 $t
+     /tmp/ccY0bVaC.s:173    .text.STM_EVAL_LEDOn:00000000 STM_EVAL_LEDOn
+     /tmp/ccY0bVaC.s:211    .text.STM_EVAL_LEDOff:00000000 $t
+     /tmp/ccY0bVaC.s:216    .text.STM_EVAL_LEDOff:00000000 STM_EVAL_LEDOff
+     /tmp/ccY0bVaC.s:254    .text.STM_EVAL_LEDToggle:00000000 $t
+     /tmp/ccY0bVaC.s:259    .text.STM_EVAL_LEDToggle:00000000 STM_EVAL_LEDToggle
+     /tmp/ccY0bVaC.s:303    .text.STM_EVAL_PBInit:00000000 $t
+     /tmp/ccY0bVaC.s:308    .text.STM_EVAL_PBInit:00000000 STM_EVAL_PBInit
+     /tmp/ccY0bVaC.s:425    .text.STM_EVAL_PBGetState:00000000 $t
+     /tmp/ccY0bVaC.s:430    .text.STM_EVAL_PBGetState:00000000 STM_EVAL_PBGetState
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
