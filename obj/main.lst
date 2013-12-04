@@ -939,16 +939,16 @@
  288:src/main.c    **** {
  666              		.loc 1 288 0
  667              		.cfi_startproc
- 668              		@ args = 0, pretend = 0, frame = 40
+ 668              		@ args = 0, pretend = 0, frame = 32
  669              		@ frame_needed = 1, uses_anonymous_args = 0
  670 0000 80B5     		push	{r7, lr}
  671              	.LCFI20:
  672              		.cfi_def_cfa_offset 8
  673              		.cfi_offset 14, -4
  674              		.cfi_offset 7, -8
- 675 0002 8AB0     		sub	sp, sp, #40
+ 675 0002 88B0     		sub	sp, sp, #32
  676              	.LCFI21:
- 677              		.cfi_def_cfa_offset 48
+ 677              		.cfi_def_cfa_offset 40
  678 0004 00AF     		add	r7, sp, #0
  679              	.LCFI22:
  680              		.cfi_def_cfa_register 7
@@ -958,1015 +958,1143 @@
  291:src/main.c    ****     LED = (int *) pvParameters;
  682              		.loc 1 291 0
  683 0008 7B68     		ldr	r3, [r7, #4]
- 684 000a 3B62     		str	r3, [r7, #32]
+ 684 000a BB61     		str	r3, [r7, #24]
  292:src/main.c    **** 
  293:src/main.c    **** 
- 294:src/main.c    **** 	uint8_t Buffer_x[2];
- 295:src/main.c    **** 	uint8_t Buffer_y[2];
+ 294:src/main.c    **** 	uint8_t Buffer_x[1];
+ 295:src/main.c    **** 	uint8_t Buffer_y[1];
  296:src/main.c    **** 	uint8_t counter  = 0;
  685              		.loc 1 296 0
  686 000c 4FF00003 		mov	r3, #0
- 687 0010 87F82730 		strb	r3, [r7, #39]
+ 687 0010 FB77     		strb	r3, [r7, #31]
  297:src/main.c    **** 	__IO uint32_t TimingDelay = 0;
  688              		.loc 1 297 0
- 689 0014 4FF00003 		mov	r3, #0
- 690 0018 3B61     		str	r3, [r7, #16]
+ 689 0012 4FF00003 		mov	r3, #0
+ 690 0016 FB60     		str	r3, [r7, #12]
  298:src/main.c    **** 	__IO int8_t XOffset;
  299:src/main.c    **** 	__IO int8_t YOffset;
  300:src/main.c    **** 
- 301:src/main.c    ****   	uint8_t TempAcceleration = 0;               
+ 301:src/main.c    ****       Buffer_x[0] = 0;
  691              		.loc 1 301 0
- 692 001a 4FF00003 		mov	r3, #0
- 693 001e FB77     		strb	r3, [r7, #31]
- 302:src/main.c    ****   	XOffset = Buffer_x[0];
+ 692 0018 4FF00003 		mov	r3, #0
+ 693 001c 3B75     		strb	r3, [r7, #20]
+ 302:src/main.c    ****       Buffer_y[0] = 0;
  694              		.loc 1 302 0
- 695 0020 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 696 0022 DBB2     		uxtb	r3, r3
- 697 0024 FB73     		strb	r3, [r7, #15]
- 303:src/main.c    ****   	YOffset = Buffer_y[0];
- 698              		.loc 1 303 0
- 699 0026 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 700 0028 DBB2     		uxtb	r3, r3
- 701 002a BB73     		strb	r3, [r7, #14]
- 304:src/main.c    **** 
- 305:src/main.c    **** 	uint8_t temp1, temp2 = 0;
- 702              		.loc 1 305 0
- 703 002c 4FF00003 		mov	r3, #0
- 704 0030 BB77     		strb	r3, [r7, #30]
- 705 0032 00E0     		b	.L28
- 706              	.L29:
- 306:src/main.c    **** 
- 307:src/main.c    **** for( ;; )
- 308:src/main.c    **** {
- 309:src/main.c    **** 	counter++;
- 310:src/main.c    **** 	if (counter == 10)
- 311:src/main.c    **** 	{
- 312:src/main.c    **** 
- 313:src/main.c    ****   	Buffer_x[2] = 0;
- 314:src/main.c    ****   	Buffer_y[2] = 0;
- 315:src/main.c    **** #if 0
- 316:src/main.c    **** 	STM_EVAL_LEDOn(LED4);
- 317:src/main.c    **** 	STM_EVAL_LEDOn(LED3);
- 318:src/main.c    **** 	STM_EVAL_LEDOn(LED5);
- 319:src/main.c    **** 	STM_EVAL_LEDOn(LED6);
- 320:src/main.c    **** 
- 321:src/main.c    **** 	STM_EVAL_LEDOff(LED4); //left
- 322:src/main.c    **** 	STM_EVAL_LEDOff(LED3); //up
- 323:src/main.c    **** 	STM_EVAL_LEDOff(LED5); //right
- 324:src/main.c    **** 	STM_EVAL_LEDOff(LED6); //down
- 325:src/main.c    **** #endif 
- 326:src/main.c    **** 
- 327:src/main.c    ****   	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 4);
- 328:src/main.c    **** 	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 4);
- 329:src/main.c    **** 
- 330:src/main.c    ****       /* Remove the offsets values from data */
- 331:src/main.c    ****       Buffer_x[0] -= XOffset;
- 332:src/main.c    ****       Buffer_y[0] -= YOffset;
+ 695 001e 4FF00003 		mov	r3, #0
+ 696 0022 3B74     		strb	r3, [r7, #16]
+ 303:src/main.c    **** 
+ 304:src/main.c    ****   	uint8_t TempAcceleration = 0;               
+ 697              		.loc 1 304 0
+ 698 0024 4FF00003 		mov	r3, #0
+ 699 0028 FB75     		strb	r3, [r7, #23]
+ 305:src/main.c    ****   	XOffset = Buffer_x[0];
+ 700              		.loc 1 305 0
+ 701 002a 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 702 002c DBB2     		uxtb	r3, r3
+ 703 002e FB72     		strb	r3, [r7, #11]
+ 306:src/main.c    ****   	YOffset = Buffer_y[0];
+ 704              		.loc 1 306 0
+ 705 0030 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 706 0032 DBB2     		uxtb	r3, r3
+ 707 0034 BB72     		strb	r3, [r7, #10]
+ 307:src/main.c    **** 
+ 308:src/main.c    **** 	int8_t temp1 = 0;
+ 708              		.loc 1 308 0
+ 709 0036 4FF00003 		mov	r3, #0
+ 710 003a BB75     		strb	r3, [r7, #22]
+ 309:src/main.c    **** 	int8_t temp2 = 0;
+ 711              		.loc 1 309 0
+ 712 003c 4FF00003 		mov	r3, #0
+ 713 0040 7B75     		strb	r3, [r7, #21]
+ 714 0042 00E0     		b	.L36
+ 715              	.L37:
+ 310:src/main.c    **** 
+ 311:src/main.c    **** for( ;; )
+ 312:src/main.c    **** {
+ 313:src/main.c    **** 	counter++;
+ 314:src/main.c    **** 	if (counter == 10)
+ 315:src/main.c    **** 	{
+ 316:src/main.c    **** 
+ 317:src/main.c    ****   	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
+ 318:src/main.c    **** 	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
+ 319:src/main.c    **** 
+ 320:src/main.c    ****       /* Remove the offsets values from data */
+ 321:src/main.c    ****       Buffer_x[0] -= XOffset;
+ 322:src/main.c    ****       Buffer_y[0] -= YOffset;
+ 323:src/main.c    **** 
+ 324:src/main.c    ****       /* Update autoreload and capture compare registers value*/
+ 325:src/main.c    ****       temp1 = ABS((int8_t)(Buffer_x[0]));
+ 326:src/main.c    ****       temp2 = ABS((int8_t)(Buffer_y[0]));
+ 327:src/main.c    ****       TempAcceleration = MAX(temp1, temp2);
+ 328:src/main.c    **** 	
+ 329:src/main.c    ****    /************************************************
+ 330:src/main.c    **** 	* buffer value error can work right
+ 331:src/main.c    **** 
+ 332:src/main.c    ****    *****************************************************/
  333:src/main.c    **** 
- 334:src/main.c    ****       /* Update autoreload and capture compare registers value*/
- 335:src/main.c    ****       temp1 = ABS((int8_t)(Buffer_x[0]));
- 336:src/main.c    ****       temp2 = ABS((int8_t)(Buffer_y[0]));
- 337:src/main.c    ****       TempAcceleration = MAX(temp1, temp2);
- 338:src/main.c    **** 	
- 339:src/main.c    ****    /************************************************
- 340:src/main.c    **** 	* buffer value error can work right
+ 334:src/main.c    **** 	if(TempAcceleration != 0)
+ 335:src/main.c    ****       {
+ 336:src/main.c    **** 	
+ 337:src/main.c    ****         if ((int8_t)Buffer_x[0] < -2)
+ 338:src/main.c    ****         {
+ 339:src/main.c    **** 				STM_EVAL_LEDOn(LED4);
+ 340:src/main.c    **** 
  341:src/main.c    **** 
- 342:src/main.c    ****    *****************************************************/
- 343:src/main.c    **** 
- 344:src/main.c    **** 	if(TempAcceleration != 0)
- 345:src/main.c    ****       {
- 346:src/main.c    **** 		//STM_EVAL_LEDOn(LED6);
+ 342:src/main.c    ****                 if ((int8_t)Buffer_x[0] <= 2)
+ 343:src/main.c    ****                 {
+ 344:src/main.c    ****                         STM_EVAL_LEDOff(LED3);
+ 345:src/main.c    **** 
+ 346:src/main.c    ****                 }
  347:src/main.c    **** 
- 348:src/main.c    **** 	
- 349:src/main.c    ****         if ((int8_t)Buffer_x[0] < -2)
- 350:src/main.c    ****         {
- 351:src/main.c    **** //				STM_EVAL_LEDOn(LED6);
- 352:src/main.c    **** 				//STM_EVAL_LEDOff(LED6);
- 353:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
- 354:src/main.c    **** 
- 355:src/main.c    ****                 if ((int8_t)Buffer_x[0] <= 2)
- 356:src/main.c    ****                 {
- 357:src/main.c    ****                       //  STM_EVAL_LEDOff(LED3);
- 358:src/main.c    **** 
- 359:src/main.c    ****                 }
- 360:src/main.c    **** 
- 361:src/main.c    ****                 if ((int8_t)Buffer_y[0] <= 2)
- 362:src/main.c    ****                 {
- 363:src/main.c    ****                     //   STM_EVAL_LEDOff(LED4);
- 364:src/main.c    ****                 }
- 365:src/main.c    **** 
- 366:src/main.c    ****                 if ((int8_t)Buffer_y[0] >= -2)
- 367:src/main.c    ****                 {
- 368:src/main.c    ****                     //    STM_EVAL_LEDOff(LED5);
- 369:src/main.c    ****                 }
- 370:src/main.c    **** 
- 371:src/main.c    ****         }
- 372:src/main.c    ****         if ((int8_t)Buffer_x[0] > 2)
- 373:src/main.c    ****         {
- 374:src/main.c    **** 				//STM_EVAL_LEDOn(LED3);
- 375:src/main.c    **** 				STM_EVAL_LEDOff(LED3);
- 376:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
- 377:src/main.c    ****                                 {
- 378:src/main.c    ****                        //         STM_EVAL_LEDOff(LED4);
- 379:src/main.c    ****                                 }
- 380:src/main.c    **** 
- 381:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
- 382:src/main.c    ****                                 {
- 383:src/main.c    ****                        // 		STM_EVAL_LEDOff(LED5);
- 384:src/main.c    ****                                 }
- 385:src/main.c    **** 
- 386:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
- 387:src/main.c    ****                                 {
- 388:src/main.c    **** 		                //        STM_EVAL_LEDOff(LED6);
- 389:src/main.c    ****                                 }
- 390:src/main.c    **** 
- 391:src/main.c    ****         }
- 392:src/main.c    ****         if ((int8_t)Buffer_y[0] > 2)
- 393:src/main.c    ****         {
- 394:src/main.c    **** 
- 395:src/main.c    **** 				//STM_EVAL_LEDOn(LED5);
- 396:src/main.c    **** 				STM_EVAL_LEDOff(LED5);
- 397:src/main.c    **** 
- 398:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
- 399:src/main.c    ****                                 {
- 400:src/main.c    ****                         //                STM_EVAL_LEDOff(LED3);
- 401:src/main.c    ****                                 }
+ 348:src/main.c    ****                 if ((int8_t)Buffer_y[0] <= 2)
+ 349:src/main.c    ****                 {
+ 350:src/main.c    ****                        STM_EVAL_LEDOff(LED6);
+ 351:src/main.c    ****                 }
+ 352:src/main.c    **** 
+ 353:src/main.c    ****                 if ((int8_t)Buffer_y[0] >= -2)
+ 354:src/main.c    ****                 {
+ 355:src/main.c    ****                         STM_EVAL_LEDOff(LED5);
+ 356:src/main.c    ****                 }
+ 357:src/main.c    **** 
+ 358:src/main.c    ****         }
+ 359:src/main.c    ****         if ((int8_t)Buffer_x[0] > 2)
+ 360:src/main.c    ****         {
+ 361:src/main.c    **** 				STM_EVAL_LEDOn(LED5);
+ 362:src/main.c    **** 
+ 363:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
+ 364:src/main.c    ****                                 {
+ 365:src/main.c    ****                                 STM_EVAL_LEDOff(LED4);
+ 366:src/main.c    ****                                 }
+ 367:src/main.c    **** 
+ 368:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
+ 369:src/main.c    ****                                 {
+ 370:src/main.c    ****                         		STM_EVAL_LEDOff(LED3);
+ 371:src/main.c    ****                                 }
+ 372:src/main.c    **** 
+ 373:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 374:src/main.c    ****                                 {
+ 375:src/main.c    **** 		                        STM_EVAL_LEDOff(LED6);
+ 376:src/main.c    ****                                 }
+ 377:src/main.c    **** 
+ 378:src/main.c    ****         }
+ 379:src/main.c    ****         if ((int8_t)Buffer_y[0] > 2)
+ 380:src/main.c    ****         {
+ 381:src/main.c    **** 
+ 382:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
+ 383:src/main.c    **** 
+ 384:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
+ 385:src/main.c    ****                                 {
+ 386:src/main.c    ****                                         STM_EVAL_LEDOff(LED4);
+ 387:src/main.c    ****                                 }
+ 388:src/main.c    **** 
+ 389:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
+ 390:src/main.c    ****                                 {
+ 391:src/main.c    ****                                         STM_EVAL_LEDOff(LED5);
+ 392:src/main.c    ****                                 }
+ 393:src/main.c    **** 
+ 394:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 395:src/main.c    ****                                 {
+ 396:src/main.c    ****                                         STM_EVAL_LEDOff(LED6);
+ 397:src/main.c    ****                                 }
+ 398:src/main.c    **** 
+ 399:src/main.c    ****         }
+ 400:src/main.c    ****         if ((int8_t)Buffer_y[0] < -2)
+ 401:src/main.c    ****         {
  402:src/main.c    **** 
- 403:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
- 404:src/main.c    ****                                 {
- 405:src/main.c    ****                        //                 STM_EVAL_LEDOff(LED5);
- 406:src/main.c    ****                                 }
- 407:src/main.c    **** 
- 408:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
- 409:src/main.c    ****                                 {
- 410:src/main.c    ****                        //                 STM_EVAL_LEDOff(LED6);
- 411:src/main.c    ****                                 }
- 412:src/main.c    **** 
- 413:src/main.c    ****         }
- 414:src/main.c    ****         if ((int8_t)Buffer_y[0] < -2)
- 415:src/main.c    ****         {
- 416:src/main.c    **** 
- 417:src/main.c    **** 			//STM_EVAL_LEDOn(LED4);
- 418:src/main.c    **** 			STM_EVAL_LEDOff(LED4);
- 419:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
- 420:src/main.c    ****                                 {
- 421:src/main.c    ****                          //               STM_EVAL_LEDOff(LED3);
- 422:src/main.c    ****                                 }
- 423:src/main.c    **** 
- 424:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
- 425:src/main.c    ****                                 {
- 426:src/main.c    ****                          //      STM_EVAL_LEDOff(LED4);
- 427:src/main.c    ****                                 }
+ 403:src/main.c    **** 			STM_EVAL_LEDOn(LED6);
+ 404:src/main.c    **** 
+ 405:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
+ 406:src/main.c    ****                                 {
+ 407:src/main.c    ****                                         STM_EVAL_LEDOff(LED3);
+ 408:src/main.c    ****                                 }
+ 409:src/main.c    **** 
+ 410:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
+ 411:src/main.c    ****                                 {
+ 412:src/main.c    ****                                STM_EVAL_LEDOff(LED4);
+ 413:src/main.c    ****                                 }
+ 414:src/main.c    **** 
+ 415:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 416:src/main.c    ****                                 {
+ 417:src/main.c    ****                                 STM_EVAL_LEDOff(LED5);
+ 418:src/main.c    ****                                 }
+ 419:src/main.c    ****         }
+ 420:src/main.c    **** 		else{/*
+ 421:src/main.c    **** 	STM_EVAL_LEDOn(LED4);
+ 422:src/main.c    **** 	STM_EVAL_LEDOn(LED3);
+ 423:src/main.c    **** 	STM_EVAL_LEDOn(LED5);
+ 424:src/main.c    **** 	STM_EVAL_LEDOn(LED6);
+ 425:src/main.c    **** */
+ 426:src/main.c    **** 		}
+ 427:src/main.c    **** 		counter = 0x00;
  428:src/main.c    **** 
- 429:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
- 430:src/main.c    ****                                 {
- 431:src/main.c    ****                          //       STM_EVAL_LEDOff(LED6);
- 432:src/main.c    ****                                 }
- 433:src/main.c    ****         }
- 434:src/main.c    **** 		else{/*
- 435:src/main.c    **** 	STM_EVAL_LEDOn(LED4);
- 436:src/main.c    **** 	STM_EVAL_LEDOn(LED3);
- 437:src/main.c    **** 	STM_EVAL_LEDOn(LED5);
- 438:src/main.c    **** 	STM_EVAL_LEDOn(LED6);
- 439:src/main.c    **** */
- 440:src/main.c    **** 		}
- 441:src/main.c    **** 		counter = 0x00;
- 442:src/main.c    **** 
- 443:src/main.c    ****     }
- 444:src/main.c    ****   }
- 445:src/main.c    **** }
- 707              		.loc 1 445 0
- 708 0034 00BF     		nop
- 709              	.L28:
- 309:src/main.c    **** 	counter++;
- 710              		.loc 1 309 0
- 711 0036 97F82730 		ldrb	r3, [r7, #39]
- 712 003a 03F10103 		add	r3, r3, #1
- 713 003e 87F82730 		strb	r3, [r7, #39]
- 310:src/main.c    **** 	if (counter == 10)
- 714              		.loc 1 310 0
- 715 0042 97F82730 		ldrb	r3, [r7, #39]	@ zero_extendqisi2
- 716 0046 0A2B     		cmp	r3, #10
- 717 0048 F4D1     		bne	.L29
- 313:src/main.c    ****   	Buffer_x[2] = 0;
- 718              		.loc 1 313 0
- 719 004a 4FF00003 		mov	r3, #0
- 720 004e BB76     		strb	r3, [r7, #26]
- 314:src/main.c    ****   	Buffer_y[2] = 0;
- 721              		.loc 1 314 0
- 722 0050 4FF00003 		mov	r3, #0
- 723 0054 BB75     		strb	r3, [r7, #22]
- 327:src/main.c    ****   	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 4);
- 724              		.loc 1 327 0
- 725 0056 07F11803 		add	r3, r7, #24
- 726 005a 1846     		mov	r0, r3
- 727 005c 4FF02901 		mov	r1, #41
- 728 0060 4FF00402 		mov	r2, #4
- 729 0064 FFF7FEFF 		bl	LIS302DL_Read
- 328:src/main.c    **** 	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 4);
- 730              		.loc 1 328 0
- 731 0068 07F11403 		add	r3, r7, #20
- 732 006c 1846     		mov	r0, r3
- 733 006e 4FF02B01 		mov	r1, #43
- 734 0072 4FF00402 		mov	r2, #4
- 735 0076 FFF7FEFF 		bl	LIS302DL_Read
- 331:src/main.c    ****       Buffer_x[0] -= XOffset;
- 736              		.loc 1 331 0
- 737 007a 3A7E     		ldrb	r2, [r7, #24]	@ zero_extendqisi2
- 738 007c FB7B     		ldrb	r3, [r7, #15]
- 739 007e DBB2     		uxtb	r3, r3
- 740 0080 DBB2     		uxtb	r3, r3
- 741 0082 D31A     		subs	r3, r2, r3
- 742 0084 DBB2     		uxtb	r3, r3
- 743 0086 3B76     		strb	r3, [r7, #24]
- 332:src/main.c    ****       Buffer_y[0] -= YOffset;
- 744              		.loc 1 332 0
- 745 0088 3A7D     		ldrb	r2, [r7, #20]	@ zero_extendqisi2
- 746 008a BB7B     		ldrb	r3, [r7, #14]
- 747 008c DBB2     		uxtb	r3, r3
- 748 008e DBB2     		uxtb	r3, r3
- 749 0090 D31A     		subs	r3, r2, r3
- 750 0092 DBB2     		uxtb	r3, r3
- 751 0094 3B75     		strb	r3, [r7, #20]
- 335:src/main.c    ****       temp1 = ABS((int8_t)(Buffer_x[0]));
- 752              		.loc 1 335 0
- 753 0096 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 754 0098 DBB2     		uxtb	r3, r3
- 755 009a 5BB2     		sxtb	r3, r3
- 756 009c 002B     		cmp	r3, #0
- 757 009e B8BF     		it	lt
- 758 00a0 5B42     		rsblt	r3, r3, #0
- 759 00a2 7B77     		strb	r3, [r7, #29]
- 336:src/main.c    ****       temp2 = ABS((int8_t)(Buffer_y[0]));
- 760              		.loc 1 336 0
- 761 00a4 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 762 00a6 DBB2     		uxtb	r3, r3
- 763 00a8 5BB2     		sxtb	r3, r3
- 764 00aa 002B     		cmp	r3, #0
- 765 00ac B8BF     		it	lt
- 766 00ae 5B42     		rsblt	r3, r3, #0
- 767 00b0 BB77     		strb	r3, [r7, #30]
- 337:src/main.c    ****       TempAcceleration = MAX(temp1, temp2);
- 768              		.loc 1 337 0
- 769 00b2 7A7F     		ldrb	r2, [r7, #29]	@ zero_extendqisi2
- 770 00b4 BB7F     		ldrb	r3, [r7, #30]	@ zero_extendqisi2
- 771 00b6 9A42     		cmp	r2, r3
- 772 00b8 28BF     		it	cs
- 773 00ba 1346     		movcs	r3, r2
- 774 00bc FB77     		strb	r3, [r7, #31]
- 344:src/main.c    **** 	if(TempAcceleration != 0)
- 775              		.loc 1 344 0
- 776 00be FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
- 777 00c0 002B     		cmp	r3, #0
- 778 00c2 B7D0     		beq	.L29
- 349:src/main.c    ****         if ((int8_t)Buffer_x[0] < -2)
- 779              		.loc 1 349 0
- 780 00c4 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 781 00c6 DBB2     		uxtb	r3, r3
- 782 00c8 5BB2     		sxtb	r3, r3
- 783 00ca 13F1020F 		cmn	r3, #2
- 784 00ce 03DA     		bge	.L24
- 353:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
- 785              		.loc 1 353 0
- 786 00d0 4FF00100 		mov	r0, #1
- 787 00d4 FFF7FEFF 		bl	STM_EVAL_LEDOn
- 788              	.L24:
- 372:src/main.c    ****         if ((int8_t)Buffer_x[0] > 2)
- 789              		.loc 1 372 0
- 790 00d8 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 791 00da DBB2     		uxtb	r3, r3
- 792 00dc 5BB2     		sxtb	r3, r3
- 793 00de 022B     		cmp	r3, #2
- 794 00e0 03DD     		ble	.L25
- 375:src/main.c    **** 				STM_EVAL_LEDOff(LED3);
- 795              		.loc 1 375 0
- 796 00e2 4FF00100 		mov	r0, #1
- 797 00e6 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 798              	.L25:
- 392:src/main.c    ****         if ((int8_t)Buffer_y[0] > 2)
- 799              		.loc 1 392 0
- 800 00ea 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 801 00ec DBB2     		uxtb	r3, r3
- 802 00ee 5BB2     		sxtb	r3, r3
- 803 00f0 022B     		cmp	r3, #2
- 804 00f2 03DD     		ble	.L26
- 396:src/main.c    **** 				STM_EVAL_LEDOff(LED5);
- 805              		.loc 1 396 0
- 806 00f4 4FF00200 		mov	r0, #2
- 807 00f8 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 808              	.L26:
- 414:src/main.c    ****         if ((int8_t)Buffer_y[0] < -2)
- 809              		.loc 1 414 0
- 810 00fc 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 811 00fe DBB2     		uxtb	r3, r3
- 812 0100 5BB2     		sxtb	r3, r3
- 813 0102 13F1020F 		cmn	r3, #2
- 814 0106 03DA     		bge	.L27
- 418:src/main.c    **** 			STM_EVAL_LEDOff(LED4);
- 815              		.loc 1 418 0
- 816 0108 4FF00000 		mov	r0, #0
- 817 010c FFF7FEFF 		bl	STM_EVAL_LEDOff
- 818              	.L27:
- 441:src/main.c    **** 		counter = 0x00;
- 819              		.loc 1 441 0
- 820 0110 4FF00003 		mov	r3, #0
- 821 0114 87F82730 		strb	r3, [r7, #39]
- 822              		.loc 1 445 0
- 823 0118 8CE7     		b	.L29
- 824              		.cfi_endproc
- 825              	.LFE117:
- 827 011a 00BF     		.section	.text.vBALANCETask,"ax",%progbits
- 828              		.align	2
- 829              		.thumb
- 830              		.thumb_func
- 832              	vBALANCETask:
- 833              	.LFB118:
- 446:src/main.c    **** }
- 447:src/main.c    **** 
- 448:src/main.c    **** /*-----------------------------------------------------------*/
- 449:src/main.c    **** 
- 450:src/main.c    **** void vBALANCETask(void *pvParameters)
- 451:src/main.c    **** {
- 834              		.loc 1 451 0
- 835              		.cfi_startproc
- 836              		@ args = 0, pretend = 0, frame = 24
- 837              		@ frame_needed = 1, uses_anonymous_args = 0
- 838 0000 80B5     		push	{r7, lr}
- 839              	.LCFI23:
- 840              		.cfi_def_cfa_offset 8
- 841              		.cfi_offset 14, -4
- 842              		.cfi_offset 7, -8
- 843 0002 86B0     		sub	sp, sp, #24
- 844              	.LCFI24:
- 845              		.cfi_def_cfa_offset 32
- 846 0004 00AF     		add	r7, sp, #0
- 847              	.LCFI25:
- 848              		.cfi_def_cfa_register 7
- 849 0006 7860     		str	r0, [r7, #4]
- 452:src/main.c    **** 	uint8_t temp1, temp2 = 0;
- 850              		.loc 1 452 0
- 851 0008 4FF00003 		mov	r3, #0
- 852 000c FB75     		strb	r3, [r7, #23]
- 453:src/main.c    **** 	__IO uint8_t TempAcceleration = 0;
- 853              		.loc 1 453 0
- 854 000e 4FF00003 		mov	r3, #0
- 855 0012 7B75     		strb	r3, [r7, #21]
- 856              	.L36:
- 454:src/main.c    **** 	uint8_t xBuffer_receive[queueSIZE];
- 455:src/main.c    **** 	for( ;; )
- 456:src/main.c    **** 	{
- 457:src/main.c    **** 	 if(xQueueReceive(xQueue,xBuffer_receive,0)==pdPASS)
- 857              		.loc 1 457 0
- 858 0014 40F20003 		movw	r3, #:lower16:xQueue
- 859 0018 C0F20003 		movt	r3, #:upper16:xQueue
- 860 001c 1B68     		ldr	r3, [r3, #0]
- 861 001e 1846     		mov	r0, r3
- 862 0020 07F10C03 		add	r3, r7, #12
- 863 0024 1946     		mov	r1, r3
- 864 0026 4FF00002 		mov	r2, #0
- 865 002a 4FF00003 		mov	r3, #0
- 866 002e FFF7FEFF 		bl	xQueueGenericReceive
- 867 0032 0346     		mov	r3, r0
- 868 0034 012B     		cmp	r3, #1
- 869 0036 40F0C080 		bne	.L31
- 458:src/main.c    **** 		{
- 459:src/main.c    **** 		/* Disable All TIM4 Capture Compare Channels */
- 460:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_1, DISABLE);
- 870              		.loc 1 460 0
- 871 003a 4FF40060 		mov	r0, #2048
- 872 003e C4F20000 		movt	r0, 16384
- 873 0042 4FF00001 		mov	r1, #0
- 874 0046 4FF00002 		mov	r2, #0
- 875 004a FFF7FEFF 		bl	TIM_CCxCmd
- 461:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_2, DISABLE);
- 876              		.loc 1 461 0
- 877 004e 4FF40060 		mov	r0, #2048
- 878 0052 C4F20000 		movt	r0, 16384
- 879 0056 4FF00401 		mov	r1, #4
- 880 005a 4FF00002 		mov	r2, #0
- 881 005e FFF7FEFF 		bl	TIM_CCxCmd
- 462:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_3, DISABLE);
- 882              		.loc 1 462 0
- 883 0062 4FF40060 		mov	r0, #2048
- 884 0066 C4F20000 		movt	r0, 16384
- 885 006a 4FF00801 		mov	r1, #8
- 886 006e 4FF00002 		mov	r2, #0
- 887 0072 FFF7FEFF 		bl	TIM_CCxCmd
- 463:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_4, DISABLE);
- 888              		.loc 1 463 0
- 889 0076 4FF40060 		mov	r0, #2048
- 890 007a C4F20000 		movt	r0, 16384
- 891 007e 4FF00C01 		mov	r1, #12
- 892 0082 4FF00002 		mov	r2, #0
- 893 0086 FFF7FEFF 		bl	TIM_CCxCmd
- 464:src/main.c    **** 
- 465:src/main.c    **** 		/* Update autoreload and capture compare registers value*/
- 466:src/main.c    **** 		temp1=((int8_t)(xBuffer_receive[0])<0)?(int8_t)(xBuffer_receive[0])*(-1):(int8_t)(xBuffer_receive
- 894              		.loc 1 466 0
- 895 008a 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
- 896 008c DBB2     		uxtb	r3, r3
- 897 008e 5BB2     		sxtb	r3, r3
- 898 0090 002B     		cmp	r3, #0
- 899 0092 B8BF     		it	lt
- 900 0094 5B42     		rsblt	r3, r3, #0
- 901 0096 BB75     		strb	r3, [r7, #22]
- 467:src/main.c    **** 		temp2=((int8_t)(xBuffer_receive[2])<0)?(int8_t)(xBuffer_receive[2])*(-1):(int8_t)(xBuffer_receive
- 902              		.loc 1 467 0
- 903 0098 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
- 904 009a DBB2     		uxtb	r3, r3
- 905 009c 5BB2     		sxtb	r3, r3
- 906 009e 002B     		cmp	r3, #0
- 907 00a0 B8BF     		it	lt
- 908 00a2 5B42     		rsblt	r3, r3, #0
- 909 00a4 FB75     		strb	r3, [r7, #23]
- 468:src/main.c    **** 		TempAcceleration = (temp1<temp2)?temp2:temp1; //MAX(temp1,temp2)
- 910              		.loc 1 468 0
- 911 00a6 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
- 912 00a8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
- 913 00aa 9A42     		cmp	r2, r3
- 914 00ac 28BF     		it	cs
- 915 00ae 1346     		movcs	r3, r2
- 916 00b0 DBB2     		uxtb	r3, r3
- 917 00b2 7B75     		strb	r3, [r7, #21]
- 469:src/main.c    **** 
- 470:src/main.c    **** 		if(TempAcceleration != 0)
- 918              		.loc 1 470 0
- 919 00b4 7B7D     		ldrb	r3, [r7, #21]
- 920 00b6 DBB2     		uxtb	r3, r3
- 921 00b8 002B     		cmp	r3, #0
- 922 00ba 7ED0     		beq	.L31
- 471:src/main.c    **** 		{
- 472:src/main.c    **** 			if ((int8_t)xBuffer_receive[0] < -2)
- 923              		.loc 1 472 0
- 924 00bc 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
- 925 00be DBB2     		uxtb	r3, r3
- 926 00c0 5BB2     		sxtb	r3, r3
- 927 00c2 13F1020F 		cmn	r3, #2
- 928 00c6 16DA     		bge	.L32
+ 429:src/main.c    ****     }
+ 430:src/main.c    ****   }
+ 431:src/main.c    **** }
+ 716              		.loc 1 431 0
+ 717 0044 00BF     		nop
+ 718              	.L36:
+ 313:src/main.c    **** 	counter++;
+ 719              		.loc 1 313 0
+ 720 0046 FB7F     		ldrb	r3, [r7, #31]
+ 721 0048 03F10103 		add	r3, r3, #1
+ 722 004c FB77     		strb	r3, [r7, #31]
+ 314:src/main.c    **** 	if (counter == 10)
+ 723              		.loc 1 314 0
+ 724 004e FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 725 0050 0A2B     		cmp	r3, #10
+ 726 0052 F7D1     		bne	.L37
+ 317:src/main.c    ****   	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
+ 727              		.loc 1 317 0
+ 728 0054 07F11403 		add	r3, r7, #20
+ 729 0058 1846     		mov	r0, r3
+ 730 005a 4FF02901 		mov	r1, #41
+ 731 005e 4FF00102 		mov	r2, #1
+ 732 0062 FFF7FEFF 		bl	LIS302DL_Read
+ 318:src/main.c    **** 	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
+ 733              		.loc 1 318 0
+ 734 0066 07F11003 		add	r3, r7, #16
+ 735 006a 1846     		mov	r0, r3
+ 736 006c 4FF02B01 		mov	r1, #43
+ 737 0070 4FF00102 		mov	r2, #1
+ 738 0074 FFF7FEFF 		bl	LIS302DL_Read
+ 321:src/main.c    ****       Buffer_x[0] -= XOffset;
+ 739              		.loc 1 321 0
+ 740 0078 3A7D     		ldrb	r2, [r7, #20]	@ zero_extendqisi2
+ 741 007a FB7A     		ldrb	r3, [r7, #11]
+ 742 007c DBB2     		uxtb	r3, r3
+ 743 007e DBB2     		uxtb	r3, r3
+ 744 0080 D31A     		subs	r3, r2, r3
+ 745 0082 DBB2     		uxtb	r3, r3
+ 746 0084 3B75     		strb	r3, [r7, #20]
+ 322:src/main.c    ****       Buffer_y[0] -= YOffset;
+ 747              		.loc 1 322 0
+ 748 0086 3A7C     		ldrb	r2, [r7, #16]	@ zero_extendqisi2
+ 749 0088 BB7A     		ldrb	r3, [r7, #10]
+ 750 008a DBB2     		uxtb	r3, r3
+ 751 008c DBB2     		uxtb	r3, r3
+ 752 008e D31A     		subs	r3, r2, r3
+ 753 0090 DBB2     		uxtb	r3, r3
+ 754 0092 3B74     		strb	r3, [r7, #16]
+ 325:src/main.c    ****       temp1 = ABS((int8_t)(Buffer_x[0]));
+ 755              		.loc 1 325 0
+ 756 0094 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 757 0096 DBB2     		uxtb	r3, r3
+ 758 0098 5BB2     		sxtb	r3, r3
+ 759 009a 002B     		cmp	r3, #0
+ 760 009c B8BF     		it	lt
+ 761 009e 5B42     		rsblt	r3, r3, #0
+ 762 00a0 BB75     		strb	r3, [r7, #22]
+ 326:src/main.c    ****       temp2 = ABS((int8_t)(Buffer_y[0]));
+ 763              		.loc 1 326 0
+ 764 00a2 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 765 00a4 DBB2     		uxtb	r3, r3
+ 766 00a6 5BB2     		sxtb	r3, r3
+ 767 00a8 002B     		cmp	r3, #0
+ 768 00aa B8BF     		it	lt
+ 769 00ac 5B42     		rsblt	r3, r3, #0
+ 770 00ae 7B75     		strb	r3, [r7, #21]
+ 327:src/main.c    ****       TempAcceleration = MAX(temp1, temp2);
+ 771              		.loc 1 327 0
+ 772 00b0 97F91620 		ldrsb	r2, [r7, #22]
+ 773 00b4 97F91530 		ldrsb	r3, [r7, #21]
+ 774 00b8 9A42     		cmp	r2, r3
+ 775 00ba A8BF     		it	ge
+ 776 00bc 1346     		movge	r3, r2
+ 777 00be DBB2     		uxtb	r3, r3
+ 778 00c0 FB75     		strb	r3, [r7, #23]
+ 334:src/main.c    **** 	if(TempAcceleration != 0)
+ 779              		.loc 1 334 0
+ 780 00c2 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 781 00c4 002B     		cmp	r3, #0
+ 782 00c6 BDD0     		beq	.L37
+ 337:src/main.c    ****         if ((int8_t)Buffer_x[0] < -2)
+ 783              		.loc 1 337 0
+ 784 00c8 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 785 00ca DBB2     		uxtb	r3, r3
+ 786 00cc 5BB2     		sxtb	r3, r3
+ 787 00ce 13F1020F 		cmn	r3, #2
+ 788 00d2 1FDA     		bge	.L24
+ 339:src/main.c    **** 				STM_EVAL_LEDOn(LED4);
+ 789              		.loc 1 339 0
+ 790 00d4 4FF00000 		mov	r0, #0
+ 791 00d8 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 342:src/main.c    ****                 if ((int8_t)Buffer_x[0] <= 2)
+ 792              		.loc 1 342 0
+ 793 00dc 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 794 00de DBB2     		uxtb	r3, r3
+ 795 00e0 5BB2     		sxtb	r3, r3
+ 796 00e2 022B     		cmp	r3, #2
+ 797 00e4 03DC     		bgt	.L25
+ 344:src/main.c    ****                         STM_EVAL_LEDOff(LED3);
+ 798              		.loc 1 344 0
+ 799 00e6 4FF00100 		mov	r0, #1
+ 800 00ea FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 801              	.L25:
+ 348:src/main.c    ****                 if ((int8_t)Buffer_y[0] <= 2)
+ 802              		.loc 1 348 0
+ 803 00ee 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 804 00f0 DBB2     		uxtb	r3, r3
+ 805 00f2 5BB2     		sxtb	r3, r3
+ 806 00f4 022B     		cmp	r3, #2
+ 807 00f6 03DC     		bgt	.L26
+ 350:src/main.c    ****                        STM_EVAL_LEDOff(LED6);
+ 808              		.loc 1 350 0
+ 809 00f8 4FF00300 		mov	r0, #3
+ 810 00fc FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 811              	.L26:
+ 353:src/main.c    ****                 if ((int8_t)Buffer_y[0] >= -2)
+ 812              		.loc 1 353 0
+ 813 0100 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 814 0102 DBB2     		uxtb	r3, r3
+ 815 0104 5BB2     		sxtb	r3, r3
+ 816 0106 13F1020F 		cmn	r3, #2
+ 817 010a 03DB     		blt	.L24
+ 355:src/main.c    ****                         STM_EVAL_LEDOff(LED5);
+ 818              		.loc 1 355 0
+ 819 010c 4FF00200 		mov	r0, #2
+ 820 0110 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 821              	.L24:
+ 359:src/main.c    ****         if ((int8_t)Buffer_x[0] > 2)
+ 822              		.loc 1 359 0
+ 823 0114 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 824 0116 DBB2     		uxtb	r3, r3
+ 825 0118 5BB2     		sxtb	r3, r3
+ 826 011a 022B     		cmp	r3, #2
+ 827 011c 20DD     		ble	.L27
+ 361:src/main.c    **** 				STM_EVAL_LEDOn(LED5);
+ 828              		.loc 1 361 0
+ 829 011e 4FF00200 		mov	r0, #2
+ 830 0122 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 363:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
+ 831              		.loc 1 363 0
+ 832 0126 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 833 0128 DBB2     		uxtb	r3, r3
+ 834 012a 5BB2     		sxtb	r3, r3
+ 835 012c 022B     		cmp	r3, #2
+ 836 012e 03DC     		bgt	.L28
+ 365:src/main.c    ****                                 STM_EVAL_LEDOff(LED4);
+ 837              		.loc 1 365 0
+ 838 0130 4FF00000 		mov	r0, #0
+ 839 0134 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 840              	.L28:
+ 368:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
+ 841              		.loc 1 368 0
+ 842 0138 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 843 013a DBB2     		uxtb	r3, r3
+ 844 013c 5BB2     		sxtb	r3, r3
+ 845 013e 13F1020F 		cmn	r3, #2
+ 846 0142 03DB     		blt	.L29
+ 370:src/main.c    ****                         		STM_EVAL_LEDOff(LED3);
+ 847              		.loc 1 370 0
+ 848 0144 4FF00100 		mov	r0, #1
+ 849 0148 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 850              	.L29:
+ 373:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 851              		.loc 1 373 0
+ 852 014c 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 853 014e DBB2     		uxtb	r3, r3
+ 854 0150 5BB2     		sxtb	r3, r3
+ 855 0152 13F1020F 		cmn	r3, #2
+ 856 0156 03DB     		blt	.L27
+ 375:src/main.c    **** 		                        STM_EVAL_LEDOff(LED6);
+ 857              		.loc 1 375 0
+ 858 0158 4FF00300 		mov	r0, #3
+ 859 015c FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 860              	.L27:
+ 379:src/main.c    ****         if ((int8_t)Buffer_y[0] > 2)
+ 861              		.loc 1 379 0
+ 862 0160 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 863 0162 DBB2     		uxtb	r3, r3
+ 864 0164 5BB2     		sxtb	r3, r3
+ 865 0166 022B     		cmp	r3, #2
+ 866 0168 20DD     		ble	.L30
+ 382:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
+ 867              		.loc 1 382 0
+ 868 016a 4FF00100 		mov	r0, #1
+ 869 016e FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 384:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
+ 870              		.loc 1 384 0
+ 871 0172 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 872 0174 DBB2     		uxtb	r3, r3
+ 873 0176 5BB2     		sxtb	r3, r3
+ 874 0178 022B     		cmp	r3, #2
+ 875 017a 03DC     		bgt	.L31
+ 386:src/main.c    ****                                         STM_EVAL_LEDOff(LED4);
+ 876              		.loc 1 386 0
+ 877 017c 4FF00000 		mov	r0, #0
+ 878 0180 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 879              	.L31:
+ 389:src/main.c    ****                                 if ((int8_t)Buffer_y[0] >= -2)
+ 880              		.loc 1 389 0
+ 881 0184 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 882 0186 DBB2     		uxtb	r3, r3
+ 883 0188 5BB2     		sxtb	r3, r3
+ 884 018a 13F1020F 		cmn	r3, #2
+ 885 018e 03DB     		blt	.L32
+ 391:src/main.c    ****                                         STM_EVAL_LEDOff(LED5);
+ 886              		.loc 1 391 0
+ 887 0190 4FF00200 		mov	r0, #2
+ 888 0194 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 889              	.L32:
+ 394:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 890              		.loc 1 394 0
+ 891 0198 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 892 019a DBB2     		uxtb	r3, r3
+ 893 019c 5BB2     		sxtb	r3, r3
+ 894 019e 13F1020F 		cmn	r3, #2
+ 895 01a2 03DB     		blt	.L30
+ 396:src/main.c    ****                                         STM_EVAL_LEDOff(LED6);
+ 896              		.loc 1 396 0
+ 897 01a4 4FF00300 		mov	r0, #3
+ 898 01a8 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 899              	.L30:
+ 400:src/main.c    ****         if ((int8_t)Buffer_y[0] < -2)
+ 900              		.loc 1 400 0
+ 901 01ac 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 902 01ae DBB2     		uxtb	r3, r3
+ 903 01b0 5BB2     		sxtb	r3, r3
+ 904 01b2 13F1020F 		cmn	r3, #2
+ 905 01b6 1FDA     		bge	.L33
+ 403:src/main.c    **** 			STM_EVAL_LEDOn(LED6);
+ 906              		.loc 1 403 0
+ 907 01b8 4FF00300 		mov	r0, #3
+ 908 01bc FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 405:src/main.c    ****                                 if ((int8_t)Buffer_x[0] <= 2)
+ 909              		.loc 1 405 0
+ 910 01c0 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 911 01c2 DBB2     		uxtb	r3, r3
+ 912 01c4 5BB2     		sxtb	r3, r3
+ 913 01c6 022B     		cmp	r3, #2
+ 914 01c8 03DC     		bgt	.L34
+ 407:src/main.c    ****                                         STM_EVAL_LEDOff(LED3);
+ 915              		.loc 1 407 0
+ 916 01ca 4FF00100 		mov	r0, #1
+ 917 01ce FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 918              	.L34:
+ 410:src/main.c    ****                                 if ((int8_t)Buffer_y[0] <= 2)
+ 919              		.loc 1 410 0
+ 920 01d2 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 921 01d4 DBB2     		uxtb	r3, r3
+ 922 01d6 5BB2     		sxtb	r3, r3
+ 923 01d8 022B     		cmp	r3, #2
+ 924 01da 03DC     		bgt	.L35
+ 412:src/main.c    ****                                STM_EVAL_LEDOff(LED4);
+ 925              		.loc 1 412 0
+ 926 01dc 4FF00000 		mov	r0, #0
+ 927 01e0 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 928              	.L35:
+ 415:src/main.c    ****                                 if ((int8_t)Buffer_x[0] >= -2)
+ 929              		.loc 1 415 0
+ 930 01e4 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 931 01e6 DBB2     		uxtb	r3, r3
+ 932 01e8 5BB2     		sxtb	r3, r3
+ 933 01ea 13F1020F 		cmn	r3, #2
+ 934 01ee 03DB     		blt	.L33
+ 417:src/main.c    ****                                 STM_EVAL_LEDOff(LED5);
+ 935              		.loc 1 417 0
+ 936 01f0 4FF00200 		mov	r0, #2
+ 937 01f4 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 938              	.L33:
+ 427:src/main.c    **** 		counter = 0x00;
+ 939              		.loc 1 427 0
+ 940 01f8 4FF00003 		mov	r3, #0
+ 941 01fc FB77     		strb	r3, [r7, #31]
+ 942              		.loc 1 431 0
+ 943 01fe 21E7     		b	.L37
+ 944              		.cfi_endproc
+ 945              	.LFE117:
+ 947              		.section	.text.vBALANCETask,"ax",%progbits
+ 948              		.align	2
+ 949              		.thumb
+ 950              		.thumb_func
+ 952              	vBALANCETask:
+ 953              	.LFB118:
+ 432:src/main.c    **** }
+ 433:src/main.c    **** 
+ 434:src/main.c    **** /*-----------------------------------------------------------*/
+ 435:src/main.c    **** 
+ 436:src/main.c    **** void vBALANCETask(void *pvParameters)
+ 437:src/main.c    **** {
+ 954              		.loc 1 437 0
+ 955              		.cfi_startproc
+ 956              		@ args = 0, pretend = 0, frame = 24
+ 957              		@ frame_needed = 1, uses_anonymous_args = 0
+ 958 0000 80B5     		push	{r7, lr}
+ 959              	.LCFI23:
+ 960              		.cfi_def_cfa_offset 8
+ 961              		.cfi_offset 14, -4
+ 962              		.cfi_offset 7, -8
+ 963 0002 86B0     		sub	sp, sp, #24
+ 964              	.LCFI24:
+ 965              		.cfi_def_cfa_offset 32
+ 966 0004 00AF     		add	r7, sp, #0
+ 967              	.LCFI25:
+ 968              		.cfi_def_cfa_register 7
+ 969 0006 7860     		str	r0, [r7, #4]
+ 438:src/main.c    **** 	uint8_t temp1, temp2 = 0;
+ 970              		.loc 1 438 0
+ 971 0008 4FF00003 		mov	r3, #0
+ 972 000c FB75     		strb	r3, [r7, #23]
+ 439:src/main.c    **** 	__IO uint8_t TempAcceleration = 0;
+ 973              		.loc 1 439 0
+ 974 000e 4FF00003 		mov	r3, #0
+ 975 0012 7B75     		strb	r3, [r7, #21]
+ 976              	.L44:
+ 440:src/main.c    **** 	uint8_t xBuffer_receive[queueSIZE];
+ 441:src/main.c    **** 	for( ;; )
+ 442:src/main.c    **** 	{
+ 443:src/main.c    **** 	 if(xQueueReceive(xQueue,xBuffer_receive,0)==pdPASS)
+ 977              		.loc 1 443 0
+ 978 0014 40F20003 		movw	r3, #:lower16:xQueue
+ 979 0018 C0F20003 		movt	r3, #:upper16:xQueue
+ 980 001c 1B68     		ldr	r3, [r3, #0]
+ 981 001e 1846     		mov	r0, r3
+ 982 0020 07F10C03 		add	r3, r7, #12
+ 983 0024 1946     		mov	r1, r3
+ 984 0026 4FF00002 		mov	r2, #0
+ 985 002a 4FF00003 		mov	r3, #0
+ 986 002e FFF7FEFF 		bl	xQueueGenericReceive
+ 987 0032 0346     		mov	r3, r0
+ 988 0034 012B     		cmp	r3, #1
+ 989 0036 40F0C080 		bne	.L39
+ 444:src/main.c    **** 		{
+ 445:src/main.c    **** 		/* Disable All TIM4 Capture Compare Channels */
+ 446:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_1, DISABLE);
+ 990              		.loc 1 446 0
+ 991 003a 4FF40060 		mov	r0, #2048
+ 992 003e C4F20000 		movt	r0, 16384
+ 993 0042 4FF00001 		mov	r1, #0
+ 994 0046 4FF00002 		mov	r2, #0
+ 995 004a FFF7FEFF 		bl	TIM_CCxCmd
+ 447:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_2, DISABLE);
+ 996              		.loc 1 447 0
+ 997 004e 4FF40060 		mov	r0, #2048
+ 998 0052 C4F20000 		movt	r0, 16384
+ 999 0056 4FF00401 		mov	r1, #4
+ 1000 005a 4FF00002 		mov	r2, #0
+ 1001 005e FFF7FEFF 		bl	TIM_CCxCmd
+ 448:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_3, DISABLE);
+ 1002              		.loc 1 448 0
+ 1003 0062 4FF40060 		mov	r0, #2048
+ 1004 0066 C4F20000 		movt	r0, 16384
+ 1005 006a 4FF00801 		mov	r1, #8
+ 1006 006e 4FF00002 		mov	r2, #0
+ 1007 0072 FFF7FEFF 		bl	TIM_CCxCmd
+ 449:src/main.c    **** 		TIM_CCxCmd(TIM4, TIM_Channel_4, DISABLE);
+ 1008              		.loc 1 449 0
+ 1009 0076 4FF40060 		mov	r0, #2048
+ 1010 007a C4F20000 		movt	r0, 16384
+ 1011 007e 4FF00C01 		mov	r1, #12
+ 1012 0082 4FF00002 		mov	r2, #0
+ 1013 0086 FFF7FEFF 		bl	TIM_CCxCmd
+ 450:src/main.c    **** 
+ 451:src/main.c    **** 		/* Update autoreload and capture compare registers value*/
+ 452:src/main.c    **** 		temp1=((int8_t)(xBuffer_receive[0])<0)?(int8_t)(xBuffer_receive[0])*(-1):(int8_t)(xBuffer_receive
+ 1014              		.loc 1 452 0
+ 1015 008a 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 1016 008c DBB2     		uxtb	r3, r3
+ 1017 008e 5BB2     		sxtb	r3, r3
+ 1018 0090 002B     		cmp	r3, #0
+ 1019 0092 B8BF     		it	lt
+ 1020 0094 5B42     		rsblt	r3, r3, #0
+ 1021 0096 BB75     		strb	r3, [r7, #22]
+ 453:src/main.c    **** 		temp2=((int8_t)(xBuffer_receive[2])<0)?(int8_t)(xBuffer_receive[2])*(-1):(int8_t)(xBuffer_receive
+ 1022              		.loc 1 453 0
+ 1023 0098 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1024 009a DBB2     		uxtb	r3, r3
+ 1025 009c 5BB2     		sxtb	r3, r3
+ 1026 009e 002B     		cmp	r3, #0
+ 1027 00a0 B8BF     		it	lt
+ 1028 00a2 5B42     		rsblt	r3, r3, #0
+ 1029 00a4 FB75     		strb	r3, [r7, #23]
+ 454:src/main.c    **** 		TempAcceleration = (temp1<temp2)?temp2:temp1; //MAX(temp1,temp2)
+ 1030              		.loc 1 454 0
+ 1031 00a6 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+ 1032 00a8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1033 00aa 9A42     		cmp	r2, r3
+ 1034 00ac 28BF     		it	cs
+ 1035 00ae 1346     		movcs	r3, r2
+ 1036 00b0 DBB2     		uxtb	r3, r3
+ 1037 00b2 7B75     		strb	r3, [r7, #21]
+ 455:src/main.c    **** 
+ 456:src/main.c    **** 		if(TempAcceleration != 0)
+ 1038              		.loc 1 456 0
+ 1039 00b4 7B7D     		ldrb	r3, [r7, #21]
+ 1040 00b6 DBB2     		uxtb	r3, r3
+ 1041 00b8 002B     		cmp	r3, #0
+ 1042 00ba 7ED0     		beq	.L39
+ 457:src/main.c    **** 		{
+ 458:src/main.c    **** 			if ((int8_t)xBuffer_receive[0] < -2)
+ 1043              		.loc 1 458 0
+ 1044 00bc 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 1045 00be DBB2     		uxtb	r3, r3
+ 1046 00c0 5BB2     		sxtb	r3, r3
+ 1047 00c2 13F1020F 		cmn	r3, #2
+ 1048 00c6 16DA     		bge	.L40
+ 459:src/main.c    **** 			{
+ 460:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 4 */
+ 461:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_4, ENABLE);
+ 1049              		.loc 1 461 0
+ 1050 00c8 4FF40060 		mov	r0, #2048
+ 1051 00cc C4F20000 		movt	r0, 16384
+ 1052 00d0 4FF00C01 		mov	r1, #12
+ 1053 00d4 4FF00102 		mov	r2, #1
+ 1054 00d8 FFF7FEFF 		bl	TIM_CCxCmd
+ 462:src/main.c    **** 				/* Sets the TIM4 Capture Compare4 Register value */
+ 463:src/main.c    **** 				TIM_SetCompare4(TIM4, TIM_CCR/TempAcceleration);
+ 1055              		.loc 1 463 0
+ 1056 00dc 7B7D     		ldrb	r3, [r7, #21]
+ 1057 00de DBB2     		uxtb	r3, r3
+ 1058 00e0 4FF47A72 		mov	r2, #1000
+ 1059 00e4 92FBF3F3 		sdiv	r3, r2, r3
+ 1060 00e8 4FF40060 		mov	r0, #2048
+ 1061 00ec C4F20000 		movt	r0, 16384
+ 1062 00f0 1946     		mov	r1, r3
+ 1063 00f2 FFF7FEFF 		bl	TIM_SetCompare4
+ 1064              	.L40:
+ 464:src/main.c    **** 			}
+ 465:src/main.c    **** 			if ((int8_t)xBuffer_receive[0] > 2)
+ 1065              		.loc 1 465 0
+ 1066 00f6 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
+ 1067 00f8 DBB2     		uxtb	r3, r3
+ 1068 00fa 5BB2     		sxtb	r3, r3
+ 1069 00fc 022B     		cmp	r3, #2
+ 1070 00fe 16DD     		ble	.L41
+ 466:src/main.c    **** 			{
+ 467:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 2 */
+ 468:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_2, ENABLE);
+ 1071              		.loc 1 468 0
+ 1072 0100 4FF40060 		mov	r0, #2048
+ 1073 0104 C4F20000 		movt	r0, 16384
+ 1074 0108 4FF00401 		mov	r1, #4
+ 1075 010c 4FF00102 		mov	r2, #1
+ 1076 0110 FFF7FEFF 		bl	TIM_CCxCmd
+ 469:src/main.c    **** 				/* Sets the TIM4 Capture Compare2 Register value */
+ 470:src/main.c    **** 				TIM_SetCompare2(TIM4, TIM_CCR/TempAcceleration);
+ 1077              		.loc 1 470 0
+ 1078 0114 7B7D     		ldrb	r3, [r7, #21]
+ 1079 0116 DBB2     		uxtb	r3, r3
+ 1080 0118 4FF47A72 		mov	r2, #1000
+ 1081 011c 92FBF3F3 		sdiv	r3, r2, r3
+ 1082 0120 4FF40060 		mov	r0, #2048
+ 1083 0124 C4F20000 		movt	r0, 16384
+ 1084 0128 1946     		mov	r1, r3
+ 1085 012a FFF7FEFF 		bl	TIM_SetCompare2
+ 1086              	.L41:
+ 471:src/main.c    **** 			}
+ 472:src/main.c    **** 			if ((int8_t)xBuffer_receive[2] > 2)
+ 1087              		.loc 1 472 0
+ 1088 012e BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1089 0130 DBB2     		uxtb	r3, r3
+ 1090 0132 5BB2     		sxtb	r3, r3
+ 1091 0134 022B     		cmp	r3, #2
+ 1092 0136 16DD     		ble	.L42
  473:src/main.c    **** 			{
- 474:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 4 */
- 475:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_4, ENABLE);
- 929              		.loc 1 475 0
- 930 00c8 4FF40060 		mov	r0, #2048
- 931 00cc C4F20000 		movt	r0, 16384
- 932 00d0 4FF00C01 		mov	r1, #12
- 933 00d4 4FF00102 		mov	r2, #1
- 934 00d8 FFF7FEFF 		bl	TIM_CCxCmd
- 476:src/main.c    **** 				/* Sets the TIM4 Capture Compare4 Register value */
- 477:src/main.c    **** 				TIM_SetCompare4(TIM4, TIM_CCR/TempAcceleration);
- 935              		.loc 1 477 0
- 936 00dc 7B7D     		ldrb	r3, [r7, #21]
- 937 00de DBB2     		uxtb	r3, r3
- 938 00e0 4FF47A72 		mov	r2, #1000
- 939 00e4 92FBF3F3 		sdiv	r3, r2, r3
- 940 00e8 4FF40060 		mov	r0, #2048
- 941 00ec C4F20000 		movt	r0, 16384
- 942 00f0 1946     		mov	r1, r3
- 943 00f2 FFF7FEFF 		bl	TIM_SetCompare4
- 944              	.L32:
+ 474:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 1 */
+ 475:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_1, ENABLE);
+ 1093              		.loc 1 475 0
+ 1094 0138 4FF40060 		mov	r0, #2048
+ 1095 013c C4F20000 		movt	r0, 16384
+ 1096 0140 4FF00001 		mov	r1, #0
+ 1097 0144 4FF00102 		mov	r2, #1
+ 1098 0148 FFF7FEFF 		bl	TIM_CCxCmd
+ 476:src/main.c    **** 				/* Sets the TIM4 Capture Compare1 Register value */
+ 477:src/main.c    **** 				TIM_SetCompare1(TIM4, TIM_CCR/TempAcceleration);
+ 1099              		.loc 1 477 0
+ 1100 014c 7B7D     		ldrb	r3, [r7, #21]
+ 1101 014e DBB2     		uxtb	r3, r3
+ 1102 0150 4FF47A72 		mov	r2, #1000
+ 1103 0154 92FBF3F3 		sdiv	r3, r2, r3
+ 1104 0158 4FF40060 		mov	r0, #2048
+ 1105 015c C4F20000 		movt	r0, 16384
+ 1106 0160 1946     		mov	r1, r3
+ 1107 0162 FFF7FEFF 		bl	TIM_SetCompare1
+ 1108              	.L42:
  478:src/main.c    **** 			}
- 479:src/main.c    **** 			if ((int8_t)xBuffer_receive[0] > 2)
- 945              		.loc 1 479 0
- 946 00f6 3B7B     		ldrb	r3, [r7, #12]	@ zero_extendqisi2
- 947 00f8 DBB2     		uxtb	r3, r3
- 948 00fa 5BB2     		sxtb	r3, r3
- 949 00fc 022B     		cmp	r3, #2
- 950 00fe 16DD     		ble	.L33
+ 479:src/main.c    **** 			if ((int8_t)xBuffer_receive[2] < -2)
+ 1109              		.loc 1 479 0
+ 1110 0166 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1111 0168 DBB2     		uxtb	r3, r3
+ 1112 016a 5BB2     		sxtb	r3, r3
+ 1113 016c 13F1020F 		cmn	r3, #2
+ 1114 0170 16DA     		bge	.L43
  480:src/main.c    **** 			{
- 481:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 2 */
- 482:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_2, ENABLE);
- 951              		.loc 1 482 0
- 952 0100 4FF40060 		mov	r0, #2048
- 953 0104 C4F20000 		movt	r0, 16384
- 954 0108 4FF00401 		mov	r1, #4
- 955 010c 4FF00102 		mov	r2, #1
- 956 0110 FFF7FEFF 		bl	TIM_CCxCmd
- 483:src/main.c    **** 				/* Sets the TIM4 Capture Compare2 Register value */
- 484:src/main.c    **** 				TIM_SetCompare2(TIM4, TIM_CCR/TempAcceleration);
- 957              		.loc 1 484 0
- 958 0114 7B7D     		ldrb	r3, [r7, #21]
- 959 0116 DBB2     		uxtb	r3, r3
- 960 0118 4FF47A72 		mov	r2, #1000
- 961 011c 92FBF3F3 		sdiv	r3, r2, r3
- 962 0120 4FF40060 		mov	r0, #2048
- 963 0124 C4F20000 		movt	r0, 16384
- 964 0128 1946     		mov	r1, r3
- 965 012a FFF7FEFF 		bl	TIM_SetCompare2
- 966              	.L33:
+ 481:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 3 */
+ 482:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_3, ENABLE);
+ 1115              		.loc 1 482 0
+ 1116 0172 4FF40060 		mov	r0, #2048
+ 1117 0176 C4F20000 		movt	r0, 16384
+ 1118 017a 4FF00801 		mov	r1, #8
+ 1119 017e 4FF00102 		mov	r2, #1
+ 1120 0182 FFF7FEFF 		bl	TIM_CCxCmd
+ 483:src/main.c    **** 				/* Sets the TIM4 Capture Compare3 Register value */
+ 484:src/main.c    **** 				TIM_SetCompare3(TIM4, TIM_CCR/TempAcceleration);
+ 1121              		.loc 1 484 0
+ 1122 0186 7B7D     		ldrb	r3, [r7, #21]
+ 1123 0188 DBB2     		uxtb	r3, r3
+ 1124 018a 4FF47A72 		mov	r2, #1000
+ 1125 018e 92FBF3F3 		sdiv	r3, r2, r3
+ 1126 0192 4FF40060 		mov	r0, #2048
+ 1127 0196 C4F20000 		movt	r0, 16384
+ 1128 019a 1946     		mov	r1, r3
+ 1129 019c FFF7FEFF 		bl	TIM_SetCompare3
+ 1130              	.L43:
  485:src/main.c    **** 			}
- 486:src/main.c    **** 			if ((int8_t)xBuffer_receive[2] > 2)
- 967              		.loc 1 486 0
- 968 012e BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
- 969 0130 DBB2     		uxtb	r3, r3
- 970 0132 5BB2     		sxtb	r3, r3
- 971 0134 022B     		cmp	r3, #2
- 972 0136 16DD     		ble	.L34
- 487:src/main.c    **** 			{
- 488:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 1 */
- 489:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_1, ENABLE);
- 973              		.loc 1 489 0
- 974 0138 4FF40060 		mov	r0, #2048
- 975 013c C4F20000 		movt	r0, 16384
- 976 0140 4FF00001 		mov	r1, #0
- 977 0144 4FF00102 		mov	r2, #1
- 978 0148 FFF7FEFF 		bl	TIM_CCxCmd
- 490:src/main.c    **** 				/* Sets the TIM4 Capture Compare1 Register value */
- 491:src/main.c    **** 				TIM_SetCompare1(TIM4, TIM_CCR/TempAcceleration);
- 979              		.loc 1 491 0
- 980 014c 7B7D     		ldrb	r3, [r7, #21]
- 981 014e DBB2     		uxtb	r3, r3
- 982 0150 4FF47A72 		mov	r2, #1000
- 983 0154 92FBF3F3 		sdiv	r3, r2, r3
- 984 0158 4FF40060 		mov	r0, #2048
- 985 015c C4F20000 		movt	r0, 16384
- 986 0160 1946     		mov	r1, r3
- 987 0162 FFF7FEFF 		bl	TIM_SetCompare1
- 988              	.L34:
- 492:src/main.c    **** 			}
- 493:src/main.c    **** 			if ((int8_t)xBuffer_receive[2] < -2)
- 989              		.loc 1 493 0
- 990 0166 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
- 991 0168 DBB2     		uxtb	r3, r3
- 992 016a 5BB2     		sxtb	r3, r3
- 993 016c 13F1020F 		cmn	r3, #2
- 994 0170 16DA     		bge	.L35
- 494:src/main.c    **** 			{
- 495:src/main.c    **** 				/* Enable TIM4 Capture Compare Channel 3 */
- 496:src/main.c    **** 				TIM_CCxCmd(TIM4, TIM_Channel_3, ENABLE);
- 995              		.loc 1 496 0
- 996 0172 4FF40060 		mov	r0, #2048
- 997 0176 C4F20000 		movt	r0, 16384
- 998 017a 4FF00801 		mov	r1, #8
- 999 017e 4FF00102 		mov	r2, #1
- 1000 0182 FFF7FEFF 		bl	TIM_CCxCmd
- 497:src/main.c    **** 				/* Sets the TIM4 Capture Compare3 Register value */
- 498:src/main.c    **** 				TIM_SetCompare3(TIM4, TIM_CCR/TempAcceleration);
- 1001              		.loc 1 498 0
- 1002 0186 7B7D     		ldrb	r3, [r7, #21]
- 1003 0188 DBB2     		uxtb	r3, r3
- 1004 018a 4FF47A72 		mov	r2, #1000
- 1005 018e 92FBF3F3 		sdiv	r3, r2, r3
- 1006 0192 4FF40060 		mov	r0, #2048
- 1007 0196 C4F20000 		movt	r0, 16384
- 1008 019a 1946     		mov	r1, r3
- 1009 019c FFF7FEFF 		bl	TIM_SetCompare3
- 1010              	.L35:
- 499:src/main.c    **** 			}
- 500:src/main.c    **** 
- 501:src/main.c    **** 			/* Time base configuration */
- 502:src/main.c    **** 			TIM_SetAutoreload(TIM4,  TIM_ARR/TempAcceleration);
- 1011              		.loc 1 502 0
- 1012 01a0 7B7D     		ldrb	r3, [r7, #21]
- 1013 01a2 DBB2     		uxtb	r3, r3
- 1014 01a4 40F26C72 		movw	r2, #1900
- 1015 01a8 92FBF3F3 		sdiv	r3, r2, r3
- 1016 01ac 4FF40060 		mov	r0, #2048
- 1017 01b0 C4F20000 		movt	r0, 16384
- 1018 01b4 1946     		mov	r1, r3
- 1019 01b6 FFF7FEFF 		bl	TIM_SetAutoreload
- 1020              	.L31:
- 503:src/main.c    **** 		}
- 504:src/main.c    **** 	 }
- 505:src/main.c    **** 	taskYIELD(); 	//task is going to ready state to allow next one to run
- 1021              		.loc 1 505 0
- 1022 01ba FFF7FEFF 		bl	vPortYieldFromISR
+ 486:src/main.c    **** 
+ 487:src/main.c    **** 			/* Time base configuration */
+ 488:src/main.c    **** 			TIM_SetAutoreload(TIM4,  TIM_ARR/TempAcceleration);
+ 1131              		.loc 1 488 0
+ 1132 01a0 7B7D     		ldrb	r3, [r7, #21]
+ 1133 01a2 DBB2     		uxtb	r3, r3
+ 1134 01a4 40F26C72 		movw	r2, #1900
+ 1135 01a8 92FBF3F3 		sdiv	r3, r2, r3
+ 1136 01ac 4FF40060 		mov	r0, #2048
+ 1137 01b0 C4F20000 		movt	r0, 16384
+ 1138 01b4 1946     		mov	r1, r3
+ 1139 01b6 FFF7FEFF 		bl	TIM_SetAutoreload
+ 1140              	.L39:
+ 489:src/main.c    **** 		}
+ 490:src/main.c    **** 	 }
+ 491:src/main.c    **** 	taskYIELD(); 	//task is going to ready state to allow next one to run
+ 1141              		.loc 1 491 0
+ 1142 01ba FFF7FEFF 		bl	vPortYieldFromISR
+ 492:src/main.c    **** 	}
+ 1143              		.loc 1 492 0
+ 1144 01be 29E7     		b	.L44
+ 1145              		.cfi_endproc
+ 1146              	.LFE118:
+ 1148              		.section	.text.vLEDTask,"ax",%progbits
+ 1149              		.align	2
+ 1150              		.thumb
+ 1151              		.thumb_func
+ 1153              	vLEDTask:
+ 1154              	.LFB119:
+ 493:src/main.c    **** }
+ 494:src/main.c    **** 
+ 495:src/main.c    **** /*-----------------------------------------------------------*/
+ 496:src/main.c    **** 
+ 497:src/main.c    **** void vLEDTask( void *pvParameters )
+ 498:src/main.c    **** {
+ 1155              		.loc 1 498 0
+ 1156              		.cfi_startproc
+ 1157              		@ args = 0, pretend = 0, frame = 16
+ 1158              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1159 0000 80B5     		push	{r7, lr}
+ 1160              	.LCFI26:
+ 1161              		.cfi_def_cfa_offset 8
+ 1162              		.cfi_offset 14, -4
+ 1163              		.cfi_offset 7, -8
+ 1164 0002 84B0     		sub	sp, sp, #16
+ 1165              	.LCFI27:
+ 1166              		.cfi_def_cfa_offset 24
+ 1167 0004 00AF     		add	r7, sp, #0
+ 1168              	.LCFI28:
+ 1169              		.cfi_def_cfa_register 7
+ 1170 0006 7860     		str	r0, [r7, #4]
+ 499:src/main.c    ****     volatile int *LED;
+ 500:src/main.c    ****     LED = (int *) pvParameters;
+ 1171              		.loc 1 500 0
+ 1172 0008 7B68     		ldr	r3, [r7, #4]
+ 1173 000a FB60     		str	r3, [r7, #12]
+ 1174              	.L46:
+ 501:src/main.c    **** 
+ 502:src/main.c    **** 	for( ;; )
+ 503:src/main.c    **** 	{
+ 504:src/main.c    **** 		STM_EVAL_LEDToggle((Led_TypeDef)LED[0]);
+ 1175              		.loc 1 504 0 discriminator 1
+ 1176 000c FB68     		ldr	r3, [r7, #12]
+ 1177 000e 1B68     		ldr	r3, [r3, #0]
+ 1178 0010 DBB2     		uxtb	r3, r3
+ 1179 0012 1846     		mov	r0, r3
+ 1180 0014 FFF7FEFF 		bl	STM_EVAL_LEDToggle
+ 505:src/main.c    **** 	    vTaskDelay(LED[1]/portTICK_RATE_MS);
+ 1181              		.loc 1 505 0 discriminator 1
+ 1182 0018 FB68     		ldr	r3, [r7, #12]
+ 1183 001a 03F10403 		add	r3, r3, #4
+ 1184 001e 1B68     		ldr	r3, [r3, #0]
+ 1185 0020 1846     		mov	r0, r3
+ 1186 0022 FFF7FEFF 		bl	vTaskDelay
  506:src/main.c    **** 	}
- 1023              		.loc 1 506 0
- 1024 01be 29E7     		b	.L36
- 1025              		.cfi_endproc
- 1026              	.LFE118:
- 1028              		.section	.text.vLEDTask,"ax",%progbits
- 1029              		.align	2
- 1030              		.thumb
- 1031              		.thumb_func
- 1033              	vLEDTask:
- 1034              	.LFB119:
+ 1187              		.loc 1 506 0 discriminator 1
+ 1188 0026 F1E7     		b	.L46
+ 1189              		.cfi_endproc
+ 1190              	.LFE119:
+ 1192              		.section	.text.vSWITCHTask,"ax",%progbits
+ 1193              		.align	2
+ 1194              		.thumb
+ 1195              		.thumb_func
+ 1197              	vSWITCHTask:
+ 1198              	.LFB120:
  507:src/main.c    **** }
  508:src/main.c    **** 
  509:src/main.c    **** /*-----------------------------------------------------------*/
  510:src/main.c    **** 
- 511:src/main.c    **** void vLEDTask( void *pvParameters )
+ 511:src/main.c    **** void vSWITCHTask( void *pvParameters )
  512:src/main.c    **** {
- 1035              		.loc 1 512 0
- 1036              		.cfi_startproc
- 1037              		@ args = 0, pretend = 0, frame = 16
- 1038              		@ frame_needed = 1, uses_anonymous_args = 0
- 1039 0000 80B5     		push	{r7, lr}
- 1040              	.LCFI26:
- 1041              		.cfi_def_cfa_offset 8
- 1042              		.cfi_offset 14, -4
- 1043              		.cfi_offset 7, -8
- 1044 0002 84B0     		sub	sp, sp, #16
- 1045              	.LCFI27:
- 1046              		.cfi_def_cfa_offset 24
- 1047 0004 00AF     		add	r7, sp, #0
- 1048              	.LCFI28:
- 1049              		.cfi_def_cfa_register 7
- 1050 0006 7860     		str	r0, [r7, #4]
- 513:src/main.c    ****     volatile int *LED;
- 514:src/main.c    ****     LED = (int *) pvParameters;
- 1051              		.loc 1 514 0
- 1052 0008 7B68     		ldr	r3, [r7, #4]
- 1053 000a FB60     		str	r3, [r7, #12]
- 1054              	.L38:
- 515:src/main.c    **** 
- 516:src/main.c    **** 	for( ;; )
- 517:src/main.c    **** 	{
- 518:src/main.c    **** 		STM_EVAL_LEDToggle((Led_TypeDef)LED[0]);
- 1055              		.loc 1 518 0 discriminator 1
- 1056 000c FB68     		ldr	r3, [r7, #12]
- 1057 000e 1B68     		ldr	r3, [r3, #0]
- 1058 0010 DBB2     		uxtb	r3, r3
- 1059 0012 1846     		mov	r0, r3
- 1060 0014 FFF7FEFF 		bl	STM_EVAL_LEDToggle
- 519:src/main.c    **** 	    vTaskDelay(LED[1]/portTICK_RATE_MS);
- 1061              		.loc 1 519 0 discriminator 1
- 1062 0018 FB68     		ldr	r3, [r7, #12]
- 1063 001a 03F10403 		add	r3, r3, #4
- 1064 001e 1B68     		ldr	r3, [r3, #0]
- 1065 0020 1846     		mov	r0, r3
- 1066 0022 FFF7FEFF 		bl	vTaskDelay
- 520:src/main.c    **** 	}
- 1067              		.loc 1 520 0 discriminator 1
- 1068 0026 F1E7     		b	.L38
- 1069              		.cfi_endproc
- 1070              	.LFE119:
- 1072              		.section	.text.vSWITCHTask,"ax",%progbits
- 1073              		.align	2
- 1074              		.thumb
- 1075              		.thumb_func
- 1077              	vSWITCHTask:
- 1078              	.LFB120:
- 521:src/main.c    **** }
- 522:src/main.c    **** 
- 523:src/main.c    **** /*-----------------------------------------------------------*/
- 524:src/main.c    **** 
- 525:src/main.c    **** void vSWITCHTask( void *pvParameters )
- 526:src/main.c    **** {
- 1079              		.loc 1 526 0
- 1080              		.cfi_startproc
- 1081              		@ args = 0, pretend = 0, frame = 8
- 1082              		@ frame_needed = 1, uses_anonymous_args = 0
- 1083 0000 80B5     		push	{r7, lr}
- 1084              	.LCFI29:
- 1085              		.cfi_def_cfa_offset 8
- 1086              		.cfi_offset 14, -4
- 1087              		.cfi_offset 7, -8
- 1088 0002 82B0     		sub	sp, sp, #8
- 1089              	.LCFI30:
- 1090              		.cfi_def_cfa_offset 16
- 1091 0004 00AF     		add	r7, sp, #0
- 1092              	.LCFI31:
- 1093              		.cfi_def_cfa_register 7
- 1094 0006 7860     		str	r0, [r7, #4]
- 1095              	.L42:
- 527:src/main.c    **** 	static int i=0;
- 528:src/main.c    **** 	for( ;; )
- 529:src/main.c    **** 	{
- 530:src/main.c    **** 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
- 1096              		.loc 1 530 0
- 1097 0008 40F20003 		movw	r3, #:lower16:xSemaphoreSW
- 1098 000c C0F20003 		movt	r3, #:upper16:xSemaphoreSW
- 1099 0010 1B68     		ldr	r3, [r3, #0]
- 1100 0012 1846     		mov	r0, r3
- 1101 0014 4FF00001 		mov	r1, #0
- 1102 0018 4FF00002 		mov	r2, #0
- 1103 001c 4FF00003 		mov	r3, #0
- 1104 0020 FFF7FEFF 		bl	xQueueGenericReceive
- 1105 0024 0346     		mov	r3, r0
- 1106 0026 012B     		cmp	r3, #1
- 1107 0028 40F08C80 		bne	.L40
- 531:src/main.c    **** 		{
- 532:src/main.c    **** 			i^=1;		//just switch the state if semaphore was given
- 1108              		.loc 1 532 0
- 1109 002c 40F20003 		movw	r3, #:lower16:i.9401
- 1110 0030 C0F20003 		movt	r3, #:upper16:i.9401
- 1111 0034 1B68     		ldr	r3, [r3, #0]
- 1112 0036 83F00102 		eor	r2, r3, #1
- 1113 003a 40F20003 		movw	r3, #:lower16:i.9401
- 1114 003e C0F20003 		movt	r3, #:upper16:i.9401
- 1115 0042 1A60     		str	r2, [r3, #0]
- 533:src/main.c    **** 
- 534:src/main.c    **** 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
- 1116              		.loc 1 534 0
- 1117 0044 40F20003 		movw	r3, #:lower16:i.9401
- 1118 0048 C0F20003 		movt	r3, #:upper16:i.9401
- 1119 004c 1B68     		ldr	r3, [r3, #0]
- 1120 004e 002B     		cmp	r3, #0
- 1121 0050 3CD1     		bne	.L41
- 535:src/main.c    **** 			{
- 536:src/main.c    **** 				vTaskSuspend(xBALANCE_Task);
- 1122              		.loc 1 536 0
- 1123 0052 40F20003 		movw	r3, #:lower16:xBALANCE_Task
- 1124 0056 C0F20003 		movt	r3, #:upper16:xBALANCE_Task
- 1125 005a 1B68     		ldr	r3, [r3, #0]
- 1126 005c 1846     		mov	r0, r3
- 1127 005e FFF7FEFF 		bl	vTaskSuspend
- 537:src/main.c    **** 				TIM_Cmd(TIM4, DISABLE);
- 1128              		.loc 1 537 0
- 1129 0062 4FF40060 		mov	r0, #2048
- 1130 0066 C4F20000 		movt	r0, 16384
- 1131 006a 4FF00001 		mov	r1, #0
- 1132 006e FFF7FEFF 		bl	TIM_Cmd
- 538:src/main.c    **** 				vTaskSuspend(xMEMS_Task);
- 1133              		.loc 1 538 0
- 1134 0072 40F20003 		movw	r3, #:lower16:xMEMS_Task
- 1135 0076 C0F20003 		movt	r3, #:upper16:xMEMS_Task
- 1136 007a 1B68     		ldr	r3, [r3, #0]
- 1137 007c 1846     		mov	r0, r3
- 1138 007e FFF7FEFF 		bl	vTaskSuspend
- 539:src/main.c    **** 				prvLED_Config(GPIO);
- 1139              		.loc 1 539 0
- 1140 0082 4FF00000 		mov	r0, #0
- 1141 0086 FFF7FEFF 		bl	prvLED_Config
- 540:src/main.c    **** 				vTaskResume(xLED_Tasks[0]);
- 1142              		.loc 1 540 0
- 1143 008a 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1144 008e C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1145 0092 1B68     		ldr	r3, [r3, #0]
- 1146 0094 1846     		mov	r0, r3
- 1147 0096 FFF7FEFF 		bl	vTaskResume
- 541:src/main.c    **** 				vTaskResume(xLED_Tasks[1]);
- 1148              		.loc 1 541 0
- 1149 009a 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1150 009e C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1151 00a2 5B68     		ldr	r3, [r3, #4]
- 1152 00a4 1846     		mov	r0, r3
- 1153 00a6 FFF7FEFF 		bl	vTaskResume
- 542:src/main.c    **** 				vTaskResume(xLED_Tasks[2]);
- 1154              		.loc 1 542 0
- 1155 00aa 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1156 00ae C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1157 00b2 9B68     		ldr	r3, [r3, #8]
- 1158 00b4 1846     		mov	r0, r3
- 1159 00b6 FFF7FEFF 		bl	vTaskResume
- 543:src/main.c    **** 				vTaskResume(xLED_Tasks[3]);
- 1160              		.loc 1 543 0
- 1161 00ba 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1162 00be C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1163 00c2 DB68     		ldr	r3, [r3, #12]
- 1164 00c4 1846     		mov	r0, r3
- 1165 00c6 FFF7FEFF 		bl	vTaskResume
- 1166 00ca 3BE0     		b	.L40
- 1167              	.L41:
- 544:src/main.c    **** 			}
- 545:src/main.c    **** 			else		//MEMS and BALANCE ready, LED tasks suspended
- 546:src/main.c    **** 			{
- 547:src/main.c    **** 				vTaskSuspend(xLED_Tasks[0]);
- 1168              		.loc 1 547 0
- 1169 00cc 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1170 00d0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1171 00d4 1B68     		ldr	r3, [r3, #0]
- 1172 00d6 1846     		mov	r0, r3
- 1173 00d8 FFF7FEFF 		bl	vTaskSuspend
- 548:src/main.c    **** 				vTaskSuspend(xLED_Tasks[1]);
- 1174              		.loc 1 548 0
- 1175 00dc 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1176 00e0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1177 00e4 5B68     		ldr	r3, [r3, #4]
- 1178 00e6 1846     		mov	r0, r3
- 1179 00e8 FFF7FEFF 		bl	vTaskSuspend
- 549:src/main.c    **** 				vTaskSuspend(xLED_Tasks[2]);
- 1180              		.loc 1 549 0
- 1181 00ec 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1182 00f0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1183 00f4 9B68     		ldr	r3, [r3, #8]
- 1184 00f6 1846     		mov	r0, r3
- 1185 00f8 FFF7FEFF 		bl	vTaskSuspend
- 550:src/main.c    **** 				vTaskSuspend(xLED_Tasks[3]);
- 1186              		.loc 1 550 0
- 1187 00fc 40F20003 		movw	r3, #:lower16:xLED_Tasks
- 1188 0100 C0F20003 		movt	r3, #:upper16:xLED_Tasks
- 1189 0104 DB68     		ldr	r3, [r3, #12]
- 1190 0106 1846     		mov	r0, r3
- 1191 0108 FFF7FEFF 		bl	vTaskSuspend
- 551:src/main.c    **** 				prvLED_Config(TIMER);
- 1192              		.loc 1 551 0
- 1193 010c 4FF00100 		mov	r0, #1
- 1194 0110 FFF7FEFF 		bl	prvLED_Config
- 552:src/main.c    **** 				TIM_Cmd(TIM4, ENABLE);
- 1195              		.loc 1 552 0
- 1196 0114 4FF40060 		mov	r0, #2048
- 1197 0118 C4F20000 		movt	r0, 16384
- 1198 011c 4FF00101 		mov	r1, #1
- 1199 0120 FFF7FEFF 		bl	TIM_Cmd
- 553:src/main.c    **** 				vTaskResume(xBALANCE_Task);
- 1200              		.loc 1 553 0
- 1201 0124 40F20003 		movw	r3, #:lower16:xBALANCE_Task
- 1202 0128 C0F20003 		movt	r3, #:upper16:xBALANCE_Task
- 1203 012c 1B68     		ldr	r3, [r3, #0]
- 1204 012e 1846     		mov	r0, r3
- 1205 0130 FFF7FEFF 		bl	vTaskResume
- 554:src/main.c    **** 				vTaskResume(xMEMS_Task);
- 1206              		.loc 1 554 0
- 1207 0134 40F20003 		movw	r3, #:lower16:xMEMS_Task
- 1208 0138 C0F20003 		movt	r3, #:upper16:xMEMS_Task
- 1209 013c 1B68     		ldr	r3, [r3, #0]
- 1210 013e 1846     		mov	r0, r3
- 1211 0140 FFF7FEFF 		bl	vTaskResume
- 1212              	.L40:
- 555:src/main.c    **** 			}
- 556:src/main.c    **** 		}
- 557:src/main.c    **** 		taskYIELD(); 	//task is going to ready state to allow next one to run
- 1213              		.loc 1 557 0
- 1214 0144 FFF7FEFF 		bl	vPortYieldFromISR
- 558:src/main.c    **** 	}
- 1215              		.loc 1 558 0
- 1216 0148 5EE7     		b	.L42
- 1217              		.cfi_endproc
- 1218              	.LFE120:
- 1220 014a 00BF     		.section	.text.vApplicationIdleHook,"ax",%progbits
- 1221              		.align	2
- 1222              		.global	vApplicationIdleHook
- 1223              		.thumb
- 1224              		.thumb_func
- 1226              	vApplicationIdleHook:
- 1227              	.LFB121:
- 559:src/main.c    **** }
- 560:src/main.c    **** 
- 561:src/main.c    **** /*-----------------------------------------------------------*/
- 562:src/main.c    **** 
- 563:src/main.c    **** void vApplicationIdleHook( void )
- 564:src/main.c    **** {
- 1228              		.loc 1 564 0
- 1229              		.cfi_startproc
- 1230              		@ args = 0, pretend = 0, frame = 8
- 1231              		@ frame_needed = 1, uses_anonymous_args = 0
- 1232 0000 80B5     		push	{r7, lr}
- 1233              	.LCFI32:
- 1234              		.cfi_def_cfa_offset 8
- 1235              		.cfi_offset 14, -4
- 1236              		.cfi_offset 7, -8
- 1237 0002 82B0     		sub	sp, sp, #8
- 1238              	.LCFI33:
- 1239              		.cfi_def_cfa_offset 16
- 1240 0004 00AF     		add	r7, sp, #0
- 1241              	.LCFI34:
- 1242              		.cfi_def_cfa_register 7
- 565:src/main.c    **** volatile size_t xFreeStackSpace;
+ 1199              		.loc 1 512 0
+ 1200              		.cfi_startproc
+ 1201              		@ args = 0, pretend = 0, frame = 8
+ 1202              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1203 0000 80B5     		push	{r7, lr}
+ 1204              	.LCFI29:
+ 1205              		.cfi_def_cfa_offset 8
+ 1206              		.cfi_offset 14, -4
+ 1207              		.cfi_offset 7, -8
+ 1208 0002 82B0     		sub	sp, sp, #8
+ 1209              	.LCFI30:
+ 1210              		.cfi_def_cfa_offset 16
+ 1211 0004 00AF     		add	r7, sp, #0
+ 1212              	.LCFI31:
+ 1213              		.cfi_def_cfa_register 7
+ 1214 0006 7860     		str	r0, [r7, #4]
+ 1215              	.L50:
+ 513:src/main.c    **** 	static int i=0;
+ 514:src/main.c    **** 	for( ;; )
+ 515:src/main.c    **** 	{
+ 516:src/main.c    **** 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
+ 1216              		.loc 1 516 0
+ 1217 0008 40F20003 		movw	r3, #:lower16:xSemaphoreSW
+ 1218 000c C0F20003 		movt	r3, #:upper16:xSemaphoreSW
+ 1219 0010 1B68     		ldr	r3, [r3, #0]
+ 1220 0012 1846     		mov	r0, r3
+ 1221 0014 4FF00001 		mov	r1, #0
+ 1222 0018 4FF00002 		mov	r2, #0
+ 1223 001c 4FF00003 		mov	r3, #0
+ 1224 0020 FFF7FEFF 		bl	xQueueGenericReceive
+ 1225 0024 0346     		mov	r3, r0
+ 1226 0026 012B     		cmp	r3, #1
+ 1227 0028 40F08C80 		bne	.L48
+ 517:src/main.c    **** 		{
+ 518:src/main.c    **** 			i^=1;		//just switch the state if semaphore was given
+ 1228              		.loc 1 518 0
+ 1229 002c 40F20003 		movw	r3, #:lower16:i.9401
+ 1230 0030 C0F20003 		movt	r3, #:upper16:i.9401
+ 1231 0034 1B68     		ldr	r3, [r3, #0]
+ 1232 0036 83F00102 		eor	r2, r3, #1
+ 1233 003a 40F20003 		movw	r3, #:lower16:i.9401
+ 1234 003e C0F20003 		movt	r3, #:upper16:i.9401
+ 1235 0042 1A60     		str	r2, [r3, #0]
+ 519:src/main.c    **** 
+ 520:src/main.c    **** 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
+ 1236              		.loc 1 520 0
+ 1237 0044 40F20003 		movw	r3, #:lower16:i.9401
+ 1238 0048 C0F20003 		movt	r3, #:upper16:i.9401
+ 1239 004c 1B68     		ldr	r3, [r3, #0]
+ 1240 004e 002B     		cmp	r3, #0
+ 1241 0050 3CD1     		bne	.L49
+ 521:src/main.c    **** 			{
+ 522:src/main.c    **** 				vTaskSuspend(xBALANCE_Task);
+ 1242              		.loc 1 522 0
+ 1243 0052 40F20003 		movw	r3, #:lower16:xBALANCE_Task
+ 1244 0056 C0F20003 		movt	r3, #:upper16:xBALANCE_Task
+ 1245 005a 1B68     		ldr	r3, [r3, #0]
+ 1246 005c 1846     		mov	r0, r3
+ 1247 005e FFF7FEFF 		bl	vTaskSuspend
+ 523:src/main.c    **** 				TIM_Cmd(TIM4, DISABLE);
+ 1248              		.loc 1 523 0
+ 1249 0062 4FF40060 		mov	r0, #2048
+ 1250 0066 C4F20000 		movt	r0, 16384
+ 1251 006a 4FF00001 		mov	r1, #0
+ 1252 006e FFF7FEFF 		bl	TIM_Cmd
+ 524:src/main.c    **** 				vTaskSuspend(xMEMS_Task);
+ 1253              		.loc 1 524 0
+ 1254 0072 40F20003 		movw	r3, #:lower16:xMEMS_Task
+ 1255 0076 C0F20003 		movt	r3, #:upper16:xMEMS_Task
+ 1256 007a 1B68     		ldr	r3, [r3, #0]
+ 1257 007c 1846     		mov	r0, r3
+ 1258 007e FFF7FEFF 		bl	vTaskSuspend
+ 525:src/main.c    **** 				prvLED_Config(GPIO);
+ 1259              		.loc 1 525 0
+ 1260 0082 4FF00000 		mov	r0, #0
+ 1261 0086 FFF7FEFF 		bl	prvLED_Config
+ 526:src/main.c    **** 				vTaskResume(xLED_Tasks[0]);
+ 1262              		.loc 1 526 0
+ 1263 008a 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1264 008e C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1265 0092 1B68     		ldr	r3, [r3, #0]
+ 1266 0094 1846     		mov	r0, r3
+ 1267 0096 FFF7FEFF 		bl	vTaskResume
+ 527:src/main.c    **** 				vTaskResume(xLED_Tasks[1]);
+ 1268              		.loc 1 527 0
+ 1269 009a 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1270 009e C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1271 00a2 5B68     		ldr	r3, [r3, #4]
+ 1272 00a4 1846     		mov	r0, r3
+ 1273 00a6 FFF7FEFF 		bl	vTaskResume
+ 528:src/main.c    **** 				vTaskResume(xLED_Tasks[2]);
+ 1274              		.loc 1 528 0
+ 1275 00aa 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1276 00ae C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1277 00b2 9B68     		ldr	r3, [r3, #8]
+ 1278 00b4 1846     		mov	r0, r3
+ 1279 00b6 FFF7FEFF 		bl	vTaskResume
+ 529:src/main.c    **** 				vTaskResume(xLED_Tasks[3]);
+ 1280              		.loc 1 529 0
+ 1281 00ba 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1282 00be C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1283 00c2 DB68     		ldr	r3, [r3, #12]
+ 1284 00c4 1846     		mov	r0, r3
+ 1285 00c6 FFF7FEFF 		bl	vTaskResume
+ 1286 00ca 3BE0     		b	.L48
+ 1287              	.L49:
+ 530:src/main.c    **** 			}
+ 531:src/main.c    **** 			else		//MEMS and BALANCE ready, LED tasks suspended
+ 532:src/main.c    **** 			{
+ 533:src/main.c    **** 				vTaskSuspend(xLED_Tasks[0]);
+ 1288              		.loc 1 533 0
+ 1289 00cc 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1290 00d0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1291 00d4 1B68     		ldr	r3, [r3, #0]
+ 1292 00d6 1846     		mov	r0, r3
+ 1293 00d8 FFF7FEFF 		bl	vTaskSuspend
+ 534:src/main.c    **** 				vTaskSuspend(xLED_Tasks[1]);
+ 1294              		.loc 1 534 0
+ 1295 00dc 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1296 00e0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1297 00e4 5B68     		ldr	r3, [r3, #4]
+ 1298 00e6 1846     		mov	r0, r3
+ 1299 00e8 FFF7FEFF 		bl	vTaskSuspend
+ 535:src/main.c    **** 				vTaskSuspend(xLED_Tasks[2]);
+ 1300              		.loc 1 535 0
+ 1301 00ec 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1302 00f0 C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1303 00f4 9B68     		ldr	r3, [r3, #8]
+ 1304 00f6 1846     		mov	r0, r3
+ 1305 00f8 FFF7FEFF 		bl	vTaskSuspend
+ 536:src/main.c    **** 				vTaskSuspend(xLED_Tasks[3]);
+ 1306              		.loc 1 536 0
+ 1307 00fc 40F20003 		movw	r3, #:lower16:xLED_Tasks
+ 1308 0100 C0F20003 		movt	r3, #:upper16:xLED_Tasks
+ 1309 0104 DB68     		ldr	r3, [r3, #12]
+ 1310 0106 1846     		mov	r0, r3
+ 1311 0108 FFF7FEFF 		bl	vTaskSuspend
+ 537:src/main.c    **** 				prvLED_Config(TIMER);
+ 1312              		.loc 1 537 0
+ 1313 010c 4FF00100 		mov	r0, #1
+ 1314 0110 FFF7FEFF 		bl	prvLED_Config
+ 538:src/main.c    **** 				TIM_Cmd(TIM4, ENABLE);
+ 1315              		.loc 1 538 0
+ 1316 0114 4FF40060 		mov	r0, #2048
+ 1317 0118 C4F20000 		movt	r0, 16384
+ 1318 011c 4FF00101 		mov	r1, #1
+ 1319 0120 FFF7FEFF 		bl	TIM_Cmd
+ 539:src/main.c    **** 				vTaskResume(xBALANCE_Task);
+ 1320              		.loc 1 539 0
+ 1321 0124 40F20003 		movw	r3, #:lower16:xBALANCE_Task
+ 1322 0128 C0F20003 		movt	r3, #:upper16:xBALANCE_Task
+ 1323 012c 1B68     		ldr	r3, [r3, #0]
+ 1324 012e 1846     		mov	r0, r3
+ 1325 0130 FFF7FEFF 		bl	vTaskResume
+ 540:src/main.c    **** 				vTaskResume(xMEMS_Task);
+ 1326              		.loc 1 540 0
+ 1327 0134 40F20003 		movw	r3, #:lower16:xMEMS_Task
+ 1328 0138 C0F20003 		movt	r3, #:upper16:xMEMS_Task
+ 1329 013c 1B68     		ldr	r3, [r3, #0]
+ 1330 013e 1846     		mov	r0, r3
+ 1331 0140 FFF7FEFF 		bl	vTaskResume
+ 1332              	.L48:
+ 541:src/main.c    **** 			}
+ 542:src/main.c    **** 		}
+ 543:src/main.c    **** 		taskYIELD(); 	//task is going to ready state to allow next one to run
+ 1333              		.loc 1 543 0
+ 1334 0144 FFF7FEFF 		bl	vPortYieldFromISR
+ 544:src/main.c    **** 	}
+ 1335              		.loc 1 544 0
+ 1336 0148 5EE7     		b	.L50
+ 1337              		.cfi_endproc
+ 1338              	.LFE120:
+ 1340 014a 00BF     		.section	.text.vApplicationIdleHook,"ax",%progbits
+ 1341              		.align	2
+ 1342              		.global	vApplicationIdleHook
+ 1343              		.thumb
+ 1344              		.thumb_func
+ 1346              	vApplicationIdleHook:
+ 1347              	.LFB121:
+ 545:src/main.c    **** }
+ 546:src/main.c    **** 
+ 547:src/main.c    **** /*-----------------------------------------------------------*/
+ 548:src/main.c    **** 
+ 549:src/main.c    **** void vApplicationIdleHook( void )
+ 550:src/main.c    **** {
+ 1348              		.loc 1 550 0
+ 1349              		.cfi_startproc
+ 1350              		@ args = 0, pretend = 0, frame = 8
+ 1351              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1352 0000 80B5     		push	{r7, lr}
+ 1353              	.LCFI32:
+ 1354              		.cfi_def_cfa_offset 8
+ 1355              		.cfi_offset 14, -4
+ 1356              		.cfi_offset 7, -8
+ 1357 0002 82B0     		sub	sp, sp, #8
+ 1358              	.LCFI33:
+ 1359              		.cfi_def_cfa_offset 16
+ 1360 0004 00AF     		add	r7, sp, #0
+ 1361              	.LCFI34:
+ 1362              		.cfi_def_cfa_register 7
+ 551:src/main.c    **** volatile size_t xFreeStackSpace;
+ 552:src/main.c    **** 
+ 553:src/main.c    **** 	/* This function is called on each cycle of the idle task.  In this case it
+ 554:src/main.c    **** 	does nothing useful, other than report the amout of FreeRTOS heap that 
+ 555:src/main.c    **** 	remains unallocated. */
+ 556:src/main.c    **** 	xFreeStackSpace = xPortGetFreeHeapSize();
+ 1363              		.loc 1 556 0
+ 1364 0006 FFF7FEFF 		bl	xPortGetFreeHeapSize
+ 1365 000a 0346     		mov	r3, r0
+ 1366 000c 7B60     		str	r3, [r7, #4]
+ 557:src/main.c    **** 
+ 558:src/main.c    **** 	if( xFreeStackSpace > 100 )
+ 1367              		.loc 1 558 0
+ 1368 000e 7B68     		ldr	r3, [r7, #4]
+ 559:src/main.c    **** 	{
+ 560:src/main.c    **** 		/* By now, the kernel has allocated everything it is going to, so
+ 561:src/main.c    **** 		if there is a lot of heap remaining unallocated then
+ 562:src/main.c    **** 		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
+ 563:src/main.c    **** 		reduced accordingly. */
+ 564:src/main.c    **** 	}
+ 565:src/main.c    **** }
+ 1369              		.loc 1 565 0
+ 1370 0010 07F10807 		add	r7, r7, #8
+ 1371 0014 BD46     		mov	sp, r7
+ 1372 0016 80BD     		pop	{r7, pc}
+ 1373              		.cfi_endproc
+ 1374              	.LFE121:
+ 1376              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
+ 1377              		.align	2
+ 1378              		.global	vApplicationMallocFailedHook
+ 1379              		.thumb
+ 1380              		.thumb_func
+ 1382              	vApplicationMallocFailedHook:
+ 1383              	.LFB122:
  566:src/main.c    **** 
- 567:src/main.c    **** 	/* This function is called on each cycle of the idle task.  In this case it
- 568:src/main.c    **** 	does nothing useful, other than report the amout of FreeRTOS heap that 
- 569:src/main.c    **** 	remains unallocated. */
- 570:src/main.c    **** 	xFreeStackSpace = xPortGetFreeHeapSize();
- 1243              		.loc 1 570 0
- 1244 0006 FFF7FEFF 		bl	xPortGetFreeHeapSize
- 1245 000a 0346     		mov	r3, r0
- 1246 000c 7B60     		str	r3, [r7, #4]
- 571:src/main.c    **** 
- 572:src/main.c    **** 	if( xFreeStackSpace > 100 )
- 1247              		.loc 1 572 0
- 1248 000e 7B68     		ldr	r3, [r7, #4]
- 573:src/main.c    **** 	{
- 574:src/main.c    **** 		/* By now, the kernel has allocated everything it is going to, so
- 575:src/main.c    **** 		if there is a lot of heap remaining unallocated then
- 576:src/main.c    **** 		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
- 577:src/main.c    **** 		reduced accordingly. */
- 578:src/main.c    **** 	}
- 579:src/main.c    **** }
- 1249              		.loc 1 579 0
- 1250 0010 07F10807 		add	r7, r7, #8
- 1251 0014 BD46     		mov	sp, r7
- 1252 0016 80BD     		pop	{r7, pc}
- 1253              		.cfi_endproc
- 1254              	.LFE121:
- 1256              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
- 1257              		.align	2
- 1258              		.global	vApplicationMallocFailedHook
- 1259              		.thumb
- 1260              		.thumb_func
- 1262              	vApplicationMallocFailedHook:
- 1263              	.LFB122:
- 580:src/main.c    **** 
- 581:src/main.c    **** /*-----------------------------------------------------------*/
- 582:src/main.c    **** 
- 583:src/main.c    **** void vApplicationMallocFailedHook( void )
- 584:src/main.c    **** {
- 1264              		.loc 1 584 0
- 1265              		.cfi_startproc
- 1266              		@ args = 0, pretend = 0, frame = 0
- 1267              		@ frame_needed = 1, uses_anonymous_args = 0
- 1268              		@ link register save eliminated.
- 1269 0000 80B4     		push	{r7}
- 1270              	.LCFI35:
- 1271              		.cfi_def_cfa_offset 4
- 1272              		.cfi_offset 7, -4
- 1273 0002 00AF     		add	r7, sp, #0
- 1274              	.LCFI36:
- 1275              		.cfi_def_cfa_register 7
- 1276              	.L45:
- 585:src/main.c    **** 	/* Called if a call to pvPortMalloc() fails because there is insufficient
- 586:src/main.c    **** 	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
- 587:src/main.c    **** 	internally by FreeRTOS API functions that create tasks, queues, software 
- 588:src/main.c    **** 	timers, and semaphores.  The size of the FreeRTOS heap is set by the
- 589:src/main.c    **** 	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
- 590:src/main.c    **** 	for( ;; );
- 1277              		.loc 1 590 0 discriminator 1
- 1278 0004 FEE7     		b	.L45
- 1279              		.cfi_endproc
- 1280              	.LFE122:
- 1282 0006 00BF     		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
- 1283              		.align	2
- 1284              		.global	vApplicationStackOverflowHook
- 1285              		.thumb
- 1286              		.thumb_func
- 1288              	vApplicationStackOverflowHook:
- 1289              	.LFB123:
- 591:src/main.c    **** }
- 592:src/main.c    **** /*-----------------------------------------------------------*/
- 593:src/main.c    **** 
- 594:src/main.c    **** void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
- 595:src/main.c    **** {
- 1290              		.loc 1 595 0
- 1291              		.cfi_startproc
- 1292              		@ args = 0, pretend = 0, frame = 8
- 1293              		@ frame_needed = 1, uses_anonymous_args = 0
- 1294              		@ link register save eliminated.
- 1295 0000 80B4     		push	{r7}
- 1296              	.LCFI37:
- 1297              		.cfi_def_cfa_offset 4
- 1298              		.cfi_offset 7, -4
- 1299 0002 83B0     		sub	sp, sp, #12
- 1300              	.LCFI38:
- 1301              		.cfi_def_cfa_offset 16
- 1302 0004 00AF     		add	r7, sp, #0
- 1303              	.LCFI39:
- 1304              		.cfi_def_cfa_register 7
- 1305 0006 7860     		str	r0, [r7, #4]
- 1306 0008 3960     		str	r1, [r7, #0]
- 1307              	.L47:
- 596:src/main.c    **** 	( void ) pcTaskName;
- 597:src/main.c    **** 	( void ) pxTask;
- 598:src/main.c    **** 
- 599:src/main.c    **** 	/* Run time stack overflow checking is performed if
- 600:src/main.c    **** 	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
- 601:src/main.c    **** 	function is called if a stack overflow is detected. */
- 602:src/main.c    **** 	for( ;; );
- 1308              		.loc 1 602 0 discriminator 1
- 1309 000a FEE7     		b	.L47
- 1310              		.cfi_endproc
- 1311              	.LFE123:
- 1313              		.section	.bss.i.9401,"aw",%nobits
- 1314              		.align	2
- 1317              	i.9401:
- 1318 0000 00000000 		.space	4
- 1319              		.text
- 1320              	.Letext0:
- 1321              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
- 1322              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
- 1323              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
- 1324              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
- 1325              		.file 6 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
- 1326              		.file 7 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
- 1327              		.file 8 "FreeRTOS/Source/include/task.h"
- 1328              		.file 9 "FreeRTOS/Source/include/queue.h"
- 1329              		.file 10 "FreeRTOS/Source/include/semphr.h"
- 1330              		.file 11 "src/stm32f4_discovery.h"
+ 567:src/main.c    **** /*-----------------------------------------------------------*/
+ 568:src/main.c    **** 
+ 569:src/main.c    **** void vApplicationMallocFailedHook( void )
+ 570:src/main.c    **** {
+ 1384              		.loc 1 570 0
+ 1385              		.cfi_startproc
+ 1386              		@ args = 0, pretend = 0, frame = 0
+ 1387              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1388              		@ link register save eliminated.
+ 1389 0000 80B4     		push	{r7}
+ 1390              	.LCFI35:
+ 1391              		.cfi_def_cfa_offset 4
+ 1392              		.cfi_offset 7, -4
+ 1393 0002 00AF     		add	r7, sp, #0
+ 1394              	.LCFI36:
+ 1395              		.cfi_def_cfa_register 7
+ 1396              	.L53:
+ 571:src/main.c    **** 	/* Called if a call to pvPortMalloc() fails because there is insufficient
+ 572:src/main.c    **** 	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
+ 573:src/main.c    **** 	internally by FreeRTOS API functions that create tasks, queues, software 
+ 574:src/main.c    **** 	timers, and semaphores.  The size of the FreeRTOS heap is set by the
+ 575:src/main.c    **** 	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+ 576:src/main.c    **** 	for( ;; );
+ 1397              		.loc 1 576 0 discriminator 1
+ 1398 0004 FEE7     		b	.L53
+ 1399              		.cfi_endproc
+ 1400              	.LFE122:
+ 1402 0006 00BF     		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
+ 1403              		.align	2
+ 1404              		.global	vApplicationStackOverflowHook
+ 1405              		.thumb
+ 1406              		.thumb_func
+ 1408              	vApplicationStackOverflowHook:
+ 1409              	.LFB123:
+ 577:src/main.c    **** }
+ 578:src/main.c    **** /*-----------------------------------------------------------*/
+ 579:src/main.c    **** 
+ 580:src/main.c    **** void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
+ 581:src/main.c    **** {
+ 1410              		.loc 1 581 0
+ 1411              		.cfi_startproc
+ 1412              		@ args = 0, pretend = 0, frame = 8
+ 1413              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1414              		@ link register save eliminated.
+ 1415 0000 80B4     		push	{r7}
+ 1416              	.LCFI37:
+ 1417              		.cfi_def_cfa_offset 4
+ 1418              		.cfi_offset 7, -4
+ 1419 0002 83B0     		sub	sp, sp, #12
+ 1420              	.LCFI38:
+ 1421              		.cfi_def_cfa_offset 16
+ 1422 0004 00AF     		add	r7, sp, #0
+ 1423              	.LCFI39:
+ 1424              		.cfi_def_cfa_register 7
+ 1425 0006 7860     		str	r0, [r7, #4]
+ 1426 0008 3960     		str	r1, [r7, #0]
+ 1427              	.L55:
+ 582:src/main.c    **** 	( void ) pcTaskName;
+ 583:src/main.c    **** 	( void ) pxTask;
+ 584:src/main.c    **** 
+ 585:src/main.c    **** 	/* Run time stack overflow checking is performed if
+ 586:src/main.c    **** 	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+ 587:src/main.c    **** 	function is called if a stack overflow is detected. */
+ 588:src/main.c    **** 	for( ;; );
+ 1428              		.loc 1 588 0 discriminator 1
+ 1429 000a FEE7     		b	.L55
+ 1430              		.cfi_endproc
+ 1431              	.LFE123:
+ 1433              		.section	.bss.i.9401,"aw",%nobits
+ 1434              		.align	2
+ 1437              	i.9401:
+ 1438 0000 00000000 		.space	4
+ 1439              		.text
+ 1440              	.Letext0:
+ 1441              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 1442              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 1443              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
+ 1444              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
+ 1445              		.file 6 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
+ 1446              		.file 7 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 1447              		.file 8 "FreeRTOS/Source/include/task.h"
+ 1448              		.file 9 "FreeRTOS/Source/include/queue.h"
+ 1449              		.file 10 "FreeRTOS/Source/include/semphr.h"
+ 1450              		.file 11 "src/stm32f4_discovery.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
-     /tmp/cc7JlscB.s:20     .text.pwm:00000000 $t
-     /tmp/cc7JlscB.s:25     .text.pwm:00000000 pwm
-     /tmp/cc7JlscB.s:175    .text.Motor_Control:00000000 Motor_Control
-     /tmp/cc7JlscB.s:117    .text.Delay_1ms:00000000 Delay_1ms
-     /tmp/cc7JlscB.s:112    .text.Delay_1ms:00000000 $t
-     /tmp/cc7JlscB.s:170    .text.Motor_Control:00000000 $t
-     /tmp/cc7JlscB.s:293    .text.RCC_Configuration:00000000 $t
-     /tmp/cc7JlscB.s:298    .text.RCC_Configuration:00000000 RCC_Configuration
-     /tmp/cc7JlscB.s:326    .text.GPIO_Configuration:00000000 $t
-     /tmp/cc7JlscB.s:331    .text.GPIO_Configuration:00000000 GPIO_Configuration
-     /tmp/cc7JlscB.s:405    .text.TIM_Configuration:00000000 $t
-     /tmp/cc7JlscB.s:410    .text.TIM_Configuration:00000000 TIM_Configuration
+     /tmp/ccNRUtAh.s:20     .text.pwm:00000000 $t
+     /tmp/ccNRUtAh.s:25     .text.pwm:00000000 pwm
+     /tmp/ccNRUtAh.s:175    .text.Motor_Control:00000000 Motor_Control
+     /tmp/ccNRUtAh.s:117    .text.Delay_1ms:00000000 Delay_1ms
+     /tmp/ccNRUtAh.s:112    .text.Delay_1ms:00000000 $t
+     /tmp/ccNRUtAh.s:170    .text.Motor_Control:00000000 $t
+     /tmp/ccNRUtAh.s:293    .text.RCC_Configuration:00000000 $t
+     /tmp/ccNRUtAh.s:298    .text.RCC_Configuration:00000000 RCC_Configuration
+     /tmp/ccNRUtAh.s:326    .text.GPIO_Configuration:00000000 $t
+     /tmp/ccNRUtAh.s:331    .text.GPIO_Configuration:00000000 GPIO_Configuration
+     /tmp/ccNRUtAh.s:405    .text.TIM_Configuration:00000000 $t
+     /tmp/ccNRUtAh.s:410    .text.TIM_Configuration:00000000 TIM_Configuration
                             *COM*:00000010 xLED_Tasks
                             *COM*:00000004 xMEMS_Task
                             *COM*:00000004 xBALANCE_Task
                             *COM*:00000004 ITM_RxBuffer
-     /tmp/cc7JlscB.s:503    .rodata.LEDS:00000000 $d
-     /tmp/cc7JlscB.s:506    .rodata.LEDS:00000000 LEDS
-     /tmp/cc7JlscB.s:520    .bss.xSemaphoreSW:00000000 xSemaphoreSW
-     /tmp/cc7JlscB.s:517    .bss.xSemaphoreSW:00000000 $d
+     /tmp/ccNRUtAh.s:503    .rodata.LEDS:00000000 $d
+     /tmp/ccNRUtAh.s:506    .rodata.LEDS:00000000 LEDS
+     /tmp/ccNRUtAh.s:520    .bss.xSemaphoreSW:00000000 xSemaphoreSW
+     /tmp/ccNRUtAh.s:517    .bss.xSemaphoreSW:00000000 $d
                             *COM*:00000004 xQueue
-     /tmp/cc7JlscB.s:524    .rodata:00000000 $d
-     /tmp/cc7JlscB.s:525    .rodata:00000000 .LC0
-     /tmp/cc7JlscB.s:528    .rodata:00000008 .LC1
-     /tmp/cc7JlscB.s:531    .rodata:00000010 .LC2
-     /tmp/cc7JlscB.s:534    .text.main:00000000 $t
-     /tmp/cc7JlscB.s:539    .text.main:00000000 main
-     /tmp/cc7JlscB.s:1077   .text.vSWITCHTask:00000000 vSWITCHTask
-     /tmp/cc7JlscB.s:664    .text.vMEMSTask:00000000 vMEMSTask
-     /tmp/cc7JlscB.s:832    .text.vBALANCETask:00000000 vBALANCETask
-     /tmp/cc7JlscB.s:660    .text.vMEMSTask:00000000 $t
-     /tmp/cc7JlscB.s:828    .text.vBALANCETask:00000000 $t
-     /tmp/cc7JlscB.s:1029   .text.vLEDTask:00000000 $t
-     /tmp/cc7JlscB.s:1033   .text.vLEDTask:00000000 vLEDTask
-     /tmp/cc7JlscB.s:1073   .text.vSWITCHTask:00000000 $t
-     /tmp/cc7JlscB.s:1317   .bss.i.9401:00000000 i.9401
-     /tmp/cc7JlscB.s:1221   .text.vApplicationIdleHook:00000000 $t
-     /tmp/cc7JlscB.s:1226   .text.vApplicationIdleHook:00000000 vApplicationIdleHook
-     /tmp/cc7JlscB.s:1257   .text.vApplicationMallocFailedHook:00000000 $t
-     /tmp/cc7JlscB.s:1262   .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
-     /tmp/cc7JlscB.s:1283   .text.vApplicationStackOverflowHook:00000000 $t
-     /tmp/cc7JlscB.s:1288   .text.vApplicationStackOverflowHook:00000000 vApplicationStackOverflowHook
-     /tmp/cc7JlscB.s:1314   .bss.i.9401:00000000 $d
+     /tmp/ccNRUtAh.s:524    .rodata:00000000 $d
+     /tmp/ccNRUtAh.s:525    .rodata:00000000 .LC0
+     /tmp/ccNRUtAh.s:528    .rodata:00000008 .LC1
+     /tmp/ccNRUtAh.s:531    .rodata:00000010 .LC2
+     /tmp/ccNRUtAh.s:534    .text.main:00000000 $t
+     /tmp/ccNRUtAh.s:539    .text.main:00000000 main
+     /tmp/ccNRUtAh.s:1197   .text.vSWITCHTask:00000000 vSWITCHTask
+     /tmp/ccNRUtAh.s:664    .text.vMEMSTask:00000000 vMEMSTask
+     /tmp/ccNRUtAh.s:952    .text.vBALANCETask:00000000 vBALANCETask
+     /tmp/ccNRUtAh.s:660    .text.vMEMSTask:00000000 $t
+     /tmp/ccNRUtAh.s:948    .text.vBALANCETask:00000000 $t
+     /tmp/ccNRUtAh.s:1149   .text.vLEDTask:00000000 $t
+     /tmp/ccNRUtAh.s:1153   .text.vLEDTask:00000000 vLEDTask
+     /tmp/ccNRUtAh.s:1193   .text.vSWITCHTask:00000000 $t
+     /tmp/ccNRUtAh.s:1437   .bss.i.9401:00000000 i.9401
+     /tmp/ccNRUtAh.s:1341   .text.vApplicationIdleHook:00000000 $t
+     /tmp/ccNRUtAh.s:1346   .text.vApplicationIdleHook:00000000 vApplicationIdleHook
+     /tmp/ccNRUtAh.s:1377   .text.vApplicationMallocFailedHook:00000000 $t
+     /tmp/ccNRUtAh.s:1382   .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
+     /tmp/ccNRUtAh.s:1403   .text.vApplicationStackOverflowHook:00000000 $t
+     /tmp/ccNRUtAh.s:1408   .text.vApplicationStackOverflowHook:00000000 vApplicationStackOverflowHook
+     /tmp/ccNRUtAh.s:1434   .bss.i.9401:00000000 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

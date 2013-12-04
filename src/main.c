@@ -291,18 +291,22 @@ void vMEMSTask(void *pvParameters)
     LED = (int *) pvParameters;
 
 
-	uint8_t Buffer_x[2];
-	uint8_t Buffer_y[2];
+	uint8_t Buffer_x[1];
+	uint8_t Buffer_y[1];
 	uint8_t counter  = 0;
 	__IO uint32_t TimingDelay = 0;
 	__IO int8_t XOffset;
 	__IO int8_t YOffset;
 
+      Buffer_x[0] = 0;
+      Buffer_y[0] = 0;
+
   	uint8_t TempAcceleration = 0;               
   	XOffset = Buffer_x[0];
   	YOffset = Buffer_y[0];
 
-	uint8_t temp1, temp2 = 0;
+	int8_t temp1 = 0;
+	int8_t temp2 = 0;
 
 for( ;; )
 {
@@ -310,22 +314,8 @@ for( ;; )
 	if (counter == 10)
 	{
 
-  	Buffer_x[2] = 0;
-  	Buffer_y[2] = 0;
-#if 0
-	STM_EVAL_LEDOn(LED4);
-	STM_EVAL_LEDOn(LED3);
-	STM_EVAL_LEDOn(LED5);
-	STM_EVAL_LEDOn(LED6);
-
-	STM_EVAL_LEDOff(LED4); //left
-	STM_EVAL_LEDOff(LED3); //up
-	STM_EVAL_LEDOff(LED5); //right
-	STM_EVAL_LEDOff(LED6); //down
-#endif 
-
-  	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 4);
-	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 4);
+  	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
+	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
 
       /* Remove the offsets values from data */
       Buffer_x[0] -= XOffset;
@@ -343,92 +333,88 @@ for( ;; )
 
 	if(TempAcceleration != 0)
       {
-		//STM_EVAL_LEDOn(LED6);
-
 	
         if ((int8_t)Buffer_x[0] < -2)
         {
-//				STM_EVAL_LEDOn(LED6);
-				//STM_EVAL_LEDOff(LED6);
-				STM_EVAL_LEDOn(LED3);
+				STM_EVAL_LEDOn(LED4);
+
 
                 if ((int8_t)Buffer_x[0] <= 2)
                 {
-                      //  STM_EVAL_LEDOff(LED3);
+                        STM_EVAL_LEDOff(LED3);
 
                 }
 
                 if ((int8_t)Buffer_y[0] <= 2)
                 {
-                    //   STM_EVAL_LEDOff(LED4);
+                       STM_EVAL_LEDOff(LED6);
                 }
 
                 if ((int8_t)Buffer_y[0] >= -2)
                 {
-                    //    STM_EVAL_LEDOff(LED5);
+                        STM_EVAL_LEDOff(LED5);
                 }
 
         }
         if ((int8_t)Buffer_x[0] > 2)
         {
-				//STM_EVAL_LEDOn(LED3);
-				STM_EVAL_LEDOff(LED3);
+				STM_EVAL_LEDOn(LED5);
+
                                 if ((int8_t)Buffer_y[0] <= 2)
                                 {
-                       //         STM_EVAL_LEDOff(LED4);
+                                STM_EVAL_LEDOff(LED4);
                                 }
 
                                 if ((int8_t)Buffer_y[0] >= -2)
                                 {
-                       // 		STM_EVAL_LEDOff(LED5);
+                        		STM_EVAL_LEDOff(LED3);
                                 }
 
                                 if ((int8_t)Buffer_x[0] >= -2)
                                 {
-		                //        STM_EVAL_LEDOff(LED6);
+		                        STM_EVAL_LEDOff(LED6);
                                 }
 
         }
         if ((int8_t)Buffer_y[0] > 2)
         {
 
-				//STM_EVAL_LEDOn(LED5);
-				STM_EVAL_LEDOff(LED5);
+				STM_EVAL_LEDOn(LED3);
 
                                 if ((int8_t)Buffer_x[0] <= 2)
                                 {
-                        //                STM_EVAL_LEDOff(LED3);
+                                        STM_EVAL_LEDOff(LED4);
                                 }
 
                                 if ((int8_t)Buffer_y[0] >= -2)
                                 {
-                       //                 STM_EVAL_LEDOff(LED5);
+                                        STM_EVAL_LEDOff(LED5);
                                 }
 
                                 if ((int8_t)Buffer_x[0] >= -2)
                                 {
-                       //                 STM_EVAL_LEDOff(LED6);
+                                        STM_EVAL_LEDOff(LED6);
                                 }
 
         }
         if ((int8_t)Buffer_y[0] < -2)
         {
 
-			//STM_EVAL_LEDOn(LED4);
-			STM_EVAL_LEDOff(LED4);
+			STM_EVAL_LEDOn(LED6);
+
                                 if ((int8_t)Buffer_x[0] <= 2)
                                 {
-                         //               STM_EVAL_LEDOff(LED3);
+                                        STM_EVAL_LEDOff(LED3);
                                 }
 
                                 if ((int8_t)Buffer_y[0] <= 2)
                                 {
-                         //      STM_EVAL_LEDOff(LED4);
+                               STM_EVAL_LEDOff(LED4);
                                 }
 
                                 if ((int8_t)Buffer_x[0] >= -2)
                                 {
-                         //       STM_EVAL_LEDOff(LED6);
+                                STM_EVAL_LEDOff(LED5);
                                 }
         }
 		else{/*
