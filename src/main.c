@@ -140,27 +140,12 @@ xQueueHandle xQueueUARTSend;
   */
 int main(void)
 { 
-<<<<<<< HEAD
-	/* create a pipe for MEMS->TIM4 data exchange */
-	xQueue=xQueueCreate(1,queueSIZE*sizeof(uint8_t));
-
-	/* create semaphores... */
-	vSemaphoreCreateBinary( xSemaphoreSW );
-
-	/* ...and clean them up */
-	if(xSemaphoreTake(xSemaphoreSW, ( portTickType ) 0) == pdTRUE);
-	
-=======
 	
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
 
->>>>>>> ac1e70594edb89011fb1fe40d9d7d2eb9ff85178
 	/* initialize hardware... */
 	prvSetupHardware();
-	RCC_Configuration();
-	TIM_Configuration();
-	GPIO_Configuration();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
@@ -246,16 +231,12 @@ void vMEMSTask(void *pvParameters)
   	ZOffset = (int8_t)Buffer_z[0];
  
 	/* reset */
-<<<<<<< HEAD
-	
-=======
 
 	for( ;; )
 	{
 		counter++;
 		if (counter == 10)
 		{
->>>>>>> ac1e70594edb89011fb1fe40d9d7d2eb9ff85178
 
   		LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
 		LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
@@ -265,92 +246,6 @@ void vMEMSTask(void *pvParameters)
 	    //Buffer_x[0] -= XOffset;
 	    //Buffer_y[0] -= YOffset;
 	    //Buffer_z[0] -= ZOffset;
-
-
-<<<<<<< HEAD
-      /* Remove the offsets values from data */
-      Buffer_x[0] -= XOffset;
-      Buffer_y[0] -= YOffset;
-		if ((int8_t)Buffer_x[0] > 2 && (int8_t)Buffer_y[0] > 2)
-		{
-		PWM_Motor1 = 0*(int8_t)Buffer_x[0];//left
-		PWM_Motor2 = 10*(int8_t)Buffer_y[0];//up
-		PWM_Motor3 = 10*(int8_t)Buffer_x[0];//right
-		PWM_Motor4 = 0*(int8_t)Buffer_y[0];//dowm
-		}
-		else if((int8_t)Buffer_x[0] < -2 && (int8_t)Buffer_y[0] < -2)
-		{
-		PWM_Motor1 = -10*(int8_t)Buffer_x[0];//left
-		PWM_Motor2 = 0;//up
-		PWM_Motor3 = 0;//right
-		PWM_Motor4 = -10*(int8_t)Buffer_y[0];//dowm		
-		}
-	}
-}
-}
-
-/*-----------------------------------------------------------*/
-
-void vBALANCETask(void *pvParameters)
-{
-	uint8_t temp1, temp2 = 0;
-	__IO uint8_t TempAcceleration = 0;
-	uint8_t xBuffer_receive[queueSIZE];
-	for( ;; )
-	{
-	 if(xQueueReceive(xQueue,xBuffer_receive,0)==pdPASS)
-		{
-		/* Disable All TIM4 Capture Compare Channels */
-		TIM_CCxCmd(TIM4, TIM_Channel_1, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_2, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_3, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_4, DISABLE);
-
-		/* Update autoreload and capture compare registers value*/
-		temp1=((int8_t)(xBuffer_receive[0])<0)?(int8_t)(xBuffer_receive[0])*(-1):(int8_t)(xBuffer_receive[0]); //ABS
-		temp2=((int8_t)(xBuffer_receive[2])<0)?(int8_t)(xBuffer_receive[2])*(-1):(int8_t)(xBuffer_receive[2]); //ABS
-		TempAcceleration = (temp1<temp2)?temp2:temp1; //MAX(temp1,temp2)
-
-		if(TempAcceleration != 0)
-		{
-			if ((int8_t)xBuffer_receive[0] < -2)
-			{
-				/* Enable TIM4 Capture Compare Channel 4 */
-				TIM_CCxCmd(TIM4, TIM_Channel_4, ENABLE);
-				/* Sets the TIM4 Capture Compare4 Register value */
-				TIM_SetCompare4(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[0] > 2)
-			{
-				/* Enable TIM4 Capture Compare Channel 2 */
-				TIM_CCxCmd(TIM4, TIM_Channel_2, ENABLE);
-				/* Sets the TIM4 Capture Compare2 Register value */
-				TIM_SetCompare2(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[2] > 2)
-			{
-				/* Enable TIM4 Capture Compare Channel 1 */
-				TIM_CCxCmd(TIM4, TIM_Channel_1, ENABLE);
-				/* Sets the TIM4 Capture Compare1 Register value */
-				TIM_SetCompare1(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[2] < -2)
-			{
-				/* Enable TIM4 Capture Compare Channel 3 */
-				TIM_CCxCmd(TIM4, TIM_Channel_3, ENABLE);
-				/* Sets the TIM4 Capture Compare3 Register value */
-				TIM_SetCompare3(TIM4, TIM_CCR/TempAcceleration);
-			}
-
-			/* Time base configuration */
-			TIM_SetAutoreload(TIM4,  TIM_ARR/TempAcceleration);
-		}
-	 }
-	taskYIELD(); 	//task is going to ready state to allow next one to run
-=======
-		temp1 = (uint8_t)((int8_t)(Buffer_x[0]) + 23);
-	    temp2 = (uint8_t)((int8_t)(Buffer_y[0]) + 23);
-	    //qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", temp1, temp2);
 
 	    /* Update autoreload and capture compare registers value*/
 	    temp1 = ABS((int8_t)(Buffer_x[0]));
@@ -451,7 +346,6 @@ void vBALANCETask(void *pvParameters)
 
 	    }
 	  }
->>>>>>> ac1e70594edb89011fb1fe40d9d7d2eb9ff85178
 	}
 }
 
