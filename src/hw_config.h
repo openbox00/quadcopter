@@ -23,5 +23,9 @@ void prvTIM4_Config(void);
 void prvMEMS_Config(void);
 void prvLED_Config(char state);
 uint32_t LIS302DL_TIMEOUT_UserCallback(void);
+void RCC_Configuration(void);
+void GPIO_Configuration(void);
+void TIM_Configuration(void);
+void USART_Configuration(void);
 
 #endif /*HW_CONFIG_H*/
