@@ -247,11 +247,6 @@ void vMEMSTask(void *pvParameters)
 	    //Buffer_y[0] -= YOffset;
 	    //Buffer_z[0] -= ZOffset;
 
-
-		temp1 = (uint8_t)((int8_t)(Buffer_x[0]) + 23);
-	    temp2 = (uint8_t)((int8_t)(Buffer_y[0]) + 23);
-	    //qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", temp1, temp2);
-
 	    /* Update autoreload and capture compare registers value*/
 	    temp1 = ABS((int8_t)(Buffer_x[0]));
 	    temp2 = ABS((int8_t)(Buffer_y[0]));
