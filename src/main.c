@@ -34,6 +34,11 @@
 #include "hw_config.h"  //all hardware configuration was setted here
 #include "main.h"
 
+#include "string-util.c"
+
+/* variable parameter function*/
+#include <stdarg.h>
+
 /** @addtogroup STM32F4-Discovery_Demo
   * @{
   */
@@ -59,6 +64,10 @@
 #define PWM_Motor4 TIM4->CCR4   
 
 /* Private variables ---------------------------------------------------------*/
+/* Queue structure used for passing messages. */
+typedef struct {
+	char str[100];
+} serial_str_msg;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -118,28 +127,11 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 /* Private functions ---------------------------------------------------------*/
 
 /* Task functions declarations */
-static void vLEDTask( void *pvParameters );
-static void vSWITCHTask( void *pvParameters );
 static void vMEMSTask(void *pvParameters);
-static void vBALANCETask(void *pvParameters);
 static void UsartTask(void *pvParameters);
 
-
-/* handlers to tasks to better control them */
-xTaskHandle xLED_Tasks[4];
-xTaskHandle xMEMS_Task, xBALANCE_Task;
-
-/* variables used by tasks */
-volatile int32_t ITM_RxBuffer;
-/* initial arguments for vLEDTask task (which LED and what is the delay) */
-static const int LEDS[4][2] = {{LED3,DELAY*1},
-							   {LED4,DELAY*2},
-							   {LED5,DELAY*3},
-							   {LED6,DELAY*4}};
-
 /* semaphores, queues declarations */
-xSemaphoreHandle xSemaphoreSW  = NULL;
-xQueueHandle xQueue;
+xQueueHandle xQueueUARTSend;
 
 /**
   * @brief  Main program.
@@ -148,27 +140,16 @@ xQueueHandle xQueue;
   */
 int main(void)
 { 
-	/* create a pipe for MEMS->TIM4 data exchange */
-	xQueue = xQueueCreate(1,queueSIZE*sizeof(uint8_t));
-
-	/* create semaphores... */
-	vSemaphoreCreateBinary( xSemaphoreSW );
-
-	/* ...and clean them up */
-	if(xSemaphoreTake(xSemaphoreSW, ( portTickType ) 0) == pdTRUE);
+	
+	/*a queue for tansfer the senddate to USART task*/
+	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
 
 	/* initialize hardware... */
 	prvSetupHardware();
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED3", configMINIMAL_STACK_SIZE, (void *)LEDS[0],tskIDLE_PRIORITY, &xLED_Tasks[0] );
-	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED4", configMINIMAL_STACK_SIZE, (void *)LEDS[1],tskIDLE_PRIORITY, &xLED_Tasks[1] );
-	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED5", configMINIMAL_STACK_SIZE, (void *)LEDS[2],tskIDLE_PRIORITY, &xLED_Tasks[2] );
-	//xTaskCreate( vLEDTask, ( signed portCHAR * ) "LED6", configMINIMAL_STACK_SIZE, (void *)LEDS[3],tskIDLE_PRIORITY, &xLED_Tasks[3] );
-	//xTaskCreate( vSWITCHTask, ( signed portCHAR * ) "SWITCH", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
-	xTaskCreate( vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, &xMEMS_Task );
-	xTaskCreate( UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	//xTaskCreate( vBALANCETask, ( signed portCHAR * ) "BALANCE", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, &xBALANCE_Task );
+	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -184,25 +165,34 @@ int main(void)
 //Task For Sending Data Via USART
 static void UsartTask(void *pvParameters)
 {
+	//Variable to store received data	
+	uint32_t Data;
+	uint8_t curr_char;	
+
 	while(1) {
 
-		//Variable to store received data	
-		uint32_t Data;
-		
+	
+		serial_str_msg msg;
 		//Wait for character
-		while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
-            if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
-				USART_ReceiveData(USART2); // Clear Error
-		}
+		// while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+  //           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
+		// 		USART_ReceiveData(USART2); // Clear Error
+		// }
 
 		//Collect the caracter
-		Data = USART_ReceiveData(USART2);
+		//Data = USART_ReceiveData(USART2);
 
-		//Wait till the flag resets
-		while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
+		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
 
-		//Send the data
-		USART_SendData(USART2, Data); // Echo Char
+		/* Write each character of the message to the RS232 port. */
+		curr_char = 0;
+		while (msg.str[curr_char] != '\0') {
+			//Wait till the flag resets
+			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
+			//Send the data
+			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
+			curr_char++;
+		}
 	}
 
 	while(1);
@@ -216,13 +206,14 @@ void vMEMSTask(void *pvParameters)
     volatile int *LED;
     LED = (int *) pvParameters;
 
-
 	uint8_t Buffer_x[1];
 	uint8_t Buffer_y[1];
+	uint8_t Buffer_z[1];
 	uint8_t counter  = 0;
 	__IO uint32_t TimingDelay = 0;
 	__IO int8_t XOffset;
 	__IO int8_t YOffset;
+	__IO int8_t ZOffset;
 
 
 	int8_t temp1 = 0;
@@ -233,9 +224,12 @@ void vMEMSTask(void *pvParameters)
 	/* reset offset */
   	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
 	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
+	LIS302DL_Read(Buffer_z, LIS302DL_OUT_Z_ADDR, 1);
             
-  	XOffset = Buffer_x[0];
-  	YOffset = Buffer_y[0];
+  	XOffset = (int8_t)Buffer_x[0];
+  	YOffset = (int8_t)Buffer_y[0];
+  	ZOffset = (int8_t)Buffer_z[0];
+ 
 	/* reset */
 
 	for( ;; )
@@ -244,17 +238,28 @@ void vMEMSTask(void *pvParameters)
 		if (counter == 10)
 		{
 
-	  	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
+  		LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
 		LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
+		LIS302DL_Read(Buffer_z, LIS302DL_OUT_Z_ADDR, 1);
 
-	      /* Remove the offsets values from data */
-	      Buffer_x[0] -= XOffset;
-	      Buffer_y[0] -= YOffset;
+	    /* Remove the offsets values from data */
+	    //Buffer_x[0] -= XOffset;
+	    //Buffer_y[0] -= YOffset;
+	    //Buffer_z[0] -= ZOffset;
 
-	      /* Update autoreload and capture compare registers value*/
-	      temp1 = ABS((int8_t)(Buffer_x[0]));
-	      temp2 = ABS((int8_t)(Buffer_y[0]));
-	      TempAcceleration = MAX(temp1, temp2);
+
+		temp1 = (uint8_t)((int8_t)(Buffer_x[0]) + 23);
+	    temp2 = (uint8_t)((int8_t)(Buffer_y[0]) + 23);
+	    //qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", temp1, temp2);
+
+	    /* Update autoreload and capture compare registers value*/
+	    temp1 = ABS((int8_t)(Buffer_x[0]));
+	    temp2 = ABS((int8_t)(Buffer_y[0]));
+    	TempAcceleration = MAX(temp1, temp2);
+		  
+		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
+		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
+		//qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", temp1, temp2);
 		
 		if(TempAcceleration != 0)
 	      {
@@ -351,116 +356,43 @@ void vMEMSTask(void *pvParameters)
 
 /*-----------------------------------------------------------*/
 
-void vBALANCETask(void *pvParameters)
-{
-	uint8_t temp1, temp2 = 0;
-	__IO uint8_t TempAcceleration = 0;
-	uint8_t xBuffer_receive[queueSIZE];
-	for( ;; )
-	{
-	 if(xQueueReceive(xQueue,xBuffer_receive,0)==pdPASS)
-		{
-		/* Disable All TIM4 Capture Compare Channels */
-		TIM_CCxCmd(TIM4, TIM_Channel_1, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_2, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_3, DISABLE);
-		TIM_CCxCmd(TIM4, TIM_Channel_4, DISABLE);
 
-		/* Update autoreload and capture compare registers value*/
-		temp1=((int8_t)(xBuffer_receive[0])<0)?(int8_t)(xBuffer_receive[0])*(-1):(int8_t)(xBuffer_receive[0]); //ABS
-		temp2=((int8_t)(xBuffer_receive[2])<0)?(int8_t)(xBuffer_receive[2])*(-1):(int8_t)(xBuffer_receive[2]); //ABS
-		TempAcceleration = (temp1<temp2)?temp2:temp1; //MAX(temp1,temp2)
 
-		if(TempAcceleration != 0)
-		{
-			if ((int8_t)xBuffer_receive[0] < -2)
-			{
-				/* Enable TIM4 Capture Compare Channel 4 */
-				TIM_CCxCmd(TIM4, TIM_Channel_4, ENABLE);
-				/* Sets the TIM4 Capture Compare4 Register value */
-				TIM_SetCompare4(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[0] > 2)
-			{
-				/* Enable TIM4 Capture Compare Channel 2 */
-				TIM_CCxCmd(TIM4, TIM_Channel_2, ENABLE);
-				/* Sets the TIM4 Capture Compare2 Register value */
-				TIM_SetCompare2(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[2] > 2)
-			{
-				/* Enable TIM4 Capture Compare Channel 1 */
-				TIM_CCxCmd(TIM4, TIM_Channel_1, ENABLE);
-				/* Sets the TIM4 Capture Compare1 Register value */
-				TIM_SetCompare1(TIM4, TIM_CCR/TempAcceleration);
-			}
-			if ((int8_t)xBuffer_receive[2] < -2)
-			{
-				/* Enable TIM4 Capture Compare Channel 3 */
-				TIM_CCxCmd(TIM4, TIM_Channel_3, ENABLE);
-				/* Sets the TIM4 Capture Compare3 Register value */
-				TIM_SetCompare3(TIM4, TIM_CCR/TempAcceleration);
-			}
+// void vSWITCHTask( void *pvParameters )
+// {
+// 	static int i=0;
+// 	for( ;; )
+// 	{
+// 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
+// 		{
+// 			i^=1;		//just switch the state if semaphore was given
 
-			/* Time base configuration */
-			TIM_SetAutoreload(TIM4,  TIM_ARR/TempAcceleration);
-		}
-	 }
-	taskYIELD(); 	//task is going to ready state to allow next one to run
-	}
-}
-
-/*-----------------------------------------------------------*/
-
-void vLEDTask( void *pvParameters )
-{
-    volatile int *LED;
-    LED = (int *) pvParameters;
-
-	for( ;; )
-	{
-		STM_EVAL_LEDToggle((Led_TypeDef)LED[0]);
-	    vTaskDelay(LED[1]/portTICK_RATE_MS);
-	}
-}
-
-/*-----------------------------------------------------------*/
-
-void vSWITCHTask( void *pvParameters )
-{
-	static int i=0;
-	for( ;; )
-	{
-		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
-		{
-			i^=1;		//just switch the state if semaphore was given
-
-			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
-			{
-				vTaskSuspend(xBALANCE_Task);
-				TIM_Cmd(TIM4, DISABLE);
-				vTaskSuspend(xMEMS_Task);
-				prvLED_Config(GPIO);
-				vTaskResume(xLED_Tasks[0]);
-				vTaskResume(xLED_Tasks[1]);
-				vTaskResume(xLED_Tasks[2]);
-				vTaskResume(xLED_Tasks[3]);
-			}
-			else		//MEMS and BALANCE ready, LED tasks suspended
-			{
-				vTaskSuspend(xLED_Tasks[0]);
-				vTaskSuspend(xLED_Tasks[1]);
-				vTaskSuspend(xLED_Tasks[2]);
-				vTaskSuspend(xLED_Tasks[3]);
-				prvLED_Config(TIMER);
-				TIM_Cmd(TIM4, ENABLE);
-				vTaskResume(xBALANCE_Task);
-				vTaskResume(xMEMS_Task);
-			}
-		}
-		taskYIELD(); 	//task is going to ready state to allow next one to run
-	}
-}
+// 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
+// 			{
+// 				vTaskSuspend(xBALANCE_Task);
+// 				TIM_Cmd(TIM4, DISABLE);
+// 				vTaskSuspend(xMEMS_Task);
+// 				prvLED_Config(GPIO);
+// 				vTaskResume(xLED_Tasks[0]);
+// 				vTaskResume(xLED_Tasks[1]);
+// 				vTaskResume(xLED_Tasks[2]);
+// 				vTaskResume(xLED_Tasks[3]);
+// 			}
+// 			else		//MEMS and BALANCE ready, LED tasks suspended
+// 			{
+// 				vTaskSuspend(xLED_Tasks[0]);
+// 				vTaskSuspend(xLED_Tasks[1]);
+// 				vTaskSuspend(xLED_Tasks[2]);
+// 				vTaskSuspend(xLED_Tasks[3]);
+// 				prvLED_Config(TIMER);
+// 				TIM_Cmd(TIM4, ENABLE);
+// 				vTaskResume(xBALANCE_Task);
+// 				vTaskResume(xMEMS_Task);
+// 			}
+// 		}
+// 		taskYIELD(); 	//task is going to ready state to allow next one to run
+// 	}
+// }
 
 /*-----------------------------------------------------------*/
 
