@@ -206,9 +206,13 @@ void vMEMSTask(void *pvParameters)
     volatile int *LED;
     LED = (int *) pvParameters;
 
-	uint8_t Buffer_x[1];
-	uint8_t Buffer_y[1];
-	uint8_t Buffer_z[1];
+	uint8_t Buffer_Hx[1];
+	uint8_t Buffer_Hy[1];
+	uint8_t Buffer_Hz[1];
+	uint8_t Buffer_Lx[1];
+	uint8_t Buffer_Ly[1];
+	uint8_t Buffer_Lz[1];
+
 	uint8_t counter  = 0;
 	__IO uint32_t TimingDelay = 0;
 	__IO int8_t XOffset;
@@ -216,19 +220,27 @@ void vMEMSTask(void *pvParameters)
 	__IO int8_t ZOffset;
 
 
-	int8_t temp1 = 0;
-	int8_t temp2 = 0;
+	int16_t temp1 = 0;
+	int16_t temp2 = 0;
+	int16_t temp3 = 0;
 
-  	uint8_t TempAcceleration = 0;   
+	int16_t temp4 = 0;
+	int16_t temp5 = 0;
+	int16_t temp6 = 0;
+
+  	uint16_t TempAcceleration = 0;   
 
 	/* reset offset */
-  	LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
-	LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
-	LIS302DL_Read(Buffer_z, LIS302DL_OUT_Z_ADDR, 1);
+  		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+  		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
             
-  	XOffset = (int8_t)Buffer_x[0];
-  	YOffset = (int8_t)Buffer_y[0];
-  	ZOffset = (int8_t)Buffer_z[0];
+  	XOffset = (int8_t)Buffer_Hx[0];
+  	YOffset = (int8_t)Buffer_Hy[0];
+  	ZOffset = (int8_t)Buffer_Hz[0];
  
 	/* reset */
 
@@ -238,9 +250,13 @@ void vMEMSTask(void *pvParameters)
 		if (counter == 10)
 		{
 
-  		LIS302DL_Read(Buffer_x, LIS302DL_OUT_X_ADDR, 1);
-		LIS302DL_Read(Buffer_y, LIS302DL_OUT_Y_ADDR, 1);
-		LIS302DL_Read(Buffer_z, LIS302DL_OUT_Z_ADDR, 1);
+  		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+  		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+
 
 	    /* Remove the offsets values from data */
 	    //Buffer_x[0] -= XOffset;
@@ -248,96 +264,107 @@ void vMEMSTask(void *pvParameters)
 	    //Buffer_z[0] -= ZOffset;
 
 	    /* Update autoreload and capture compare registers value*/
-	    temp1 = ABS((int8_t)(Buffer_x[0]));
-	    temp2 = ABS((int8_t)(Buffer_y[0]));
+	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+
+	    temp4 = (int16_t)((Buffer_Hx[0])<<8);
+		temp4 = temp4 | (Buffer_Lx[0]);
+
+	    temp5 = (int16_t)((Buffer_Hy[0])<<8);
+		temp5 = temp5 | (Buffer_Ly[0]);
+
+	    temp6 = (int16_t)((Buffer_Hy[0])<<8);
+		temp6 = temp6 | (Buffer_Ly[0]);
+
     	TempAcceleration = MAX(temp1, temp2);
 		  
 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
-		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
-		//qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", temp1, temp2);
+		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
+		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", temp4, temp5, temp6);
 		
 		if(TempAcceleration != 0)
 	      {
 		
-	        if ((int8_t)Buffer_x[0] < -G)
+	        if ((int8_t)Buffer_Hx[0] < -G)
 	        {
 				STM_EVAL_LEDOn(LED4);
 
 
-	            if ((int8_t)Buffer_x[0] <= G)
+	            if ((int8_t)Buffer_Hx[0] <= G)
 	            {
 	                STM_EVAL_LEDOff(LED3);
 
 	            }
 
-	            if ((int8_t)Buffer_y[0] <= G)
+	            if ((int8_t)Buffer_Hy[0] <= G)
 	            {
 	               STM_EVAL_LEDOff(LED6);
 	            }
 
-	            if ((int8_t)Buffer_y[0] >= -G)
+	            if ((int8_t)Buffer_Hy[0] >= -G)
 	            {
 	                STM_EVAL_LEDOff(LED5);
 	            }
 
 	        }
-	        if ((int8_t)Buffer_x[0] > G)
+	        if ((int8_t)Buffer_Hx[0] > G)
 	        {
 				STM_EVAL_LEDOn(LED5);
 
-	            if ((int8_t)Buffer_y[0] <= G)
+	            if ((int8_t)Buffer_Hy[0] <= G)
 	            {
 		            STM_EVAL_LEDOff(LED4);
 	            }
 
-	            if ((int8_t)Buffer_y[0] >= -G)
+	            if ((int8_t)Buffer_Hy[0] >= -G)
 	            {
 	    			STM_EVAL_LEDOff(LED3);
 	            }
 
-	            if ((int8_t)Buffer_x[0] >= -G)
+	            if ((int8_t)Buffer_Hx[0] >= -G)
 	            {
 	        	    STM_EVAL_LEDOff(LED6);
 	            }
 
 	        }
-	        if ((int8_t)Buffer_y[0] > G)
+	        if ((int8_t)Buffer_Hy[0] > G)
 	        {
 
 				STM_EVAL_LEDOn(LED3);
 
-	            if ((int8_t)Buffer_x[0] <= G)
+	            if ((int8_t)Buffer_Hx[0] <= G)
 	            {
 	                STM_EVAL_LEDOff(LED4);
 	            }
 
-	            if ((int8_t)Buffer_y[0] >= -G)
+	            if ((int8_t)Buffer_Hy[0] >= -G)
 	            {
 	                STM_EVAL_LEDOff(LED5);
 	            }
 
-	            if ((int8_t)Buffer_x[0] >= -G)
+	            if ((int8_t)Buffer_Hx[0] >= -G)
 	            {
 	                STM_EVAL_LEDOff(LED6);
 	            }
 
 	        }
-	        if ((int8_t)Buffer_y[0] < -G)
+	        if ((int8_t)Buffer_Hy[0] < -G)
 	        {
 
 				STM_EVAL_LEDOn(LED6);
 
-	            if ((int8_t)Buffer_x[0] <= G)
+	            if ((int8_t)Buffer_Hx[0] <= G)
 	            {
 	                STM_EVAL_LEDOff(LED3);
 	            }
 
-	            if ((int8_t)Buffer_y[0] <= G)
+	            if ((int8_t)Buffer_Hy[0] <= G)
 	            {
 		           STM_EVAL_LEDOff(LED4);
 	            }
 
-	            if ((int8_t)Buffer_x[0] >= -G)
+	            if ((int8_t)Buffer_Hx[0] >= -G)
 	            {
 	    	        STM_EVAL_LEDOff(LED5);
 	            }

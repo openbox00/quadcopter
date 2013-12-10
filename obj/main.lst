@@ -1,0 +1,3755 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 6
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.memset,"ax",%progbits
+  20              		.align	2
+  21              		.global	memset
+  22              		.thumb
+  23              		.thumb_func
+  25              	memset:
+  26              	.LFB110:
+  27              		.file 1 "src/string-util.c"
+   1:src/string-util.c **** #include <stddef.h>
+   2:src/string-util.c **** #include <stdint.h>
+   3:src/string-util.c **** #include <limits.h>
+   4:src/string-util.c **** 
+   5:src/string-util.c **** #define ALIGN (sizeof(size_t))
+   6:src/string-util.c **** #define ONES ((size_t)-1/UCHAR_MAX)                                                                
+   7:src/string-util.c **** #define HIGHS (ONES * (UCHAR_MAX/2+1))
+   8:src/string-util.c **** #define HASZERO(x) ((x)-ONES & ~(x) & HIGHS)
+   9:src/string-util.c **** 
+  10:src/string-util.c **** #define SS (sizeof(size_t))
+  11:src/string-util.c **** 
+  12:src/string-util.c **** #include <stdarg.h>
+  13:src/string-util.c **** 
+  14:src/string-util.c **** /* Scheduler includes. */
+  15:src/string-util.c **** #include "FreeRTOS.h"
+  16:src/string-util.c **** #include "task.h"
+  17:src/string-util.c **** #include "queue.h"
+  18:src/string-util.c **** #include "semphr.h"
+  19:src/string-util.c **** 
+  20:src/string-util.c **** void *memset(void *dest, int c, size_t n)
+  21:src/string-util.c **** {
+  28              		.loc 1 21 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 32
+  31              		@ frame_needed = 1, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 80B4     		push	{r7}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 4
+  36              		.cfi_offset 7, -4
+  37 0002 89B0     		sub	sp, sp, #36
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 40
+  40 0004 00AF     		add	r7, sp, #0
+  41              	.LCFI2:
+  42              		.cfi_def_cfa_register 7
+  43 0006 F860     		str	r0, [r7, #12]
+  44 0008 B960     		str	r1, [r7, #8]
+  45 000a 7A60     		str	r2, [r7, #4]
+  22:src/string-util.c **** 	unsigned char *s = dest;
+  46              		.loc 1 22 0
+  47 000c FB68     		ldr	r3, [r7, #12]
+  48 000e FB61     		str	r3, [r7, #28]
+  23:src/string-util.c **** 	c = (unsigned char)c;
+  49              		.loc 1 23 0
+  50 0010 BB68     		ldr	r3, [r7, #8]
+  51 0012 DBB2     		uxtb	r3, r3
+  52 0014 BB60     		str	r3, [r7, #8]
+  24:src/string-util.c **** 	for (; ((uintptr_t)s & ALIGN) && n; n--) *s++ = c;
+  53              		.loc 1 24 0
+  54 0016 0BE0     		b	.L2
+  55              	.L4:
+  56              		.loc 1 24 0 is_stmt 0 discriminator 1
+  57 0018 BB68     		ldr	r3, [r7, #8]
+  58 001a DAB2     		uxtb	r2, r3
+  59 001c FB69     		ldr	r3, [r7, #28]
+  60 001e 1A70     		strb	r2, [r3, #0]
+  61 0020 FB69     		ldr	r3, [r7, #28]
+  62 0022 03F10103 		add	r3, r3, #1
+  63 0026 FB61     		str	r3, [r7, #28]
+  64 0028 7B68     		ldr	r3, [r7, #4]
+  65 002a 03F1FF33 		add	r3, r3, #-1
+  66 002e 7B60     		str	r3, [r7, #4]
+  67              	.L2:
+  68 0030 FB69     		ldr	r3, [r7, #28]
+  69 0032 03F00403 		and	r3, r3, #4
+  70 0036 002B     		cmp	r3, #0
+  71 0038 02D0     		beq	.L3
+  72              		.loc 1 24 0 discriminator 2
+  73 003a 7B68     		ldr	r3, [r7, #4]
+  74 003c 002B     		cmp	r3, #0
+  75 003e EBD1     		bne	.L4
+  76              	.L3:
+  25:src/string-util.c **** 	if (n) {
+  77              		.loc 1 25 0 is_stmt 1
+  78 0040 7B68     		ldr	r3, [r7, #4]
+  79 0042 002B     		cmp	r3, #0
+  80 0044 2BD0     		beq	.L5
+  81              	.LBB2:
+  26:src/string-util.c **** 		size_t *w, k = ONES * c;
+  82              		.loc 1 26 0
+  83 0046 BA68     		ldr	r2, [r7, #8]
+  84 0048 1346     		mov	r3, r2
+  85 004a 4FEA0323 		lsl	r3, r3, #8
+  86 004e 9B18     		adds	r3, r3, r2
+  87 0050 4FEA0342 		lsl	r2, r3, #16
+  88 0054 9B18     		adds	r3, r3, r2
+  89 0056 7B61     		str	r3, [r7, #20]
+  27:src/string-util.c **** 		for (w = (void *)s; n>=SS; n-=SS, w++) *w = k;
+  90              		.loc 1 27 0
+  91 0058 FB69     		ldr	r3, [r7, #28]
+  92 005a BB61     		str	r3, [r7, #24]
+  93 005c 0AE0     		b	.L6
+  94              	.L7:
+  95              		.loc 1 27 0 is_stmt 0 discriminator 2
+  96 005e BB69     		ldr	r3, [r7, #24]
+  97 0060 7A69     		ldr	r2, [r7, #20]
+  98 0062 1A60     		str	r2, [r3, #0]
+  99 0064 7B68     		ldr	r3, [r7, #4]
+ 100 0066 A3F10403 		sub	r3, r3, #4
+ 101 006a 7B60     		str	r3, [r7, #4]
+ 102 006c BB69     		ldr	r3, [r7, #24]
+ 103 006e 03F10403 		add	r3, r3, #4
+ 104 0072 BB61     		str	r3, [r7, #24]
+ 105              	.L6:
+ 106              		.loc 1 27 0 discriminator 1
+ 107 0074 7B68     		ldr	r3, [r7, #4]
+ 108 0076 032B     		cmp	r3, #3
+ 109 0078 F1D8     		bhi	.L7
+  28:src/string-util.c **** 		for (s = (void *)w; n; n--, s++) *s = c;
+ 110              		.loc 1 28 0 is_stmt 1
+ 111 007a BB69     		ldr	r3, [r7, #24]
+ 112 007c FB61     		str	r3, [r7, #28]
+ 113 007e 0BE0     		b	.L8
+ 114              	.L9:
+ 115              		.loc 1 28 0 is_stmt 0 discriminator 2
+ 116 0080 BB68     		ldr	r3, [r7, #8]
+ 117 0082 DAB2     		uxtb	r2, r3
+ 118 0084 FB69     		ldr	r3, [r7, #28]
+ 119 0086 1A70     		strb	r2, [r3, #0]
+ 120 0088 7B68     		ldr	r3, [r7, #4]
+ 121 008a 03F1FF33 		add	r3, r3, #-1
+ 122 008e 7B60     		str	r3, [r7, #4]
+ 123 0090 FB69     		ldr	r3, [r7, #28]
+ 124 0092 03F10103 		add	r3, r3, #1
+ 125 0096 FB61     		str	r3, [r7, #28]
+ 126              	.L8:
+ 127              		.loc 1 28 0 discriminator 1
+ 128 0098 7B68     		ldr	r3, [r7, #4]
+ 129 009a 002B     		cmp	r3, #0
+ 130 009c F0D1     		bne	.L9
+ 131              	.L5:
+ 132              	.LBE2:
+  29:src/string-util.c **** 	}
+  30:src/string-util.c **** 	return dest;
+ 133              		.loc 1 30 0 is_stmt 1
+ 134 009e FB68     		ldr	r3, [r7, #12]
+  31:src/string-util.c **** }
+ 135              		.loc 1 31 0
+ 136 00a0 1846     		mov	r0, r3
+ 137 00a2 07F12407 		add	r7, r7, #36
+ 138 00a6 BD46     		mov	sp, r7
+ 139 00a8 80BC     		pop	{r7}
+ 140 00aa 7047     		bx	lr
+ 141              		.cfi_endproc
+ 142              	.LFE110:
+ 144              		.section	.text.memcpy,"ax",%progbits
+ 145              		.align	2
+ 146              		.global	memcpy
+ 147              		.thumb
+ 148              		.thumb_func
+ 150              	memcpy:
+ 151              	.LFB111:
+  32:src/string-util.c **** 
+  33:src/string-util.c **** void *memcpy(void *dest, const void *src, size_t n)
+  34:src/string-util.c **** {
+ 152              		.loc 1 34 0
+ 153              		.cfi_startproc
+ 154              		@ args = 0, pretend = 0, frame = 40
+ 155              		@ frame_needed = 1, uses_anonymous_args = 0
+ 156              		@ link register save eliminated.
+ 157 0000 80B4     		push	{r7}
+ 158              	.LCFI3:
+ 159              		.cfi_def_cfa_offset 4
+ 160              		.cfi_offset 7, -4
+ 161 0002 8BB0     		sub	sp, sp, #44
+ 162              	.LCFI4:
+ 163              		.cfi_def_cfa_offset 48
+ 164 0004 00AF     		add	r7, sp, #0
+ 165              	.LCFI5:
+ 166              		.cfi_def_cfa_register 7
+ 167 0006 F860     		str	r0, [r7, #12]
+ 168 0008 B960     		str	r1, [r7, #8]
+ 169 000a 7A60     		str	r2, [r7, #4]
+  35:src/string-util.c **** 	void *ret = dest;
+ 170              		.loc 1 35 0
+ 171 000c FB68     		ldr	r3, [r7, #12]
+ 172 000e 7B61     		str	r3, [r7, #20]
+  36:src/string-util.c **** 	
+  37:src/string-util.c **** 	//Cut rear
+  38:src/string-util.c **** 	uint8_t *dst8 = dest;
+ 173              		.loc 1 38 0
+ 174 0010 FB68     		ldr	r3, [r7, #12]
+ 175 0012 7B62     		str	r3, [r7, #36]
+  39:src/string-util.c **** 	const uint8_t *src8 = src;
+ 176              		.loc 1 39 0
+ 177 0014 BB68     		ldr	r3, [r7, #8]
+ 178 0016 3B62     		str	r3, [r7, #32]
+  40:src/string-util.c **** 	switch (n % 4) {
+ 179              		.loc 1 40 0
+ 180 0018 7B68     		ldr	r3, [r7, #4]
+ 181 001a 03F00303 		and	r3, r3, #3
+ 182 001e 022B     		cmp	r3, #2
+ 183 0020 10D0     		beq	.L13
+ 184 0022 032B     		cmp	r3, #3
+ 185 0024 02D0     		beq	.L14
+ 186 0026 012B     		cmp	r3, #1
+ 187 0028 18D0     		beq	.L12
+ 188 002a 23E0     		b	.L11
+ 189              	.L14:
+  41:src/string-util.c **** 		case 3 : *dst8++ = *src8++;
+ 190              		.loc 1 41 0
+ 191 002c 3B6A     		ldr	r3, [r7, #32]
+ 192 002e 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 193 0030 7B6A     		ldr	r3, [r7, #36]
+ 194 0032 1A70     		strb	r2, [r3, #0]
+ 195 0034 7B6A     		ldr	r3, [r7, #36]
+ 196 0036 03F10103 		add	r3, r3, #1
+ 197 003a 7B62     		str	r3, [r7, #36]
+ 198 003c 3B6A     		ldr	r3, [r7, #32]
+ 199 003e 03F10103 		add	r3, r3, #1
+ 200 0042 3B62     		str	r3, [r7, #32]
+ 201              	.L13:
+  42:src/string-util.c **** 		case 2 : *dst8++ = *src8++;
+ 202              		.loc 1 42 0
+ 203 0044 3B6A     		ldr	r3, [r7, #32]
+ 204 0046 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 205 0048 7B6A     		ldr	r3, [r7, #36]
+ 206 004a 1A70     		strb	r2, [r3, #0]
+ 207 004c 7B6A     		ldr	r3, [r7, #36]
+ 208 004e 03F10103 		add	r3, r3, #1
+ 209 0052 7B62     		str	r3, [r7, #36]
+ 210 0054 3B6A     		ldr	r3, [r7, #32]
+ 211 0056 03F10103 		add	r3, r3, #1
+ 212 005a 3B62     		str	r3, [r7, #32]
+ 213              	.L12:
+  43:src/string-util.c **** 		case 1 : *dst8++ = *src8++;
+ 214              		.loc 1 43 0
+ 215 005c 3B6A     		ldr	r3, [r7, #32]
+ 216 005e 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 217 0060 7B6A     		ldr	r3, [r7, #36]
+ 218 0062 1A70     		strb	r2, [r3, #0]
+ 219 0064 7B6A     		ldr	r3, [r7, #36]
+ 220 0066 03F10103 		add	r3, r3, #1
+ 221 006a 7B62     		str	r3, [r7, #36]
+ 222 006c 3B6A     		ldr	r3, [r7, #32]
+ 223 006e 03F10103 		add	r3, r3, #1
+ 224 0072 3B62     		str	r3, [r7, #32]
+ 225              	.L11:
+  44:src/string-util.c **** 		case 0 : ;
+  45:src/string-util.c **** 	}
+  46:src/string-util.c **** 	
+  47:src/string-util.c **** 	//stm32 data bus width
+  48:src/string-util.c **** 	uint32_t *dst32 = (void *)dst8;
+ 226              		.loc 1 48 0
+ 227 0074 7B6A     		ldr	r3, [r7, #36]
+ 228 0076 FB61     		str	r3, [r7, #28]
+  49:src/string-util.c **** 	const uint32_t *src32 = (void *)src8;
+ 229              		.loc 1 49 0
+ 230 0078 3B6A     		ldr	r3, [r7, #32]
+ 231 007a BB61     		str	r3, [r7, #24]
+  50:src/string-util.c **** 	n = n / 4;
+ 232              		.loc 1 50 0
+ 233 007c 7B68     		ldr	r3, [r7, #4]
+ 234 007e 4FEA9303 		lsr	r3, r3, #2
+ 235 0082 7B60     		str	r3, [r7, #4]
+  51:src/string-util.c **** 	while (n--) {
+ 236              		.loc 1 51 0
+ 237 0084 0BE0     		b	.L15
+ 238              	.L16:
+  52:src/string-util.c **** 		*dst32++ = *src32++;
+ 239              		.loc 1 52 0
+ 240 0086 BB69     		ldr	r3, [r7, #24]
+ 241 0088 1A68     		ldr	r2, [r3, #0]
+ 242 008a FB69     		ldr	r3, [r7, #28]
+ 243 008c 1A60     		str	r2, [r3, #0]
+ 244 008e FB69     		ldr	r3, [r7, #28]
+ 245 0090 03F10403 		add	r3, r3, #4
+ 246 0094 FB61     		str	r3, [r7, #28]
+ 247 0096 BB69     		ldr	r3, [r7, #24]
+ 248 0098 03F10403 		add	r3, r3, #4
+ 249 009c BB61     		str	r3, [r7, #24]
+ 250              	.L15:
+  51:src/string-util.c **** 	while (n--) {
+ 251              		.loc 1 51 0 discriminator 1
+ 252 009e 7B68     		ldr	r3, [r7, #4]
+ 253 00a0 002B     		cmp	r3, #0
+ 254 00a2 0CBF     		ite	eq
+ 255 00a4 0023     		moveq	r3, #0
+ 256 00a6 0123     		movne	r3, #1
+ 257 00a8 DBB2     		uxtb	r3, r3
+ 258 00aa 7A68     		ldr	r2, [r7, #4]
+ 259 00ac 02F1FF32 		add	r2, r2, #-1
+ 260 00b0 7A60     		str	r2, [r7, #4]
+ 261 00b2 002B     		cmp	r3, #0
+ 262 00b4 E7D1     		bne	.L16
+  53:src/string-util.c **** 	}
+  54:src/string-util.c **** 	
+  55:src/string-util.c **** 	return ret;
+ 263              		.loc 1 55 0
+ 264 00b6 7B69     		ldr	r3, [r7, #20]
+  56:src/string-util.c **** }
+ 265              		.loc 1 56 0
+ 266 00b8 1846     		mov	r0, r3
+ 267 00ba 07F12C07 		add	r7, r7, #44
+ 268 00be BD46     		mov	sp, r7
+ 269 00c0 80BC     		pop	{r7}
+ 270 00c2 7047     		bx	lr
+ 271              		.cfi_endproc
+ 272              	.LFE111:
+ 274              		.section	.text.strchr,"ax",%progbits
+ 275              		.align	2
+ 276              		.global	strchr
+ 277              		.thumb
+ 278              		.thumb_func
+ 280              	strchr:
+ 281              	.LFB112:
+  57:src/string-util.c **** 
+  58:src/string-util.c **** char *strchr(const char *s, int c)
+  59:src/string-util.c **** {
+ 282              		.loc 1 59 0
+ 283              		.cfi_startproc
+ 284              		@ args = 0, pretend = 0, frame = 8
+ 285              		@ frame_needed = 1, uses_anonymous_args = 0
+ 286              		@ link register save eliminated.
+ 287 0000 80B4     		push	{r7}
+ 288              	.LCFI6:
+ 289              		.cfi_def_cfa_offset 4
+ 290              		.cfi_offset 7, -4
+ 291 0002 83B0     		sub	sp, sp, #12
+ 292              	.LCFI7:
+ 293              		.cfi_def_cfa_offset 16
+ 294 0004 00AF     		add	r7, sp, #0
+ 295              	.LCFI8:
+ 296              		.cfi_def_cfa_register 7
+ 297 0006 7860     		str	r0, [r7, #4]
+ 298 0008 3960     		str	r1, [r7, #0]
+  60:src/string-util.c **** 	for (; *s && *s != c; s++);
+ 299              		.loc 1 60 0
+ 300 000a 03E0     		b	.L18
+ 301              	.L20:
+ 302              		.loc 1 60 0 is_stmt 0 discriminator 1
+ 303 000c 7B68     		ldr	r3, [r7, #4]
+ 304 000e 03F10103 		add	r3, r3, #1
+ 305 0012 7B60     		str	r3, [r7, #4]
+ 306              	.L18:
+ 307 0014 7B68     		ldr	r3, [r7, #4]
+ 308 0016 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 309 0018 002B     		cmp	r3, #0
+ 310 001a 05D0     		beq	.L19
+ 311              		.loc 1 60 0 discriminator 2
+ 312 001c 7B68     		ldr	r3, [r7, #4]
+ 313 001e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 314 0020 1A46     		mov	r2, r3
+ 315 0022 3B68     		ldr	r3, [r7, #0]
+ 316 0024 9A42     		cmp	r2, r3
+ 317 0026 F1D1     		bne	.L20
+ 318              	.L19:
+  61:src/string-util.c **** 	return (*s == c) ? (char *)s : NULL;
+ 319              		.loc 1 61 0 is_stmt 1
+ 320 0028 7B68     		ldr	r3, [r7, #4]
+ 321 002a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 322 002c 1A46     		mov	r2, r3
+ 323 002e 3B68     		ldr	r3, [r7, #0]
+ 324 0030 9A42     		cmp	r2, r3
+ 325 0032 01D1     		bne	.L21
+ 326              		.loc 1 61 0 is_stmt 0 discriminator 1
+ 327 0034 7B68     		ldr	r3, [r7, #4]
+ 328 0036 01E0     		b	.L22
+ 329              	.L21:
+ 330              		.loc 1 61 0 discriminator 2
+ 331 0038 4FF00003 		mov	r3, #0
+ 332              	.L22:
+  62:src/string-util.c **** }
+ 333              		.loc 1 62 0 is_stmt 1 discriminator 3
+ 334 003c 1846     		mov	r0, r3
+ 335 003e 07F10C07 		add	r7, r7, #12
+ 336 0042 BD46     		mov	sp, r7
+ 337 0044 80BC     		pop	{r7}
+ 338 0046 7047     		bx	lr
+ 339              		.cfi_endproc
+ 340              	.LFE112:
+ 342              		.section	.text.strcpy,"ax",%progbits
+ 343              		.align	2
+ 344              		.global	strcpy
+ 345              		.thumb
+ 346              		.thumb_func
+ 348              	strcpy:
+ 349              	.LFB113:
+  63:src/string-util.c **** 
+  64:src/string-util.c **** char *strcpy(char *dest, const char *src)
+  65:src/string-util.c **** {
+ 350              		.loc 1 65 0
+ 351              		.cfi_startproc
+ 352              		@ args = 0, pretend = 0, frame = 16
+ 353              		@ frame_needed = 1, uses_anonymous_args = 0
+ 354              		@ link register save eliminated.
+ 355 0000 80B4     		push	{r7}
+ 356              	.LCFI9:
+ 357              		.cfi_def_cfa_offset 4
+ 358              		.cfi_offset 7, -4
+ 359 0002 85B0     		sub	sp, sp, #20
+ 360              	.LCFI10:
+ 361              		.cfi_def_cfa_offset 24
+ 362 0004 00AF     		add	r7, sp, #0
+ 363              	.LCFI11:
+ 364              		.cfi_def_cfa_register 7
+ 365 0006 7860     		str	r0, [r7, #4]
+ 366 0008 3960     		str	r1, [r7, #0]
+  66:src/string-util.c **** 	const unsigned char *s = src;
+ 367              		.loc 1 66 0
+ 368 000a 3B68     		ldr	r3, [r7, #0]
+ 369 000c FB60     		str	r3, [r7, #12]
+  67:src/string-util.c **** 	unsigned char *d = dest;
+ 370              		.loc 1 67 0
+ 371 000e 7B68     		ldr	r3, [r7, #4]
+ 372 0010 BB60     		str	r3, [r7, #8]
+  68:src/string-util.c **** 	while ((*d++ = *s++));
+ 373              		.loc 1 68 0
+ 374 0012 00BF     		nop
+ 375              	.L24:
+ 376              		.loc 1 68 0 is_stmt 0 discriminator 1
+ 377 0014 FB68     		ldr	r3, [r7, #12]
+ 378 0016 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 379 0018 BB68     		ldr	r3, [r7, #8]
+ 380 001a 1A70     		strb	r2, [r3, #0]
+ 381 001c BB68     		ldr	r3, [r7, #8]
+ 382 001e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 383 0020 002B     		cmp	r3, #0
+ 384 0022 0CBF     		ite	eq
+ 385 0024 0023     		moveq	r3, #0
+ 386 0026 0123     		movne	r3, #1
+ 387 0028 DBB2     		uxtb	r3, r3
+ 388 002a BA68     		ldr	r2, [r7, #8]
+ 389 002c 02F10102 		add	r2, r2, #1
+ 390 0030 BA60     		str	r2, [r7, #8]
+ 391 0032 FA68     		ldr	r2, [r7, #12]
+ 392 0034 02F10102 		add	r2, r2, #1
+ 393 0038 FA60     		str	r2, [r7, #12]
+ 394 003a 002B     		cmp	r3, #0
+ 395 003c EAD1     		bne	.L24
+  69:src/string-util.c **** 	return dest;
+ 396              		.loc 1 69 0 is_stmt 1
+ 397 003e 7B68     		ldr	r3, [r7, #4]
+  70:src/string-util.c **** }
+ 398              		.loc 1 70 0
+ 399 0040 1846     		mov	r0, r3
+ 400 0042 07F11407 		add	r7, r7, #20
+ 401 0046 BD46     		mov	sp, r7
+ 402 0048 80BC     		pop	{r7}
+ 403 004a 7047     		bx	lr
+ 404              		.cfi_endproc
+ 405              	.LFE113:
+ 407              		.section	.text.strncpy,"ax",%progbits
+ 408              		.align	2
+ 409              		.global	strncpy
+ 410              		.thumb
+ 411              		.thumb_func
+ 413              	strncpy:
+ 414              	.LFB114:
+  71:src/string-util.c **** 
+  72:src/string-util.c **** char *strncpy(char *dest, const char *src, size_t n)
+  73:src/string-util.c **** {
+ 415              		.loc 1 73 0
+ 416              		.cfi_startproc
+ 417              		@ args = 0, pretend = 0, frame = 24
+ 418              		@ frame_needed = 1, uses_anonymous_args = 0
+ 419              		@ link register save eliminated.
+ 420 0000 80B4     		push	{r7}
+ 421              	.LCFI12:
+ 422              		.cfi_def_cfa_offset 4
+ 423              		.cfi_offset 7, -4
+ 424 0002 87B0     		sub	sp, sp, #28
+ 425              	.LCFI13:
+ 426              		.cfi_def_cfa_offset 32
+ 427 0004 00AF     		add	r7, sp, #0
+ 428              	.LCFI14:
+ 429              		.cfi_def_cfa_register 7
+ 430 0006 F860     		str	r0, [r7, #12]
+ 431 0008 B960     		str	r1, [r7, #8]
+ 432 000a 7A60     		str	r2, [r7, #4]
+  74:src/string-util.c **** 	const unsigned char *s = src;
+ 433              		.loc 1 74 0
+ 434 000c BB68     		ldr	r3, [r7, #8]
+ 435 000e 7B61     		str	r3, [r7, #20]
+  75:src/string-util.c **** 	unsigned char *d = dest;
+ 436              		.loc 1 75 0
+ 437 0010 FB68     		ldr	r3, [r7, #12]
+ 438 0012 3B61     		str	r3, [r7, #16]
+  76:src/string-util.c **** 	while (n-- && (*d++ = *s++));
+ 439              		.loc 1 76 0
+ 440 0014 00BF     		nop
+ 441              	.L27:
+ 442              		.loc 1 76 0 is_stmt 0 discriminator 1
+ 443 0016 7B68     		ldr	r3, [r7, #4]
+ 444 0018 002B     		cmp	r3, #0
+ 445 001a 0CBF     		ite	eq
+ 446 001c 0023     		moveq	r3, #0
+ 447 001e 0123     		movne	r3, #1
+ 448 0020 DBB2     		uxtb	r3, r3
+ 449 0022 7A68     		ldr	r2, [r7, #4]
+ 450 0024 02F1FF32 		add	r2, r2, #-1
+ 451 0028 7A60     		str	r2, [r7, #4]
+ 452 002a 002B     		cmp	r3, #0
+ 453 002c 14D0     		beq	.L26
+ 454              		.loc 1 76 0 discriminator 2
+ 455 002e 7B69     		ldr	r3, [r7, #20]
+ 456 0030 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 457 0032 3B69     		ldr	r3, [r7, #16]
+ 458 0034 1A70     		strb	r2, [r3, #0]
+ 459 0036 3B69     		ldr	r3, [r7, #16]
+ 460 0038 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 461 003a 002B     		cmp	r3, #0
+ 462 003c 0CBF     		ite	eq
+ 463 003e 0023     		moveq	r3, #0
+ 464 0040 0123     		movne	r3, #1
+ 465 0042 DBB2     		uxtb	r3, r3
+ 466 0044 3A69     		ldr	r2, [r7, #16]
+ 467 0046 02F10102 		add	r2, r2, #1
+ 468 004a 3A61     		str	r2, [r7, #16]
+ 469 004c 7A69     		ldr	r2, [r7, #20]
+ 470 004e 02F10102 		add	r2, r2, #1
+ 471 0052 7A61     		str	r2, [r7, #20]
+ 472 0054 002B     		cmp	r3, #0
+ 473 0056 DED1     		bne	.L27
+ 474              	.L26:
+  77:src/string-util.c **** 	return dest;
+ 475              		.loc 1 77 0 is_stmt 1
+ 476 0058 FB68     		ldr	r3, [r7, #12]
+  78:src/string-util.c **** }
+ 477              		.loc 1 78 0
+ 478 005a 1846     		mov	r0, r3
+ 479 005c 07F11C07 		add	r7, r7, #28
+ 480 0060 BD46     		mov	sp, r7
+ 481 0062 80BC     		pop	{r7}
+ 482 0064 7047     		bx	lr
+ 483              		.cfi_endproc
+ 484              	.LFE114:
+ 486 0066 00BF     		.section	.text.strncmp,"ax",%progbits
+ 487              		.align	2
+ 488              		.global	strncmp
+ 489              		.thumb
+ 490              		.thumb_func
+ 492              	strncmp:
+ 493              	.LFB115:
+  79:src/string-util.c **** 
+  80:src/string-util.c **** int strncmp(const char *s1, const char *s2, size_t n)
+  81:src/string-util.c **** {
+ 494              		.loc 1 81 0
+ 495              		.cfi_startproc
+ 496              		@ args = 0, pretend = 0, frame = 16
+ 497              		@ frame_needed = 1, uses_anonymous_args = 0
+ 498              		@ link register save eliminated.
+ 499 0000 80B4     		push	{r7}
+ 500              	.LCFI15:
+ 501              		.cfi_def_cfa_offset 4
+ 502              		.cfi_offset 7, -4
+ 503 0002 85B0     		sub	sp, sp, #20
+ 504              	.LCFI16:
+ 505              		.cfi_def_cfa_offset 24
+ 506 0004 00AF     		add	r7, sp, #0
+ 507              	.LCFI17:
+ 508              		.cfi_def_cfa_register 7
+ 509 0006 F860     		str	r0, [r7, #12]
+ 510 0008 B960     		str	r1, [r7, #8]
+ 511 000a 7A60     		str	r2, [r7, #4]
+  82:src/string-util.c ****     for ( ; n > 0; s1++, s2++, --n)
+ 512              		.loc 1 82 0
+ 513 000c 1FE0     		b	.L29
+ 514              	.L33:
+  83:src/string-util.c **** 	    if (*s1 != *s2)
+ 515              		.loc 1 83 0
+ 516 000e FB68     		ldr	r3, [r7, #12]
+ 517 0010 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 518 0012 BB68     		ldr	r3, [r7, #8]
+ 519 0014 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 520 0016 9A42     		cmp	r2, r3
+ 521 0018 06D0     		beq	.L30
+  84:src/string-util.c **** 	        return *(unsigned char *)s1 - *(unsigned char *)s2;
+ 522              		.loc 1 84 0
+ 523 001a FB68     		ldr	r3, [r7, #12]
+ 524 001c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 525 001e 1A46     		mov	r2, r3
+ 526 0020 BB68     		ldr	r3, [r7, #8]
+ 527 0022 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 528 0024 D31A     		subs	r3, r2, r3
+ 529 0026 17E0     		b	.L31
+ 530              	.L30:
+  85:src/string-util.c **** 	    else if (*s1 == '\0')
+ 531              		.loc 1 85 0
+ 532 0028 FB68     		ldr	r3, [r7, #12]
+ 533 002a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 534 002c 002B     		cmp	r3, #0
+ 535 002e 02D1     		bne	.L32
+  86:src/string-util.c **** 	        return 0;
+ 536              		.loc 1 86 0
+ 537 0030 4FF00003 		mov	r3, #0
+ 538 0034 10E0     		b	.L31
+ 539              	.L32:
+  82:src/string-util.c ****     for ( ; n > 0; s1++, s2++, --n)
+ 540              		.loc 1 82 0
+ 541 0036 FB68     		ldr	r3, [r7, #12]
+ 542 0038 03F10103 		add	r3, r3, #1
+ 543 003c FB60     		str	r3, [r7, #12]
+ 544 003e BB68     		ldr	r3, [r7, #8]
+ 545 0040 03F10103 		add	r3, r3, #1
+ 546 0044 BB60     		str	r3, [r7, #8]
+ 547 0046 7B68     		ldr	r3, [r7, #4]
+ 548 0048 03F1FF33 		add	r3, r3, #-1
+ 549 004c 7B60     		str	r3, [r7, #4]
+ 550              	.L29:
+  82:src/string-util.c ****     for ( ; n > 0; s1++, s2++, --n)
+ 551              		.loc 1 82 0 is_stmt 0 discriminator 1
+ 552 004e 7B68     		ldr	r3, [r7, #4]
+ 553 0050 002B     		cmp	r3, #0
+ 554 0052 DCD1     		bne	.L33
+  87:src/string-util.c ****     return 0;
+ 555              		.loc 1 87 0 is_stmt 1
+ 556 0054 4FF00003 		mov	r3, #0
+ 557              	.L31:
+  88:src/string-util.c **** }
+ 558              		.loc 1 88 0
+ 559 0058 1846     		mov	r0, r3
+ 560 005a 07F11407 		add	r7, r7, #20
+ 561 005e BD46     		mov	sp, r7
+ 562 0060 80BC     		pop	{r7}
+ 563 0062 7047     		bx	lr
+ 564              		.cfi_endproc
+ 565              	.LFE115:
+ 567              		.section	.text.strcmp,"ax",%progbits
+ 568              		.align	2
+ 569              		.global	strcmp
+ 570              		.thumb
+ 571              		.thumb_func
+ 573              	strcmp:
+ 574              	.LFB116:
+  89:src/string-util.c **** 
+  90:src/string-util.c **** int strcmp(const char *s1, const char *s2)
+  91:src/string-util.c **** {
+ 575              		.loc 1 91 0
+ 576              		.cfi_startproc
+ 577              		@ args = 0, pretend = 0, frame = 8
+ 578              		@ frame_needed = 1, uses_anonymous_args = 0
+ 579              		@ link register save eliminated.
+ 580 0000 80B4     		push	{r7}
+ 581              	.LCFI18:
+ 582              		.cfi_def_cfa_offset 4
+ 583              		.cfi_offset 7, -4
+ 584 0002 83B0     		sub	sp, sp, #12
+ 585              	.LCFI19:
+ 586              		.cfi_def_cfa_offset 16
+ 587 0004 00AF     		add	r7, sp, #0
+ 588              	.LCFI20:
+ 589              		.cfi_def_cfa_register 7
+ 590 0006 7860     		str	r0, [r7, #4]
+ 591 0008 3960     		str	r1, [r7, #0]
+ 592              	.L38:
+  92:src/string-util.c ****     for ( ; ; s1++, s2++)
+  93:src/string-util.c **** 	    if (*s1 != *s2)
+ 593              		.loc 1 93 0
+ 594 000a 7B68     		ldr	r3, [r7, #4]
+ 595 000c 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 596 000e 3B68     		ldr	r3, [r7, #0]
+ 597 0010 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 598 0012 9A42     		cmp	r2, r3
+ 599 0014 06D0     		beq	.L35
+  94:src/string-util.c **** 	        return *(unsigned char *)s1 - *(unsigned char *)s2;
+ 600              		.loc 1 94 0
+ 601 0016 7B68     		ldr	r3, [r7, #4]
+ 602 0018 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 603 001a 1A46     		mov	r2, r3
+ 604 001c 3B68     		ldr	r3, [r7, #0]
+ 605 001e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 606 0020 D31A     		subs	r3, r2, r3
+ 607 0022 0FE0     		b	.L36
+ 608              	.L35:
+  95:src/string-util.c **** 	    else if (*s1 == '\0')
+ 609              		.loc 1 95 0
+ 610 0024 7B68     		ldr	r3, [r7, #4]
+ 611 0026 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 612 0028 002B     		cmp	r3, #0
+ 613 002a 02D1     		bne	.L37
+  96:src/string-util.c **** 	        return 0;
+ 614              		.loc 1 96 0
+ 615 002c 4FF00003 		mov	r3, #0
+ 616 0030 08E0     		b	.L36
+ 617              	.L37:
+  92:src/string-util.c ****     for ( ; ; s1++, s2++)
+ 618              		.loc 1 92 0
+ 619 0032 7B68     		ldr	r3, [r7, #4]
+ 620 0034 03F10103 		add	r3, r3, #1
+ 621 0038 7B60     		str	r3, [r7, #4]
+ 622 003a 3B68     		ldr	r3, [r7, #0]
+ 623 003c 03F10103 		add	r3, r3, #1
+ 624 0040 3B60     		str	r3, [r7, #0]
+  97:src/string-util.c ****     return 0;
+ 625              		.loc 1 97 0
+ 626 0042 E2E7     		b	.L38
+ 627              	.L36:
+  98:src/string-util.c **** }
+ 628              		.loc 1 98 0
+ 629 0044 1846     		mov	r0, r3
+ 630 0046 07F10C07 		add	r7, r7, #12
+ 631 004a BD46     		mov	sp, r7
+ 632 004c 80BC     		pop	{r7}
+ 633 004e 7047     		bx	lr
+ 634              		.cfi_endproc
+ 635              	.LFE116:
+ 637              		.section	.text.atoi,"ax",%progbits
+ 638              		.align	2
+ 639              		.global	atoi
+ 640              		.thumb
+ 641              		.thumb_func
+ 643              	atoi:
+ 644              	.LFB117:
+  99:src/string-util.c **** 
+ 100:src/string-util.c **** int atoi(const char *str){
+ 645              		.loc 1 100 0
+ 646              		.cfi_startproc
+ 647              		@ args = 0, pretend = 0, frame = 16
+ 648              		@ frame_needed = 1, uses_anonymous_args = 0
+ 649              		@ link register save eliminated.
+ 650 0000 80B4     		push	{r7}
+ 651              	.LCFI21:
+ 652              		.cfi_def_cfa_offset 4
+ 653              		.cfi_offset 7, -4
+ 654 0002 85B0     		sub	sp, sp, #20
+ 655              	.LCFI22:
+ 656              		.cfi_def_cfa_offset 24
+ 657 0004 00AF     		add	r7, sp, #0
+ 658              	.LCFI23:
+ 659              		.cfi_def_cfa_register 7
+ 660 0006 7860     		str	r0, [r7, #4]
+ 101:src/string-util.c ****         int result = 0;
+ 661              		.loc 1 101 0
+ 662 0008 4FF00003 		mov	r3, #0
+ 663 000c FB60     		str	r3, [r7, #12]
+ 102:src/string-util.c ****         while (*str != '\0'){
+ 664              		.loc 1 102 0
+ 665 000e 13E0     		b	.L40
+ 666              	.L41:
+ 103:src/string-util.c ****                 result = result * 10;
+ 667              		.loc 1 103 0
+ 668 0010 FA68     		ldr	r2, [r7, #12]
+ 669 0012 1346     		mov	r3, r2
+ 670 0014 4FEA8303 		lsl	r3, r3, #2
+ 671 0018 9B18     		adds	r3, r3, r2
+ 672 001a 4FEA4303 		lsl	r3, r3, #1
+ 673 001e FB60     		str	r3, [r7, #12]
+ 104:src/string-util.c ****                 result = result + *str - '0';
+ 674              		.loc 1 104 0
+ 675 0020 7B68     		ldr	r3, [r7, #4]
+ 676 0022 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 677 0024 1A46     		mov	r2, r3
+ 678 0026 FB68     		ldr	r3, [r7, #12]
+ 679 0028 D318     		adds	r3, r2, r3
+ 680 002a A3F13003 		sub	r3, r3, #48
+ 681 002e FB60     		str	r3, [r7, #12]
+ 105:src/string-util.c ****                 str++;
+ 682              		.loc 1 105 0
+ 683 0030 7B68     		ldr	r3, [r7, #4]
+ 684 0032 03F10103 		add	r3, r3, #1
+ 685 0036 7B60     		str	r3, [r7, #4]
+ 686              	.L40:
+ 102:src/string-util.c ****         while (*str != '\0'){
+ 687              		.loc 1 102 0 discriminator 1
+ 688 0038 7B68     		ldr	r3, [r7, #4]
+ 689 003a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 690 003c 002B     		cmp	r3, #0
+ 691 003e E7D1     		bne	.L41
+ 106:src/string-util.c ****         }
+ 107:src/string-util.c ****         return result;
+ 692              		.loc 1 107 0
+ 693 0040 FB68     		ldr	r3, [r7, #12]
+ 108:src/string-util.c **** }
+ 694              		.loc 1 108 0
+ 695 0042 1846     		mov	r0, r3
+ 696 0044 07F11407 		add	r7, r7, #20
+ 697 0048 BD46     		mov	sp, r7
+ 698 004a 80BC     		pop	{r7}
+ 699 004c 7047     		bx	lr
+ 700              		.cfi_endproc
+ 701              	.LFE117:
+ 703 004e 00BF     		.section	.text._toa,"ax",%progbits
+ 704              		.align	2
+ 705              		.global	_toa
+ 706              		.thumb
+ 707              		.thumb_func
+ 709              	_toa:
+ 710              	.LFB118:
+ 109:src/string-util.c **** 
+ 110:src/string-util.c **** #define MaxDigit 6
+ 111:src/string-util.c **** /*
+ 112:src/string-util.c **** * Main part of itoa and xtoa
+ 113:src/string-util.c **** * Utilize the concept of long division to implement
+ 114:src/string-util.c **** */
+ 115:src/string-util.c **** void _toa(int in_num, char *out_str, int base, int digit){
+ 711              		.loc 1 115 0
+ 712              		.cfi_startproc
+ 713              		@ args = 0, pretend = 0, frame = 32
+ 714              		@ frame_needed = 1, uses_anonymous_args = 0
+ 715              		@ link register save eliminated.
+ 716 0000 80B4     		push	{r7}
+ 717              	.LCFI24:
+ 718              		.cfi_def_cfa_offset 4
+ 719              		.cfi_offset 7, -4
+ 720 0002 89B0     		sub	sp, sp, #36
+ 721              	.LCFI25:
+ 722              		.cfi_def_cfa_offset 40
+ 723 0004 00AF     		add	r7, sp, #0
+ 724              	.LCFI26:
+ 725              		.cfi_def_cfa_register 7
+ 726 0006 F860     		str	r0, [r7, #12]
+ 727 0008 B960     		str	r1, [r7, #8]
+ 728 000a 7A60     		str	r2, [r7, #4]
+ 729 000c 3B60     		str	r3, [r7, #0]
+ 116:src/string-util.c **** 	
+ 117:src/string-util.c ****     int Mdigit = digit;
+ 730              		.loc 1 117 0
+ 731 000e 3B68     		ldr	r3, [r7, #0]
+ 732 0010 7B61     		str	r3, [r7, #20]
+ 118:src/string-util.c ****     int neg = 0;
+ 733              		.loc 1 118 0
+ 734 0012 4FF00003 		mov	r3, #0
+ 735 0016 FB61     		str	r3, [r7, #28]
+ 119:src/string-util.c ****     out_str[digit--] = '\0';
+ 736              		.loc 1 119 0
+ 737 0018 3B68     		ldr	r3, [r7, #0]
+ 738 001a BA68     		ldr	r2, [r7, #8]
+ 739 001c D318     		adds	r3, r2, r3
+ 740 001e 4FF00002 		mov	r2, #0
+ 741 0022 1A70     		strb	r2, [r3, #0]
+ 742 0024 3B68     		ldr	r3, [r7, #0]
+ 743 0026 03F1FF33 		add	r3, r3, #-1
+ 744 002a 3B60     		str	r3, [r7, #0]
+ 120:src/string-util.c ****     
+ 121:src/string-util.c ****     if(in_num == 0) out_str[digit--] = '0';    
+ 745              		.loc 1 121 0
+ 746 002c FB68     		ldr	r3, [r7, #12]
+ 747 002e 002B     		cmp	r3, #0
+ 748 0030 0AD1     		bne	.L43
+ 749              		.loc 1 121 0 is_stmt 0 discriminator 1
+ 750 0032 3B68     		ldr	r3, [r7, #0]
+ 751 0034 BA68     		ldr	r2, [r7, #8]
+ 752 0036 D318     		adds	r3, r2, r3
+ 753 0038 4FF03002 		mov	r2, #48
+ 754 003c 1A70     		strb	r2, [r3, #0]
+ 755 003e 3B68     		ldr	r3, [r7, #0]
+ 756 0040 03F1FF33 		add	r3, r3, #-1
+ 757 0044 3B60     		str	r3, [r7, #0]
+ 122:src/string-util.c ****     else if(in_num < 0){
+ 123:src/string-util.c ****         in_num = -in_num;
+ 124:src/string-util.c ****         neg = 1;
+ 125:src/string-util.c ****     }
+ 126:src/string-util.c **** 
+ 127:src/string-util.c ****     while(in_num > 0){
+ 758              		.loc 1 127 0 is_stmt 1 discriminator 1
+ 759 0046 45E0     		b	.L45
+ 760              	.L43:
+ 122:src/string-util.c ****     else if(in_num < 0){
+ 761              		.loc 1 122 0
+ 762 0048 FB68     		ldr	r3, [r7, #12]
+ 763 004a 002B     		cmp	r3, #0
+ 764 004c 42DA     		bge	.L45
+ 123:src/string-util.c ****         in_num = -in_num;
+ 765              		.loc 1 123 0
+ 766 004e FB68     		ldr	r3, [r7, #12]
+ 767 0050 C3F10003 		rsb	r3, r3, #0
+ 768 0054 FB60     		str	r3, [r7, #12]
+ 124:src/string-util.c ****         neg = 1;
+ 769              		.loc 1 124 0
+ 770 0056 4FF00103 		mov	r3, #1
+ 771 005a FB61     		str	r3, [r7, #28]
+ 772              		.loc 1 127 0
+ 773 005c 3AE0     		b	.L45
+ 774              	.L48:
+ 128:src/string-util.c **** 
+ 129:src/string-util.c ****         if(base == 16 && in_num % base >= 10)
+ 775              		.loc 1 129 0
+ 776 005e 7B68     		ldr	r3, [r7, #4]
+ 777 0060 102B     		cmp	r3, #16
+ 778 0062 1ED1     		bne	.L46
+ 779              		.loc 1 129 0 is_stmt 0 discriminator 1
+ 780 0064 FB68     		ldr	r3, [r7, #12]
+ 781 0066 7A68     		ldr	r2, [r7, #4]
+ 782 0068 93FBF2F2 		sdiv	r2, r3, r2
+ 783 006c 7968     		ldr	r1, [r7, #4]
+ 784 006e 01FB02F2 		mul	r2, r1, r2
+ 785 0072 9B1A     		subs	r3, r3, r2
+ 786 0074 092B     		cmp	r3, #9
+ 787 0076 14DD     		ble	.L46
+ 130:src/string-util.c ****             out_str[digit--] = (in_num % base) + 'A' - 10;
+ 788              		.loc 1 130 0 is_stmt 1
+ 789 0078 3B68     		ldr	r3, [r7, #0]
+ 790 007a BA68     		ldr	r2, [r7, #8]
+ 791 007c D218     		adds	r2, r2, r3
+ 792 007e FB68     		ldr	r3, [r7, #12]
+ 793 0080 7968     		ldr	r1, [r7, #4]
+ 794 0082 93FBF1F1 		sdiv	r1, r3, r1
+ 795 0086 7868     		ldr	r0, [r7, #4]
+ 796 0088 00FB01F1 		mul	r1, r0, r1
+ 797 008c 5B1A     		subs	r3, r3, r1
+ 798 008e DBB2     		uxtb	r3, r3
+ 799 0090 03F13703 		add	r3, r3, #55
+ 800 0094 DBB2     		uxtb	r3, r3
+ 801 0096 1370     		strb	r3, [r2, #0]
+ 802 0098 3B68     		ldr	r3, [r7, #0]
+ 803 009a 03F1FF33 		add	r3, r3, #-1
+ 804 009e 3B60     		str	r3, [r7, #0]
+ 805 00a0 13E0     		b	.L47
+ 806              	.L46:
+ 131:src/string-util.c ****         else
+ 132:src/string-util.c ****             out_str[digit--] = (in_num % base) + '0';
+ 807              		.loc 1 132 0
+ 808 00a2 3B68     		ldr	r3, [r7, #0]
+ 809 00a4 BA68     		ldr	r2, [r7, #8]
+ 810 00a6 D218     		adds	r2, r2, r3
+ 811 00a8 FB68     		ldr	r3, [r7, #12]
+ 812 00aa 7968     		ldr	r1, [r7, #4]
+ 813 00ac 93FBF1F1 		sdiv	r1, r3, r1
+ 814 00b0 7868     		ldr	r0, [r7, #4]
+ 815 00b2 00FB01F1 		mul	r1, r0, r1
+ 816 00b6 5B1A     		subs	r3, r3, r1
+ 817 00b8 DBB2     		uxtb	r3, r3
+ 818 00ba 03F13003 		add	r3, r3, #48
+ 819 00be DBB2     		uxtb	r3, r3
+ 820 00c0 1370     		strb	r3, [r2, #0]
+ 821 00c2 3B68     		ldr	r3, [r7, #0]
+ 822 00c4 03F1FF33 		add	r3, r3, #-1
+ 823 00c8 3B60     		str	r3, [r7, #0]
+ 824              	.L47:
+ 133:src/string-util.c ****         
+ 134:src/string-util.c ****         in_num /= base;
+ 825              		.loc 1 134 0
+ 826 00ca FA68     		ldr	r2, [r7, #12]
+ 827 00cc 7B68     		ldr	r3, [r7, #4]
+ 828 00ce 92FBF3F3 		sdiv	r3, r2, r3
+ 829 00d2 FB60     		str	r3, [r7, #12]
+ 830              	.L45:
+ 127:src/string-util.c ****     while(in_num > 0){
+ 831              		.loc 1 127 0 discriminator 1
+ 832 00d4 FB68     		ldr	r3, [r7, #12]
+ 833 00d6 002B     		cmp	r3, #0
+ 834 00d8 C1DC     		bgt	.L48
+ 135:src/string-util.c ****     }//End of while(in_num > 0)
+ 136:src/string-util.c ****     
+ 137:src/string-util.c ****     if(base == 16){
+ 835              		.loc 1 137 0
+ 836 00da 7B68     		ldr	r3, [r7, #4]
+ 837 00dc 102B     		cmp	r3, #16
+ 838 00de 13D1     		bne	.L49
+ 138:src/string-util.c ****         out_str[digit--] = 'x';
+ 839              		.loc 1 138 0
+ 840 00e0 3B68     		ldr	r3, [r7, #0]
+ 841 00e2 BA68     		ldr	r2, [r7, #8]
+ 842 00e4 D318     		adds	r3, r2, r3
+ 843 00e6 4FF07802 		mov	r2, #120
+ 844 00ea 1A70     		strb	r2, [r3, #0]
+ 845 00ec 3B68     		ldr	r3, [r7, #0]
+ 846 00ee 03F1FF33 		add	r3, r3, #-1
+ 847 00f2 3B60     		str	r3, [r7, #0]
+ 139:src/string-util.c ****         out_str[digit--] = '0';
+ 848              		.loc 1 139 0
+ 849 00f4 3B68     		ldr	r3, [r7, #0]
+ 850 00f6 BA68     		ldr	r2, [r7, #8]
+ 851 00f8 D318     		adds	r3, r2, r3
+ 852 00fa 4FF03002 		mov	r2, #48
+ 853 00fe 1A70     		strb	r2, [r3, #0]
+ 854 0100 3B68     		ldr	r3, [r7, #0]
+ 855 0102 03F1FF33 		add	r3, r3, #-1
+ 856 0106 3B60     		str	r3, [r7, #0]
+ 857              	.L49:
+ 140:src/string-util.c ****     }    
+ 141:src/string-util.c **** 
+ 142:src/string-util.c ****     if(neg) out_str[digit--] = '-'; //negative number
+ 858              		.loc 1 142 0
+ 859 0108 FB69     		ldr	r3, [r7, #28]
+ 860 010a 002B     		cmp	r3, #0
+ 861 010c 09D0     		beq	.L50
+ 862              		.loc 1 142 0 is_stmt 0 discriminator 1
+ 863 010e 3B68     		ldr	r3, [r7, #0]
+ 864 0110 BA68     		ldr	r2, [r7, #8]
+ 865 0112 D318     		adds	r3, r2, r3
+ 866 0114 4FF02D02 		mov	r2, #45
+ 867 0118 1A70     		strb	r2, [r3, #0]
+ 868 011a 3B68     		ldr	r3, [r7, #0]
+ 869 011c 03F1FF33 		add	r3, r3, #-1
+ 870 0120 3B60     		str	r3, [r7, #0]
+ 871              	.L50:
+ 143:src/string-util.c **** 
+ 144:src/string-util.c **** 	digit++;
+ 872              		.loc 1 144 0 is_stmt 1
+ 873 0122 3B68     		ldr	r3, [r7, #0]
+ 874 0124 03F10103 		add	r3, r3, #1
+ 875 0128 3B60     		str	r3, [r7, #0]
+ 145:src/string-util.c ****     //reorder
+ 146:src/string-util.c ****     int j = 0;
+ 876              		.loc 1 146 0
+ 877 012a 4FF00003 		mov	r3, #0
+ 878 012e BB61     		str	r3, [r7, #24]
+ 147:src/string-util.c ****     while(digit < Mdigit + 1){
+ 879              		.loc 1 147 0
+ 880 0130 0FE0     		b	.L51
+ 881              	.L52:
+ 148:src/string-util.c ****         out_str[j++] = out_str[digit++];
+ 882              		.loc 1 148 0
+ 883 0132 BB69     		ldr	r3, [r7, #24]
+ 884 0134 BA68     		ldr	r2, [r7, #8]
+ 885 0136 D318     		adds	r3, r2, r3
+ 886 0138 3A68     		ldr	r2, [r7, #0]
+ 887 013a B968     		ldr	r1, [r7, #8]
+ 888 013c 8A18     		adds	r2, r1, r2
+ 889 013e 1278     		ldrb	r2, [r2, #0]	@ zero_extendqisi2
+ 890 0140 1A70     		strb	r2, [r3, #0]
+ 891 0142 BB69     		ldr	r3, [r7, #24]
+ 892 0144 03F10103 		add	r3, r3, #1
+ 893 0148 BB61     		str	r3, [r7, #24]
+ 894 014a 3B68     		ldr	r3, [r7, #0]
+ 895 014c 03F10103 		add	r3, r3, #1
+ 896 0150 3B60     		str	r3, [r7, #0]
+ 897              	.L51:
+ 147:src/string-util.c ****     while(digit < Mdigit + 1){
+ 898              		.loc 1 147 0 discriminator 1
+ 899 0152 7B69     		ldr	r3, [r7, #20]
+ 900 0154 03F10102 		add	r2, r3, #1
+ 901 0158 3B68     		ldr	r3, [r7, #0]
+ 902 015a 9A42     		cmp	r2, r3
+ 903 015c E9DC     		bgt	.L52
+ 149:src/string-util.c ****     } 
+ 150:src/string-util.c **** }
+ 904              		.loc 1 150 0
+ 905 015e 07F12407 		add	r7, r7, #36
+ 906 0162 BD46     		mov	sp, r7
+ 907 0164 80BC     		pop	{r7}
+ 908 0166 7047     		bx	lr
+ 909              		.cfi_endproc
+ 910              	.LFE118:
+ 912              		.section	.text.xtoa,"ax",%progbits
+ 913              		.align	2
+ 914              		.global	xtoa
+ 915              		.thumb
+ 916              		.thumb_func
+ 918              	xtoa:
+ 919              	.LFB119:
+ 151:src/string-util.c **** 
+ 152:src/string-util.c **** void xtoa(int in_num, char *out_str){
+ 920              		.loc 1 152 0
+ 921              		.cfi_startproc
+ 922              		@ args = 0, pretend = 0, frame = 8
+ 923              		@ frame_needed = 1, uses_anonymous_args = 0
+ 924 0000 80B5     		push	{r7, lr}
+ 925              	.LCFI27:
+ 926              		.cfi_def_cfa_offset 8
+ 927              		.cfi_offset 14, -4
+ 928              		.cfi_offset 7, -8
+ 929 0002 82B0     		sub	sp, sp, #8
+ 930              	.LCFI28:
+ 931              		.cfi_def_cfa_offset 16
+ 932 0004 00AF     		add	r7, sp, #0
+ 933              	.LCFI29:
+ 934              		.cfi_def_cfa_register 7
+ 935 0006 7860     		str	r0, [r7, #4]
+ 936 0008 3960     		str	r1, [r7, #0]
+ 153:src/string-util.c ****     
+ 154:src/string-util.c ****     _toa(in_num, out_str, 16, MaxDigit + 4);//MaxDigit + 4 that can contain address
+ 937              		.loc 1 154 0
+ 938 000a 7868     		ldr	r0, [r7, #4]
+ 939 000c 3968     		ldr	r1, [r7, #0]
+ 940 000e 4FF01002 		mov	r2, #16
+ 941 0012 4FF00A03 		mov	r3, #10
+ 942 0016 FFF7FEFF 		bl	_toa
+ 155:src/string-util.c **** }
+ 943              		.loc 1 155 0
+ 944 001a 07F10807 		add	r7, r7, #8
+ 945 001e BD46     		mov	sp, r7
+ 946 0020 80BD     		pop	{r7, pc}
+ 947              		.cfi_endproc
+ 948              	.LFE119:
+ 950 0022 00BF     		.section	.text.itoa,"ax",%progbits
+ 951              		.align	2
+ 952              		.global	itoa
+ 953              		.thumb
+ 954              		.thumb_func
+ 956              	itoa:
+ 957              	.LFB120:
+ 156:src/string-util.c **** 
+ 157:src/string-util.c **** 
+ 158:src/string-util.c **** void itoa(int in_num, char *out_str){
+ 958              		.loc 1 158 0
+ 959              		.cfi_startproc
+ 960              		@ args = 0, pretend = 0, frame = 8
+ 961              		@ frame_needed = 1, uses_anonymous_args = 0
+ 962 0000 80B5     		push	{r7, lr}
+ 963              	.LCFI30:
+ 964              		.cfi_def_cfa_offset 8
+ 965              		.cfi_offset 14, -4
+ 966              		.cfi_offset 7, -8
+ 967 0002 82B0     		sub	sp, sp, #8
+ 968              	.LCFI31:
+ 969              		.cfi_def_cfa_offset 16
+ 970 0004 00AF     		add	r7, sp, #0
+ 971              	.LCFI32:
+ 972              		.cfi_def_cfa_register 7
+ 973 0006 7860     		str	r0, [r7, #4]
+ 974 0008 3960     		str	r1, [r7, #0]
+ 159:src/string-util.c ****    
+ 160:src/string-util.c ****     _toa(in_num, out_str, 10, MaxDigit);
+ 975              		.loc 1 160 0
+ 976 000a 7868     		ldr	r0, [r7, #4]
+ 977 000c 3968     		ldr	r1, [r7, #0]
+ 978 000e 4FF00A02 		mov	r2, #10
+ 979 0012 4FF00603 		mov	r3, #6
+ 980 0016 FFF7FEFF 		bl	_toa
+ 161:src/string-util.c **** }
+ 981              		.loc 1 161 0
+ 982 001a 07F10807 		add	r7, r7, #8
+ 983 001e BD46     		mov	sp, r7
+ 984 0020 80BD     		pop	{r7, pc}
+ 985              		.cfi_endproc
+ 986              	.LFE120:
+ 988 0022 00BF     		.section	.rodata
+ 989              		.align	2
+ 990              	.LC0:
+ 991 0000 0A       		.byte	10
+ 992 0001 0D       		.byte	13
+ 993 0002 00       		.byte	0
+ 994              		.section	.text.qprintf,"ax",%progbits
+ 995              		.align	2
+ 996              		.global	qprintf
+ 997              		.thumb
+ 998              		.thumb_func
+ 1000              	qprintf:
+ 1001              	.LFB121:
+ 162:src/string-util.c **** 
+ 163:src/string-util.c **** 
+ 164:src/string-util.c **** void qprintf(xQueueHandle tx_queue, const char *format, ...){
+ 1002              		.loc 1 164 0
+ 1003              		.cfi_startproc
+ 1004              		@ args = 4, pretend = 12, frame = 48
+ 1005              		@ frame_needed = 1, uses_anonymous_args = 1
+ 1006 0000 0EB4     		push	{r1, r2, r3}
+ 1007              	.LCFI33:
+ 1008              		.cfi_def_cfa_offset 12
+ 1009              		.cfi_offset 3, -4
+ 1010              		.cfi_offset 2, -8
+ 1011              		.cfi_offset 1, -12
+ 1012 0002 80B5     		push	{r7, lr}
+ 1013              	.LCFI34:
+ 1014              		.cfi_def_cfa_offset 20
+ 1015              		.cfi_offset 14, -16
+ 1016              		.cfi_offset 7, -20
+ 1017 0004 8DB0     		sub	sp, sp, #52
+ 1018              	.LCFI35:
+ 1019              		.cfi_def_cfa_offset 72
+ 1020 0006 00AF     		add	r7, sp, #0
+ 1021              	.LCFI36:
+ 1022              		.cfi_def_cfa_register 7
+ 1023 0008 7860     		str	r0, [r7, #4]
+ 165:src/string-util.c ****     va_list ap;
+ 166:src/string-util.c ****     va_start(ap, format);
+ 1024              		.loc 1 166 0
+ 1025 000a 07F14003 		add	r3, r7, #64
+ 1026 000e 3B62     		str	r3, [r7, #32]
+ 167:src/string-util.c ****     int curr_ch = 0;
+ 1027              		.loc 1 167 0
+ 1028 0010 4FF00003 		mov	r3, #0
+ 1029 0014 FB62     		str	r3, [r7, #44]
+ 168:src/string-util.c ****     char out_ch[2] = {'\0', '\0'};
+ 1030              		.loc 1 168 0
+ 1031 0016 4FF00003 		mov	r3, #0
+ 1032 001a 3B77     		strb	r3, [r7, #28]
+ 1033 001c 4FF00003 		mov	r3, #0
+ 1034 0020 7B77     		strb	r3, [r7, #29]
+ 169:src/string-util.c ****     char newLine[3] = {'\n' , '\r', '\0'};
+ 1035              		.loc 1 169 0
+ 1036 0022 40F20003 		movw	r3, #:lower16:.LC0
+ 1037 0026 C0F20003 		movt	r3, #:upper16:.LC0
+ 1038 002a 1988     		ldrh	r1, [r3, #0]	@ unaligned
+ 1039 002c 9A78     		ldrb	r2, [r3, #2]
+ 1040 002e 07F11803 		add	r3, r7, #24
+ 1041 0032 1980     		strh	r1, [r3, #0]	@ unaligned
+ 1042 0034 9A70     		strb	r2, [r3, #2]
+ 170:src/string-util.c ****     char percentage[] = "%";
+ 1043              		.loc 1 170 0
+ 1044 0036 4FF02503 		mov	r3, #37
+ 1045 003a BB82     		strh	r3, [r7, #20]	@ movhi
+ 171:src/string-util.c ****     char *str;
+ 172:src/string-util.c ****     char str_num[10];
+ 173:src/string-util.c ****     int out_int;
+ 174:src/string-util.c **** 
+ 175:src/string-util.c ****     /* Block for 1ms. */
+ 176:src/string-util.c ****      const portTickType xDelay = 0.1; // portTICK_RATE_MS;
+ 1046              		.loc 1 176 0
+ 1047 003c 4FF00003 		mov	r3, #0
+ 1048 0040 BB62     		str	r3, [r7, #40]
+ 177:src/string-util.c **** 
+ 178:src/string-util.c ****     while( format[curr_ch] != '\0' ){
+ 1049              		.loc 1 178 0
+ 1050 0042 CDE0     		b	.L56
+ 1051              	.L72:
+ 179:src/string-util.c ****         vTaskDelay( xDelay ); 
+ 1052              		.loc 1 179 0
+ 1053 0044 B86A     		ldr	r0, [r7, #40]
+ 1054 0046 FFF7FEFF 		bl	vTaskDelay
+ 180:src/string-util.c ****         if(format[curr_ch] == '%'){
+ 1055              		.loc 1 180 0
+ 1056 004a FB6A     		ldr	r3, [r7, #44]
+ 1057 004c FA6B     		ldr	r2, [r7, #60]
+ 1058 004e D318     		adds	r3, r2, r3
+ 1059 0050 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1060 0052 252B     		cmp	r3, #37
+ 1061 0054 40F09880 		bne	.L57
+ 181:src/string-util.c ****             if(format[curr_ch + 1] == 's'){
+ 1062              		.loc 1 181 0
+ 1063 0058 FB6A     		ldr	r3, [r7, #44]
+ 1064 005a 03F10103 		add	r3, r3, #1
+ 1065 005e FA6B     		ldr	r2, [r7, #60]
+ 1066 0060 D318     		adds	r3, r2, r3
+ 1067 0062 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1068 0064 732B     		cmp	r3, #115
+ 1069 0066 12D1     		bne	.L58
+ 182:src/string-util.c ****                 str = va_arg(ap, char *);
+ 1070              		.loc 1 182 0
+ 1071 0068 3B6A     		ldr	r3, [r7, #32]
+ 1072 006a 03F10402 		add	r2, r3, #4
+ 1073 006e 3A62     		str	r2, [r7, #32]
+ 1074 0070 1B68     		ldr	r3, [r3, #0]
+ 1075 0072 7B62     		str	r3, [r7, #36]
+ 183:src/string-util.c ****                 while (!xQueueSendToBack(tx_queue, str, portMAX_DELAY)); 
+ 1076              		.loc 1 183 0
+ 1077 0074 00BF     		nop
+ 1078              	.L59:
+ 1079              		.loc 1 183 0 is_stmt 0 discriminator 1
+ 1080 0076 7868     		ldr	r0, [r7, #4]
+ 1081 0078 796A     		ldr	r1, [r7, #36]
+ 1082 007a 4FF0FF32 		mov	r2, #-1
+ 1083 007e 4FF00003 		mov	r3, #0
+ 1084 0082 FFF7FEFF 		bl	xQueueGenericSend
+ 1085 0086 0346     		mov	r3, r0
+ 1086 0088 002B     		cmp	r3, #0
+ 1087 008a F4D0     		beq	.L59
+ 1088              		.loc 1 183 0
+ 1089 008c 77E0     		b	.L60
+ 1090              	.L58:
+ 184:src/string-util.c ****                 //parameter(...,The address of a string which is put in the queue,...)
+ 185:src/string-util.c ****             }else if(format[curr_ch + 1] == 'd'){
+ 1091              		.loc 1 185 0 is_stmt 1
+ 1092 008e FB6A     		ldr	r3, [r7, #44]
+ 1093 0090 03F10103 		add	r3, r3, #1
+ 1094 0094 FA6B     		ldr	r2, [r7, #60]
+ 1095 0096 D318     		adds	r3, r2, r3
+ 1096 0098 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1097 009a 642B     		cmp	r3, #100
+ 1098 009c 19D1     		bne	.L61
+ 186:src/string-util.c ****                 itoa(va_arg(ap, int), str_num);
+ 1099              		.loc 1 186 0
+ 1100 009e 3B6A     		ldr	r3, [r7, #32]
+ 1101 00a0 03F10402 		add	r2, r3, #4
+ 1102 00a4 3A62     		str	r2, [r7, #32]
+ 1103 00a6 1B68     		ldr	r3, [r3, #0]
+ 1104 00a8 1846     		mov	r0, r3
+ 1105 00aa 07F10803 		add	r3, r7, #8
+ 1106 00ae 1946     		mov	r1, r3
+ 1107 00b0 FFF7FEFF 		bl	itoa
+ 187:src/string-util.c ****                 while (!xQueueSendToBack(tx_queue, str_num, portMAX_DELAY));                
+ 1108              		.loc 1 187 0
+ 1109 00b4 00BF     		nop
+ 1110              	.L62:
+ 1111              		.loc 1 187 0 is_stmt 0 discriminator 1
+ 1112 00b6 7868     		ldr	r0, [r7, #4]
+ 1113 00b8 07F10803 		add	r3, r7, #8
+ 1114 00bc 1946     		mov	r1, r3
+ 1115 00be 4FF0FF32 		mov	r2, #-1
+ 1116 00c2 4FF00003 		mov	r3, #0
+ 1117 00c6 FFF7FEFF 		bl	xQueueGenericSend
+ 1118 00ca 0346     		mov	r3, r0
+ 1119 00cc 002B     		cmp	r3, #0
+ 1120 00ce F2D0     		beq	.L62
+ 1121              		.loc 1 187 0
+ 1122 00d0 55E0     		b	.L60
+ 1123              	.L61:
+ 188:src/string-util.c ****             }else if(format[curr_ch + 1] == 'c'){
+ 1124              		.loc 1 188 0 is_stmt 1
+ 1125 00d2 FB6A     		ldr	r3, [r7, #44]
+ 1126 00d4 03F10103 		add	r3, r3, #1
+ 1127 00d8 FA6B     		ldr	r2, [r7, #60]
+ 1128 00da D318     		adds	r3, r2, r3
+ 1129 00dc 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1130 00de 632B     		cmp	r3, #99
+ 1131 00e0 15D1     		bne	.L63
+ 189:src/string-util.c ****                 out_ch[0] = (char)va_arg(ap, int);
+ 1132              		.loc 1 189 0
+ 1133 00e2 3B6A     		ldr	r3, [r7, #32]
+ 1134 00e4 03F10402 		add	r2, r3, #4
+ 1135 00e8 3A62     		str	r2, [r7, #32]
+ 1136 00ea 1B68     		ldr	r3, [r3, #0]
+ 1137 00ec DBB2     		uxtb	r3, r3
+ 1138 00ee 3B77     		strb	r3, [r7, #28]
+ 190:src/string-util.c ****                 while (!xQueueSendToBack(tx_queue, out_ch, portMAX_DELAY));                        
+ 1139              		.loc 1 190 0
+ 1140 00f0 00BF     		nop
+ 1141              	.L64:
+ 1142              		.loc 1 190 0 is_stmt 0 discriminator 1
+ 1143 00f2 7868     		ldr	r0, [r7, #4]
+ 1144 00f4 07F11C03 		add	r3, r7, #28
+ 1145 00f8 1946     		mov	r1, r3
+ 1146 00fa 4FF0FF32 		mov	r2, #-1
+ 1147 00fe 4FF00003 		mov	r3, #0
+ 1148 0102 FFF7FEFF 		bl	xQueueGenericSend
+ 1149 0106 0346     		mov	r3, r0
+ 1150 0108 002B     		cmp	r3, #0
+ 1151 010a F2D0     		beq	.L64
+ 1152              		.loc 1 190 0
+ 1153 010c 37E0     		b	.L60
+ 1154              	.L63:
+ 191:src/string-util.c ****            }else if(format[curr_ch + 1] == 'x'){
+ 1155              		.loc 1 191 0 is_stmt 1
+ 1156 010e FB6A     		ldr	r3, [r7, #44]
+ 1157 0110 03F10103 		add	r3, r3, #1
+ 1158 0114 FA6B     		ldr	r2, [r7, #60]
+ 1159 0116 D318     		adds	r3, r2, r3
+ 1160 0118 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1161 011a 782B     		cmp	r3, #120
+ 1162 011c 19D1     		bne	.L65
+ 192:src/string-util.c ****                 xtoa(va_arg(ap, int), str_num);
+ 1163              		.loc 1 192 0
+ 1164 011e 3B6A     		ldr	r3, [r7, #32]
+ 1165 0120 03F10402 		add	r2, r3, #4
+ 1166 0124 3A62     		str	r2, [r7, #32]
+ 1167 0126 1B68     		ldr	r3, [r3, #0]
+ 1168 0128 1846     		mov	r0, r3
+ 1169 012a 07F10803 		add	r3, r7, #8
+ 1170 012e 1946     		mov	r1, r3
+ 1171 0130 FFF7FEFF 		bl	xtoa
+ 193:src/string-util.c ****                 while (!xQueueSendToBack(tx_queue, str_num, portMAX_DELAY));                       
+ 1172              		.loc 1 193 0
+ 1173 0134 00BF     		nop
+ 1174              	.L66:
+ 1175              		.loc 1 193 0 is_stmt 0 discriminator 1
+ 1176 0136 7868     		ldr	r0, [r7, #4]
+ 1177 0138 07F10803 		add	r3, r7, #8
+ 1178 013c 1946     		mov	r1, r3
+ 1179 013e 4FF0FF32 		mov	r2, #-1
+ 1180 0142 4FF00003 		mov	r3, #0
+ 1181 0146 FFF7FEFF 		bl	xQueueGenericSend
+ 1182 014a 0346     		mov	r3, r0
+ 1183 014c 002B     		cmp	r3, #0
+ 1184 014e F2D0     		beq	.L66
+ 1185              		.loc 1 193 0
+ 1186 0150 15E0     		b	.L60
+ 1187              	.L65:
+ 194:src/string-util.c ****             }else if(format[curr_ch + 1] == '%'){
+ 1188              		.loc 1 194 0 is_stmt 1
+ 1189 0152 FB6A     		ldr	r3, [r7, #44]
+ 1190 0154 03F10103 		add	r3, r3, #1
+ 1191 0158 FA6B     		ldr	r2, [r7, #60]
+ 1192 015a D318     		adds	r3, r2, r3
+ 1193 015c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1194 015e 252B     		cmp	r3, #37
+ 1195 0160 0DD1     		bne	.L60
+ 195:src/string-util.c ****                 while (!xQueueSendToBack(tx_queue, percentage, portMAX_DELAY));                    
+ 1196              		.loc 1 195 0
+ 1197 0162 00BF     		nop
+ 1198              	.L67:
+ 1199              		.loc 1 195 0 is_stmt 0 discriminator 1
+ 1200 0164 7868     		ldr	r0, [r7, #4]
+ 1201 0166 07F11403 		add	r3, r7, #20
+ 1202 016a 1946     		mov	r1, r3
+ 1203 016c 4FF0FF32 		mov	r2, #-1
+ 1204 0170 4FF00003 		mov	r3, #0
+ 1205 0174 FFF7FEFF 		bl	xQueueGenericSend
+ 1206 0178 0346     		mov	r3, r0
+ 1207 017a 002B     		cmp	r3, #0
+ 1208 017c F2D0     		beq	.L67
+ 1209              	.L60:
+ 196:src/string-util.c ****             }
+ 197:src/string-util.c ****             curr_ch++;
+ 1210              		.loc 1 197 0 is_stmt 1
+ 1211 017e FB6A     		ldr	r3, [r7, #44]
+ 1212 0180 03F10103 		add	r3, r3, #1
+ 1213 0184 FB62     		str	r3, [r7, #44]
+ 1214 0186 27E0     		b	.L68
+ 1215              	.L57:
+ 198:src/string-util.c ****         }else if(format[curr_ch] == '\n'){
+ 1216              		.loc 1 198 0
+ 1217 0188 FB6A     		ldr	r3, [r7, #44]
+ 1218 018a FA6B     		ldr	r2, [r7, #60]
+ 1219 018c D318     		adds	r3, r2, r3
+ 1220 018e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1221 0190 0A2B     		cmp	r3, #10
+ 1222 0192 0ED1     		bne	.L69
+ 199:src/string-util.c ****             while (!xQueueSendToBack(tx_queue, newLine, portMAX_DELAY));
+ 1223              		.loc 1 199 0
+ 1224 0194 00BF     		nop
+ 1225              	.L70:
+ 1226              		.loc 1 199 0 is_stmt 0 discriminator 1
+ 1227 0196 7868     		ldr	r0, [r7, #4]
+ 1228 0198 07F11803 		add	r3, r7, #24
+ 1229 019c 1946     		mov	r1, r3
+ 1230 019e 4FF0FF32 		mov	r2, #-1
+ 1231 01a2 4FF00003 		mov	r3, #0
+ 1232 01a6 FFF7FEFF 		bl	xQueueGenericSend
+ 1233 01aa 0346     		mov	r3, r0
+ 1234 01ac 002B     		cmp	r3, #0
+ 1235 01ae F2D0     		beq	.L70
+ 1236              		.loc 1 199 0
+ 1237 01b0 12E0     		b	.L68
+ 1238              	.L69:
+ 200:src/string-util.c ****         }else{
+ 201:src/string-util.c ****             out_ch[0] = format[curr_ch];
+ 1239              		.loc 1 201 0 is_stmt 1
+ 1240 01b2 FB6A     		ldr	r3, [r7, #44]
+ 1241 01b4 FA6B     		ldr	r2, [r7, #60]
+ 1242 01b6 D318     		adds	r3, r2, r3
+ 1243 01b8 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1244 01ba 3B77     		strb	r3, [r7, #28]
+ 202:src/string-util.c ****             while (!xQueueSendToBack(tx_queue, out_ch, portMAX_DELAY));         
+ 1245              		.loc 1 202 0
+ 1246 01bc 00BF     		nop
+ 1247              	.L71:
+ 1248              		.loc 1 202 0 is_stmt 0 discriminator 1
+ 1249 01be 7868     		ldr	r0, [r7, #4]
+ 1250 01c0 07F11C03 		add	r3, r7, #28
+ 1251 01c4 1946     		mov	r1, r3
+ 1252 01c6 4FF0FF32 		mov	r2, #-1
+ 1253 01ca 4FF00003 		mov	r3, #0
+ 1254 01ce FFF7FEFF 		bl	xQueueGenericSend
+ 1255 01d2 0346     		mov	r3, r0
+ 1256 01d4 002B     		cmp	r3, #0
+ 1257 01d6 F2D0     		beq	.L71
+ 1258              	.L68:
+ 203:src/string-util.c ****         }
+ 204:src/string-util.c ****         curr_ch++;
+ 1259              		.loc 1 204 0 is_stmt 1
+ 1260 01d8 FB6A     		ldr	r3, [r7, #44]
+ 1261 01da 03F10103 		add	r3, r3, #1
+ 1262 01de FB62     		str	r3, [r7, #44]
+ 1263              	.L56:
+ 178:src/string-util.c ****     while( format[curr_ch] != '\0' ){
+ 1264              		.loc 1 178 0 discriminator 1
+ 1265 01e0 FB6A     		ldr	r3, [r7, #44]
+ 1266 01e2 FA6B     		ldr	r2, [r7, #60]
+ 1267 01e4 D318     		adds	r3, r2, r3
+ 1268 01e6 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1269 01e8 002B     		cmp	r3, #0
+ 1270 01ea 7FF42BAF 		bne	.L72
+ 205:src/string-util.c ****     }//End of while
+ 206:src/string-util.c ****     va_end(ap);
+ 207:src/string-util.c **** }
+ 1271              		.loc 1 207 0
+ 1272 01ee 07F13407 		add	r7, r7, #52
+ 1273 01f2 BD46     		mov	sp, r7
+ 1274 01f4 BDE88040 		pop	{r7, lr}
+ 1275 01f8 03B0     		add	sp, sp, #12
+ 1276 01fa 7047     		bx	lr
+ 1277              		.cfi_endproc
+ 1278              	.LFE121:
+ 1280              		.section	.text.strlen,"ax",%progbits
+ 1281              		.align	2
+ 1282              		.global	strlen
+ 1283              		.thumb
+ 1284              		.thumb_func
+ 1286              	strlen:
+ 1287              	.LFB122:
+ 208:src/string-util.c **** 
+ 209:src/string-util.c **** 
+ 210:src/string-util.c **** //Ref from zzz0072 -----------------------------------------------
+ 211:src/string-util.c **** size_t strlen(const char *string)
+ 212:src/string-util.c **** {
+ 1288              		.loc 1 212 0
+ 1289              		.cfi_startproc
+ 1290              		@ args = 0, pretend = 0, frame = 16
+ 1291              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1292              		@ link register save eliminated.
+ 1293 0000 80B4     		push	{r7}
+ 1294              	.LCFI37:
+ 1295              		.cfi_def_cfa_offset 4
+ 1296              		.cfi_offset 7, -4
+ 1297 0002 85B0     		sub	sp, sp, #20
+ 1298              	.LCFI38:
+ 1299              		.cfi_def_cfa_offset 24
+ 1300 0004 00AF     		add	r7, sp, #0
+ 1301              	.LCFI39:
+ 1302              		.cfi_def_cfa_register 7
+ 1303 0006 7860     		str	r0, [r7, #4]
+ 213:src/string-util.c ****     size_t chars = 0;
+ 1304              		.loc 1 213 0
+ 1305 0008 4FF00003 		mov	r3, #0
+ 1306 000c FB60     		str	r3, [r7, #12]
+ 214:src/string-util.c **** 
+ 215:src/string-util.c ****     while(*string++) {
+ 1307              		.loc 1 215 0
+ 1308 000e 03E0     		b	.L74
+ 1309              	.L75:
+ 216:src/string-util.c ****         chars++;
+ 1310              		.loc 1 216 0
+ 1311 0010 FB68     		ldr	r3, [r7, #12]
+ 1312 0012 03F10103 		add	r3, r3, #1
+ 1313 0016 FB60     		str	r3, [r7, #12]
+ 1314              	.L74:
+ 215:src/string-util.c ****     while(*string++) {
+ 1315              		.loc 1 215 0 discriminator 1
+ 1316 0018 7B68     		ldr	r3, [r7, #4]
+ 1317 001a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1318 001c 002B     		cmp	r3, #0
+ 1319 001e 0CBF     		ite	eq
+ 1320 0020 0023     		moveq	r3, #0
+ 1321 0022 0123     		movne	r3, #1
+ 1322 0024 DBB2     		uxtb	r3, r3
+ 1323 0026 7A68     		ldr	r2, [r7, #4]
+ 1324 0028 02F10102 		add	r2, r2, #1
+ 1325 002c 7A60     		str	r2, [r7, #4]
+ 1326 002e 002B     		cmp	r3, #0
+ 1327 0030 EED1     		bne	.L75
+ 217:src/string-util.c ****     }
+ 218:src/string-util.c ****     return chars;
+ 1328              		.loc 1 218 0
+ 1329 0032 FB68     		ldr	r3, [r7, #12]
+ 219:src/string-util.c **** }
+ 1330              		.loc 1 219 0
+ 1331 0034 1846     		mov	r0, r3
+ 1332 0036 07F11407 		add	r7, r7, #20
+ 1333 003a BD46     		mov	sp, r7
+ 1334 003c 80BC     		pop	{r7}
+ 1335 003e 7047     		bx	lr
+ 1336              		.cfi_endproc
+ 1337              	.LFE122:
+ 1339              		.section	.text.strcat,"ax",%progbits
+ 1340              		.align	2
+ 1341              		.global	strcat
+ 1342              		.thumb
+ 1343              		.thumb_func
+ 1345              	strcat:
+ 1346              	.LFB123:
+ 220:src/string-util.c **** 
+ 221:src/string-util.c **** 
+ 222:src/string-util.c **** 
+ 223:src/string-util.c **** 
+ 224:src/string-util.c **** char *strcat(char *dest, const char *src)
+ 225:src/string-util.c **** {
+ 1347              		.loc 1 225 0
+ 1348              		.cfi_startproc
+ 1349              		@ args = 0, pretend = 0, frame = 16
+ 1350              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1351 0000 80B5     		push	{r7, lr}
+ 1352              	.LCFI40:
+ 1353              		.cfi_def_cfa_offset 8
+ 1354              		.cfi_offset 14, -4
+ 1355              		.cfi_offset 7, -8
+ 1356 0002 84B0     		sub	sp, sp, #16
+ 1357              	.LCFI41:
+ 1358              		.cfi_def_cfa_offset 24
+ 1359 0004 00AF     		add	r7, sp, #0
+ 1360              	.LCFI42:
+ 1361              		.cfi_def_cfa_register 7
+ 1362 0006 7860     		str	r0, [r7, #4]
+ 1363 0008 3960     		str	r1, [r7, #0]
+ 226:src/string-util.c ****     size_t src_len = strlen(src);
+ 1364              		.loc 1 226 0
+ 1365 000a 3868     		ldr	r0, [r7, #0]
+ 1366 000c FFF7FEFF 		bl	strlen
+ 1367 0010 F860     		str	r0, [r7, #12]
+ 227:src/string-util.c ****     size_t dest_len = strlen(dest);
+ 1368              		.loc 1 227 0
+ 1369 0012 7868     		ldr	r0, [r7, #4]
+ 1370 0014 FFF7FEFF 		bl	strlen
+ 1371 0018 B860     		str	r0, [r7, #8]
+ 228:src/string-util.c **** 
+ 229:src/string-util.c ****     if (!dest || !src) {
+ 1372              		.loc 1 229 0
+ 1373 001a 7B68     		ldr	r3, [r7, #4]
+ 1374 001c 002B     		cmp	r3, #0
+ 1375 001e 02D0     		beq	.L77
+ 1376              		.loc 1 229 0 is_stmt 0 discriminator 1
+ 1377 0020 3B68     		ldr	r3, [r7, #0]
+ 1378 0022 002B     		cmp	r3, #0
+ 1379 0024 01D1     		bne	.L78
+ 1380              	.L77:
+ 230:src/string-util.c ****         return dest;
+ 1381              		.loc 1 230 0 is_stmt 1
+ 1382 0026 7B68     		ldr	r3, [r7, #4]
+ 1383 0028 0BE0     		b	.L79
+ 1384              	.L78:
+ 231:src/string-util.c ****     }
+ 232:src/string-util.c **** 
+ 233:src/string-util.c ****     memcpy(dest + dest_len, src, src_len + 1);
+ 1385              		.loc 1 233 0
+ 1386 002a 7A68     		ldr	r2, [r7, #4]
+ 1387 002c BB68     		ldr	r3, [r7, #8]
+ 1388 002e D218     		adds	r2, r2, r3
+ 1389 0030 FB68     		ldr	r3, [r7, #12]
+ 1390 0032 03F10103 		add	r3, r3, #1
+ 1391 0036 1046     		mov	r0, r2
+ 1392 0038 3968     		ldr	r1, [r7, #0]
+ 1393 003a 1A46     		mov	r2, r3
+ 1394 003c FFF7FEFF 		bl	memcpy
+ 234:src/string-util.c ****     return dest;
+ 1395              		.loc 1 234 0
+ 1396 0040 7B68     		ldr	r3, [r7, #4]
+ 1397              	.L79:
+ 235:src/string-util.c **** }
+ 1398              		.loc 1 235 0
+ 1399 0042 1846     		mov	r0, r3
+ 1400 0044 07F11007 		add	r7, r7, #16
+ 1401 0048 BD46     		mov	sp, r7
+ 1402 004a 80BD     		pop	{r7, pc}
+ 1403              		.cfi_endproc
+ 1404              	.LFE123:
+ 1406              		.section	.text.puts,"ax",%progbits
+ 1407              		.align	2
+ 1408              		.global	puts
+ 1409              		.thumb
+ 1410              		.thumb_func
+ 1412              	puts:
+ 1413              	.LFB124:
+ 236:src/string-util.c **** 
+ 237:src/string-util.c **** int puts(const char *msg)
+ 238:src/string-util.c **** {
+ 1414              		.loc 1 238 0
+ 1415              		.cfi_startproc
+ 1416              		@ args = 0, pretend = 0, frame = 8
+ 1417              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1418 0000 80B5     		push	{r7, lr}
+ 1419              	.LCFI43:
+ 1420              		.cfi_def_cfa_offset 8
+ 1421              		.cfi_offset 14, -4
+ 1422              		.cfi_offset 7, -8
+ 1423 0002 82B0     		sub	sp, sp, #8
+ 1424              	.LCFI44:
+ 1425              		.cfi_def_cfa_offset 16
+ 1426 0004 00AF     		add	r7, sp, #0
+ 1427              	.LCFI45:
+ 1428              		.cfi_def_cfa_register 7
+ 1429 0006 7860     		str	r0, [r7, #4]
+ 239:src/string-util.c ****     if (!msg) {
+ 1430              		.loc 1 239 0
+ 1431 0008 7B68     		ldr	r3, [r7, #4]
+ 1432 000a 002B     		cmp	r3, #0
+ 1433 000c 02D1     		bne	.L81
+ 240:src/string-util.c ****         return -1;
+ 1434              		.loc 1 240 0
+ 1435 000e 4FF0FF33 		mov	r3, #-1
+ 1436 0012 0AE0     		b	.L82
+ 1437              	.L81:
+ 241:src/string-util.c ****     }
+ 242:src/string-util.c **** 
+ 243:src/string-util.c ****     return (int)fio_write(1, msg, strlen(msg));
+ 1438              		.loc 1 243 0
+ 1439 0014 7868     		ldr	r0, [r7, #4]
+ 1440 0016 FFF7FEFF 		bl	strlen
+ 1441 001a 0346     		mov	r3, r0
+ 1442 001c 4FF00100 		mov	r0, #1
+ 1443 0020 7968     		ldr	r1, [r7, #4]
+ 1444 0022 1A46     		mov	r2, r3
+ 1445 0024 FFF7FEFF 		bl	fio_write
+ 1446 0028 0346     		mov	r3, r0
+ 1447              	.L82:
+ 244:src/string-util.c **** }
+ 1448              		.loc 1 244 0
+ 1449 002a 1846     		mov	r0, r3
+ 1450 002c 07F10807 		add	r7, r7, #8
+ 1451 0030 BD46     		mov	sp, r7
+ 1452 0032 80BD     		pop	{r7, pc}
+ 1453              		.cfi_endproc
+ 1454              	.LFE124:
+ 1456              		.section	.text.printf_cb,"ax",%progbits
+ 1457              		.align	2
+ 1458              		.thumb
+ 1459              		.thumb_func
+ 1461              	printf_cb:
+ 1462              	.LFB125:
+ 245:src/string-util.c **** 
+ 246:src/string-util.c **** static int printf_cb(char *dest, const char *src)
+ 247:src/string-util.c **** {
+ 1463              		.loc 1 247 0
+ 1464              		.cfi_startproc
+ 1465              		@ args = 0, pretend = 0, frame = 8
+ 1466              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1467 0000 80B5     		push	{r7, lr}
+ 1468              	.LCFI46:
+ 1469              		.cfi_def_cfa_offset 8
+ 1470              		.cfi_offset 14, -4
+ 1471              		.cfi_offset 7, -8
+ 1472 0002 82B0     		sub	sp, sp, #8
+ 1473              	.LCFI47:
+ 1474              		.cfi_def_cfa_offset 16
+ 1475 0004 00AF     		add	r7, sp, #0
+ 1476              	.LCFI48:
+ 1477              		.cfi_def_cfa_register 7
+ 1478 0006 7860     		str	r0, [r7, #4]
+ 1479 0008 3960     		str	r1, [r7, #0]
+ 248:src/string-util.c ****     return puts(src);
+ 1480              		.loc 1 248 0
+ 1481 000a 3868     		ldr	r0, [r7, #0]
+ 1482 000c FFF7FEFF 		bl	puts
+ 1483 0010 0346     		mov	r3, r0
+ 249:src/string-util.c **** }
+ 1484              		.loc 1 249 0
+ 1485 0012 1846     		mov	r0, r3
+ 1486 0014 07F10807 		add	r7, r7, #8
+ 1487 0018 BD46     		mov	sp, r7
+ 1488 001a 80BD     		pop	{r7, pc}
+ 1489              		.cfi_endproc
+ 1490              	.LFE125:
+ 1492              		.section	.text.sprintf_cb,"ax",%progbits
+ 1493              		.align	2
+ 1494              		.thumb
+ 1495              		.thumb_func
+ 1497              	sprintf_cb:
+ 1498              	.LFB126:
+ 250:src/string-util.c **** 
+ 251:src/string-util.c **** static int sprintf_cb(char *dest, const char *src)
+ 252:src/string-util.c **** {
+ 1499              		.loc 1 252 0
+ 1500              		.cfi_startproc
+ 1501              		@ args = 0, pretend = 0, frame = 8
+ 1502              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1503 0000 80B5     		push	{r7, lr}
+ 1504              	.LCFI49:
+ 1505              		.cfi_def_cfa_offset 8
+ 1506              		.cfi_offset 14, -4
+ 1507              		.cfi_offset 7, -8
+ 1508 0002 82B0     		sub	sp, sp, #8
+ 1509              	.LCFI50:
+ 1510              		.cfi_def_cfa_offset 16
+ 1511 0004 00AF     		add	r7, sp, #0
+ 1512              	.LCFI51:
+ 1513              		.cfi_def_cfa_register 7
+ 1514 0006 7860     		str	r0, [r7, #4]
+ 1515 0008 3960     		str	r1, [r7, #0]
+ 253:src/string-util.c ****     return (int)strcat(dest, src);
+ 1516              		.loc 1 253 0
+ 1517 000a 7868     		ldr	r0, [r7, #4]
+ 1518 000c 3968     		ldr	r1, [r7, #0]
+ 1519 000e FFF7FEFF 		bl	strcat
+ 1520 0012 0346     		mov	r3, r0
+ 254:src/string-util.c **** }
+ 1521              		.loc 1 254 0
+ 1522 0014 1846     		mov	r0, r3
+ 1523 0016 07F10807 		add	r7, r7, #8
+ 1524 001a BD46     		mov	sp, r7
+ 1525 001c 80BD     		pop	{r7, pc}
+ 1526              		.cfi_endproc
+ 1527              	.LFE126:
+ 1529 001e 00BF     		.section	.text.base_printf,"ax",%progbits
+ 1530              		.align	2
+ 1531              		.thumb
+ 1532              		.thumb_func
+ 1534              	base_printf:
+ 1535              	.LFB127:
+ 255:src/string-util.c **** 
+ 256:src/string-util.c **** typedef int (*proc_str_func_t)(char *, const char *);
+ 257:src/string-util.c **** 
+ 258:src/string-util.c **** /* Common body for sprintf and printf */
+ 259:src/string-util.c **** static int base_printf(proc_str_func_t proc_str, \
+ 260:src/string-util.c ****                 char *dest, const char *fmt_str, va_list param)
+ 261:src/string-util.c **** {
+ 1536              		.loc 1 261 0
+ 1537              		.cfi_startproc
+ 1538              		@ args = 0, pretend = 0, frame = 56
+ 1539              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1540 0000 80B5     		push	{r7, lr}
+ 1541              	.LCFI52:
+ 1542              		.cfi_def_cfa_offset 8
+ 1543              		.cfi_offset 14, -4
+ 1544              		.cfi_offset 7, -8
+ 1545 0002 8EB0     		sub	sp, sp, #56
+ 1546              	.LCFI53:
+ 1547              		.cfi_def_cfa_offset 64
+ 1548 0004 00AF     		add	r7, sp, #0
+ 1549              	.LCFI54:
+ 1550              		.cfi_def_cfa_register 7
+ 1551 0006 F860     		str	r0, [r7, #12]
+ 1552 0008 B960     		str	r1, [r7, #8]
+ 1553 000a 7A60     		str	r2, [r7, #4]
+ 1554 000c 3B60     		str	r3, [r7, #0]
+ 262:src/string-util.c ****     char param_chr[] = {0, 0};
+ 1555              		.loc 1 262 0
+ 1556 000e 4FF00003 		mov	r3, #0
+ 1557 0012 87F82430 		strb	r3, [r7, #36]
+ 1558 0016 4FF00003 		mov	r3, #0
+ 1559 001a 87F82530 		strb	r3, [r7, #37]
+ 263:src/string-util.c ****     int param_int = 0;
+ 1560              		.loc 1 263 0
+ 1561 001e 4FF00003 		mov	r3, #0
+ 1562 0022 7B63     		str	r3, [r7, #52]
+ 264:src/string-util.c ****     
+ 265:src/string-util.c ****     long int param_lint = 0;
+ 1563              		.loc 1 265 0
+ 1564 0024 4FF00003 		mov	r3, #0
+ 1565 0028 BB62     		str	r3, [r7, #40]
+ 266:src/string-util.c **** 
+ 267:src/string-util.c ****     char *str_to_output = 0;
+ 1566              		.loc 1 267 0
+ 1567 002a 4FF00003 		mov	r3, #0
+ 1568 002e 3B63     		str	r3, [r7, #48]
+ 268:src/string-util.c ****     char itoa_buf[20] = {0};
+ 1569              		.loc 1 268 0
+ 1570 0030 07F11003 		add	r3, r7, #16
+ 1571 0034 4FF00002 		mov	r2, #0
+ 1572 0038 1A60     		str	r2, [r3, #0]
+ 1573 003a 03F10403 		add	r3, r3, #4
+ 1574 003e 4FF00002 		mov	r2, #0
+ 1575 0042 1A60     		str	r2, [r3, #0]
+ 1576 0044 03F10403 		add	r3, r3, #4
+ 1577 0048 4FF00002 		mov	r2, #0
+ 1578 004c 1A60     		str	r2, [r3, #0]
+ 1579 004e 03F10403 		add	r3, r3, #4
+ 1580 0052 4FF00002 		mov	r2, #0
+ 1581 0056 1A60     		str	r2, [r3, #0]
+ 1582 0058 03F10403 		add	r3, r3, #4
+ 1583 005c 4FF00002 		mov	r2, #0
+ 1584 0060 1A60     		str	r2, [r3, #0]
+ 1585 0062 03F10403 		add	r3, r3, #4
+ 269:src/string-util.c ****     int curr_char = 0;
+ 1586              		.loc 1 269 0
+ 1587 0066 4FF00003 		mov	r3, #0
+ 1588 006a FB62     		str	r3, [r7, #44]
+ 270:src/string-util.c **** 
+ 271:src/string-util.c ****     /* Make sure strlen(dest) is 0
+ 272:src/string-util.c **** * for first strcat */
+ 273:src/string-util.c ****     if (dest) {
+ 1589              		.loc 1 273 0
+ 1590 006c BB68     		ldr	r3, [r7, #8]
+ 1591 006e 002B     		cmp	r3, #0
+ 1592 0070 00F0DE80 		beq	.L99
+ 274:src/string-util.c ****         dest[0] = 0;
+ 1593              		.loc 1 274 0
+ 1594 0074 BB68     		ldr	r3, [r7, #8]
+ 1595 0076 4FF00002 		mov	r2, #0
+ 1596 007a 1A70     		strb	r2, [r3, #0]
+ 275:src/string-util.c ****     }
+ 276:src/string-util.c **** 
+ 277:src/string-util.c ****     /* Let's parse */
+ 278:src/string-util.c ****     while (fmt_str[curr_char]) {
+ 1597              		.loc 1 278 0
+ 1598 007c D8E0     		b	.L99
+ 1599              	.L98:
+ 279:src/string-util.c ****         /* Deal with normal string
+ 280:src/string-util.c **** * increase index by 1 here */
+ 281:src/string-util.c ****         if (fmt_str[curr_char++] != '%') {
+ 1600              		.loc 1 281 0
+ 1601 007e FB6A     		ldr	r3, [r7, #44]
+ 1602 0080 7A68     		ldr	r2, [r7, #4]
+ 1603 0082 D318     		adds	r3, r2, r3
+ 1604 0084 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1605 0086 252B     		cmp	r3, #37
+ 1606 0088 0CBF     		ite	eq
+ 1607 008a 0023     		moveq	r3, #0
+ 1608 008c 0123     		movne	r3, #1
+ 1609 008e DBB2     		uxtb	r3, r3
+ 1610 0090 FA6A     		ldr	r2, [r7, #44]
+ 1611 0092 02F10102 		add	r2, r2, #1
+ 1612 0096 FA62     		str	r2, [r7, #44]
+ 1613 0098 002B     		cmp	r3, #0
+ 1614 009a 0BD0     		beq	.L88
+ 282:src/string-util.c ****             param_chr[0] = fmt_str[curr_char - 1];
+ 1615              		.loc 1 282 0
+ 1616 009c FB6A     		ldr	r3, [r7, #44]
+ 1617 009e 03F1FF33 		add	r3, r3, #-1
+ 1618 00a2 7A68     		ldr	r2, [r7, #4]
+ 1619 00a4 D318     		adds	r3, r2, r3
+ 1620 00a6 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1621 00a8 87F82430 		strb	r3, [r7, #36]
+ 283:src/string-util.c ****             str_to_output = param_chr;
+ 1622              		.loc 1 283 0
+ 1623 00ac 07F12403 		add	r3, r7, #36
+ 1624 00b0 3B63     		str	r3, [r7, #48]
+ 1625 00b2 B8E0     		b	.L89
+ 1626              	.L88:
+ 284:src/string-util.c ****         }
+ 285:src/string-util.c ****         /* % case-> retrive latter params */
+ 286:src/string-util.c ****         else {
+ 287:src/string-util.c ****             switch (fmt_str[curr_char]) {
+ 1627              		.loc 1 287 0
+ 1628 00b4 FB6A     		ldr	r3, [r7, #44]
+ 1629 00b6 7A68     		ldr	r2, [r7, #4]
+ 1630 00b8 D318     		adds	r3, r2, r3
+ 1631 00ba 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1632 00bc A3F14303 		sub	r3, r3, #67
+ 1633 00c0 352B     		cmp	r3, #53
+ 1634 00c2 00F2A380 		bhi	.L90
+ 1635 00c6 01A2     		adr	r2, .L96
+ 1636 00c8 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1637              		.align	2
+ 1638              	.L96:
+ 1639 00cc F5010000 		.word	.L91+1
+ 1640 00d0 B3010000 		.word	.L92+1
+ 1641 00d4 0D020000 		.word	.L90+1
+ 1642 00d8 0D020000 		.word	.L90+1
+ 1643 00dc 0D020000 		.word	.L90+1
+ 1644 00e0 0D020000 		.word	.L90+1
+ 1645 00e4 0D020000 		.word	.L90+1
+ 1646 00e8 0D020000 		.word	.L90+1
+ 1647 00ec 0D020000 		.word	.L90+1
+ 1648 00f0 0D020000 		.word	.L90+1
+ 1649 00f4 0D020000 		.word	.L90+1
+ 1650 00f8 0D020000 		.word	.L90+1
+ 1651 00fc 0D020000 		.word	.L90+1
+ 1652 0100 DF010000 		.word	.L93+1
+ 1653 0104 0D020000 		.word	.L90+1
+ 1654 0108 0D020000 		.word	.L90+1
+ 1655 010c A5010000 		.word	.L94+1
+ 1656 0110 0D020000 		.word	.L90+1
+ 1657 0114 0D020000 		.word	.L90+1
+ 1658 0118 0D020000 		.word	.L90+1
+ 1659 011c 0D020000 		.word	.L90+1
+ 1660 0120 C9010000 		.word	.L95+1
+ 1661 0124 0D020000 		.word	.L90+1
+ 1662 0128 0D020000 		.word	.L90+1
+ 1663 012c 0D020000 		.word	.L90+1
+ 1664 0130 0D020000 		.word	.L90+1
+ 1665 0134 0D020000 		.word	.L90+1
+ 1666 0138 0D020000 		.word	.L90+1
+ 1667 013c 0D020000 		.word	.L90+1
+ 1668 0140 0D020000 		.word	.L90+1
+ 1669 0144 0D020000 		.word	.L90+1
+ 1670 0148 0D020000 		.word	.L90+1
+ 1671 014c F5010000 		.word	.L91+1
+ 1672 0150 B3010000 		.word	.L92+1
+ 1673 0154 0D020000 		.word	.L90+1
+ 1674 0158 0D020000 		.word	.L90+1
+ 1675 015c 0D020000 		.word	.L90+1
+ 1676 0160 0D020000 		.word	.L90+1
+ 1677 0164 0D020000 		.word	.L90+1
+ 1678 0168 0D020000 		.word	.L90+1
+ 1679 016c 0D020000 		.word	.L90+1
+ 1680 0170 0D020000 		.word	.L90+1
+ 1681 0174 0D020000 		.word	.L90+1
+ 1682 0178 0D020000 		.word	.L90+1
+ 1683 017c 0D020000 		.word	.L90+1
+ 1684 0180 DF010000 		.word	.L93+1
+ 1685 0184 0D020000 		.word	.L90+1
+ 1686 0188 0D020000 		.word	.L90+1
+ 1687 018c A5010000 		.word	.L94+1
+ 1688 0190 0D020000 		.word	.L90+1
+ 1689 0194 B3010000 		.word	.L92+1
+ 1690 0198 0D020000 		.word	.L90+1
+ 1691 019c 0D020000 		.word	.L90+1
+ 1692 01a0 C9010000 		.word	.L95+1
+ 1693              	.L94:
+ 288:src/string-util.c ****                 case 'S':
+ 289:src/string-util.c ****                 case 's':
+ 290:src/string-util.c ****                     {
+ 291:src/string-util.c ****                         str_to_output = va_arg(param, char *);
+ 1694              		.loc 1 291 0
+ 1695 01a4 3B68     		ldr	r3, [r7, #0]
+ 1696 01a6 03F10402 		add	r2, r3, #4
+ 1697 01aa 3A60     		str	r2, [r7, #0]
+ 1698 01ac 1B68     		ldr	r3, [r3, #0]
+ 1699 01ae 3B63     		str	r3, [r7, #48]
+ 292:src/string-util.c ****                     }
+ 293:src/string-util.c ****                     break;
+ 1700              		.loc 1 293 0
+ 1701 01b0 35E0     		b	.L97
+ 1702              	.L92:
+ 294:src/string-util.c **** 
+ 295:src/string-util.c ****                 case 'd':
+ 296:src/string-util.c ****                 case 'D':
+ 297:src/string-util.c ****                 case 'u':
+ 298:src/string-util.c ****                     {
+ 299:src/string-util.c ****                        param_int = va_arg(param, int);
+ 1703              		.loc 1 299 0
+ 1704 01b2 3B68     		ldr	r3, [r7, #0]
+ 1705 01b4 03F10402 		add	r2, r3, #4
+ 1706 01b8 3A60     		str	r2, [r7, #0]
+ 1707 01ba 1B68     		ldr	r3, [r3, #0]
+ 1708 01bc 7B63     		str	r3, [r7, #52]
+ 300:src/string-util.c ****                        itoa(param_int, str_to_output);
+ 1709              		.loc 1 300 0
+ 1710 01be 786B     		ldr	r0, [r7, #52]
+ 1711 01c0 396B     		ldr	r1, [r7, #48]
+ 1712 01c2 FFF7FEFF 		bl	itoa
+ 301:src/string-util.c ****                     }
+ 302:src/string-util.c ****                     break;
+ 1713              		.loc 1 302 0
+ 1714 01c6 2AE0     		b	.L97
+ 1715              	.L95:
+ 303:src/string-util.c **** 
+ 304:src/string-util.c ****                 case 'X':
+ 305:src/string-util.c ****                 case 'x':
+ 306:src/string-util.c ****                     {
+ 307:src/string-util.c ****                        param_int = va_arg(param, int);
+ 1716              		.loc 1 307 0
+ 1717 01c8 3B68     		ldr	r3, [r7, #0]
+ 1718 01ca 03F10402 		add	r2, r3, #4
+ 1719 01ce 3A60     		str	r2, [r7, #0]
+ 1720 01d0 1B68     		ldr	r3, [r3, #0]
+ 1721 01d2 7B63     		str	r3, [r7, #52]
+ 308:src/string-util.c ****                        xtoa(param_int, str_to_output);
+ 1722              		.loc 1 308 0
+ 1723 01d4 786B     		ldr	r0, [r7, #52]
+ 1724 01d6 396B     		ldr	r1, [r7, #48]
+ 1725 01d8 FFF7FEFF 		bl	xtoa
+ 309:src/string-util.c ****                     }
+ 310:src/string-util.c ****                     break;
+ 1726              		.loc 1 310 0
+ 1727 01dc 1FE0     		b	.L97
+ 1728              	.L93:
+ 311:src/string-util.c **** 
+ 312:src/string-util.c ****                 case 'P':
+ 313:src/string-util.c ****                 case 'p':
+ 314:src/string-util.c ****                     {
+ 315:src/string-util.c ****                        param_lint = va_arg(param, long int);
+ 1729              		.loc 1 315 0
+ 1730 01de 3B68     		ldr	r3, [r7, #0]
+ 1731 01e0 03F10402 		add	r2, r3, #4
+ 1732 01e4 3A60     		str	r2, [r7, #0]
+ 1733 01e6 1B68     		ldr	r3, [r3, #0]
+ 1734 01e8 BB62     		str	r3, [r7, #40]
+ 316:src/string-util.c ****                        xtoa(param_int, str_to_output);
+ 1735              		.loc 1 316 0
+ 1736 01ea 786B     		ldr	r0, [r7, #52]
+ 1737 01ec 396B     		ldr	r1, [r7, #48]
+ 1738 01ee FFF7FEFF 		bl	xtoa
+ 317:src/string-util.c ****                     }
+ 318:src/string-util.c ****                     break;
+ 1739              		.loc 1 318 0
+ 1740 01f2 14E0     		b	.L97
+ 1741              	.L91:
+ 319:src/string-util.c **** 
+ 320:src/string-util.c ****                 case 'c':
+ 321:src/string-util.c ****                 case 'C':
+ 322:src/string-util.c ****                     {
+ 323:src/string-util.c ****                         param_chr[0] = (char) va_arg(param, int);
+ 1742              		.loc 1 323 0
+ 1743 01f4 3B68     		ldr	r3, [r7, #0]
+ 1744 01f6 03F10402 		add	r2, r3, #4
+ 1745 01fa 3A60     		str	r2, [r7, #0]
+ 1746 01fc 1B68     		ldr	r3, [r3, #0]
+ 1747 01fe DBB2     		uxtb	r3, r3
+ 1748 0200 87F82430 		strb	r3, [r7, #36]
+ 324:src/string-util.c ****                         str_to_output = param_chr;
+ 1749              		.loc 1 324 0
+ 1750 0204 07F12403 		add	r3, r7, #36
+ 1751 0208 3B63     		str	r3, [r7, #48]
+ 325:src/string-util.c ****                         break;
+ 1752              		.loc 1 325 0
+ 1753 020a 08E0     		b	.L97
+ 1754              	.L90:
+ 326:src/string-util.c ****                     }
+ 327:src/string-util.c **** 
+ 328:src/string-util.c ****                 default:
+ 329:src/string-util.c ****                     {
+ 330:src/string-util.c ****                         param_chr[0] = fmt_str[curr_char];
+ 1755              		.loc 1 330 0
+ 1756 020c FB6A     		ldr	r3, [r7, #44]
+ 1757 020e 7A68     		ldr	r2, [r7, #4]
+ 1758 0210 D318     		adds	r3, r2, r3
+ 1759 0212 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1760 0214 87F82430 		strb	r3, [r7, #36]
+ 331:src/string-util.c ****                         str_to_output = param_chr;
+ 1761              		.loc 1 331 0
+ 1762 0218 07F12403 		add	r3, r7, #36
+ 1763 021c 3B63     		str	r3, [r7, #48]
+ 1764              	.L97:
+ 332:src/string-util.c ****                     }
+ 333:src/string-util.c ****             } /* switch (fmt_str[curr_char]) */
+ 334:src/string-util.c ****             curr_char++;
+ 1765              		.loc 1 334 0
+ 1766 021e FB6A     		ldr	r3, [r7, #44]
+ 1767 0220 03F10103 		add	r3, r3, #1
+ 1768 0224 FB62     		str	r3, [r7, #44]
+ 1769              	.L89:
+ 335:src/string-util.c ****         } /* if (fmt_str[curr_char++] == '%') */
+ 336:src/string-util.c ****         proc_str(dest, str_to_output);
+ 1770              		.loc 1 336 0
+ 1771 0226 FB68     		ldr	r3, [r7, #12]
+ 1772 0228 B868     		ldr	r0, [r7, #8]
+ 1773 022a 396B     		ldr	r1, [r7, #48]
+ 1774 022c 9847     		blx	r3
+ 1775 022e 00E0     		b	.L87
+ 1776              	.L99:
+ 278:src/string-util.c ****     while (fmt_str[curr_char]) {
+ 1777              		.loc 1 278 0
+ 1778 0230 00BF     		nop
+ 1779              	.L87:
+ 278:src/string-util.c ****     while (fmt_str[curr_char]) {
+ 1780              		.loc 1 278 0 is_stmt 0 discriminator 1
+ 1781 0232 FB6A     		ldr	r3, [r7, #44]
+ 1782 0234 7A68     		ldr	r2, [r7, #4]
+ 1783 0236 D318     		adds	r3, r2, r3
+ 1784 0238 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1785 023a 002B     		cmp	r3, #0
+ 1786 023c 7FF41FAF 		bne	.L98
+ 337:src/string-util.c ****     } /* while (fmt_str[curr_char]) */
+ 338:src/string-util.c **** 
+ 339:src/string-util.c ****     return curr_char;
+ 1787              		.loc 1 339 0 is_stmt 1
+ 1788 0240 FB6A     		ldr	r3, [r7, #44]
+ 340:src/string-util.c **** }
+ 1789              		.loc 1 340 0
+ 1790 0242 1846     		mov	r0, r3
+ 1791 0244 07F13807 		add	r7, r7, #56
+ 1792 0248 BD46     		mov	sp, r7
+ 1793 024a 80BD     		pop	{r7, pc}
+ 1794              		.cfi_endproc
+ 1795              	.LFE127:
+ 1797              		.section	.text.sprintf,"ax",%progbits
+ 1798              		.align	2
+ 1799              		.global	sprintf
+ 1800              		.thumb
+ 1801              		.thumb_func
+ 1803              	sprintf:
+ 1804              	.LFB128:
+ 341:src/string-util.c **** 
+ 342:src/string-util.c **** int sprintf(char *str, const char *format, ...)
+ 343:src/string-util.c **** {
+ 1805              		.loc 1 343 0
+ 1806              		.cfi_startproc
+ 1807              		@ args = 4, pretend = 12, frame = 16
+ 1808              		@ frame_needed = 1, uses_anonymous_args = 1
+ 1809 0000 0EB4     		push	{r1, r2, r3}
+ 1810              	.LCFI55:
+ 1811              		.cfi_def_cfa_offset 12
+ 1812              		.cfi_offset 3, -4
+ 1813              		.cfi_offset 2, -8
+ 1814              		.cfi_offset 1, -12
+ 1815 0002 80B5     		push	{r7, lr}
+ 1816              	.LCFI56:
+ 1817              		.cfi_def_cfa_offset 20
+ 1818              		.cfi_offset 14, -16
+ 1819              		.cfi_offset 7, -20
+ 1820 0004 85B0     		sub	sp, sp, #20
+ 1821              	.LCFI57:
+ 1822              		.cfi_def_cfa_offset 40
+ 1823 0006 00AF     		add	r7, sp, #0
+ 1824              	.LCFI58:
+ 1825              		.cfi_def_cfa_register 7
+ 1826 0008 7860     		str	r0, [r7, #4]
+ 344:src/string-util.c ****     int rval = 0;
+ 1827              		.loc 1 344 0
+ 1828 000a 4FF00003 		mov	r3, #0
+ 1829 000e FB60     		str	r3, [r7, #12]
+ 345:src/string-util.c ****     va_list param = {0};
+ 1830              		.loc 1 345 0
+ 1831 0010 4FF00003 		mov	r3, #0
+ 1832 0014 BB60     		str	r3, [r7, #8]
+ 346:src/string-util.c **** 
+ 347:src/string-util.c ****     va_start(param, format);
+ 1833              		.loc 1 347 0
+ 1834 0016 07F12003 		add	r3, r7, #32
+ 1835 001a BB60     		str	r3, [r7, #8]
+ 348:src/string-util.c ****     rval = base_printf(sprintf_cb, (char *)str, format, param);
+ 1836              		.loc 1 348 0
+ 1837 001c 40F20000 		movw	r0, #:lower16:sprintf_cb
+ 1838 0020 C0F20000 		movt	r0, #:upper16:sprintf_cb
+ 1839 0024 7968     		ldr	r1, [r7, #4]
+ 1840 0026 FA69     		ldr	r2, [r7, #28]
+ 1841 0028 BB68     		ldr	r3, [r7, #8]
+ 1842 002a FFF7FEFF 		bl	base_printf
+ 1843 002e F860     		str	r0, [r7, #12]
+ 349:src/string-util.c ****     va_end(param);
+ 350:src/string-util.c **** 
+ 351:src/string-util.c ****     return rval;
+ 1844              		.loc 1 351 0
+ 1845 0030 FB68     		ldr	r3, [r7, #12]
+ 352:src/string-util.c **** }
+ 1846              		.loc 1 352 0
+ 1847 0032 1846     		mov	r0, r3
+ 1848 0034 07F11407 		add	r7, r7, #20
+ 1849 0038 BD46     		mov	sp, r7
+ 1850 003a BDE88040 		pop	{r7, lr}
+ 1851 003e 03B0     		add	sp, sp, #12
+ 1852 0040 7047     		bx	lr
+ 1853              		.cfi_endproc
+ 1854              	.LFE128:
+ 1856 0042 00BF     		.section	.text.pwm,"ax",%progbits
+ 1857              		.align	2
+ 1858              		.global	pwm
+ 1859              		.thumb
+ 1860              		.thumb_func
+ 1862              	pwm:
+ 1863              	.LFB129:
+ 1864              		.file 2 "src/main.c"
+   1:src/main.c    **** /**
+   2:src/main.c    ****   ******************************************************************************
+   3:src/main.c    ****   * @file    STM32F4-Discovery FreeRTOS demo\main.c
+   4:src/main.c    ****   * @author  T.O.M.A.S. Team
+   5:src/main.c    ****   * @version V1.1.0
+   6:src/main.c    ****   * @date    14-October-2011
+   7:src/main.c    ****   * @brief   Main program body
+   8:src/main.c    ****   ******************************************************************************
+   9:src/main.c    ****   * @attention
+  10:src/main.c    ****   *
+  11:src/main.c    ****   * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  12:src/main.c    ****   * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  13:src/main.c    ****   * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  14:src/main.c    ****   * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  15:src/main.c    ****   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  16:src/main.c    ****   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  17:src/main.c    ****   *
+  18:src/main.c    ****   * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  19:src/main.c    ****   ******************************************************************************
+  20:src/main.c    ****   */ 
+  21:src/main.c    **** 
+  22:src/main.c    **** /* Includes ------------------------------------------------------------------*/
+  23:src/main.c    **** #include "stm32f4xx.h"
+  24:src/main.c    **** 
+  25:src/main.c    **** /* FreeRTOS includes */
+  26:src/main.c    **** #include "FreeRTOS.h"
+  27:src/main.c    **** #include "task.h"
+  28:src/main.c    **** #include "semphr.h"
+  29:src/main.c    **** 
+  30:src/main.c    **** #include <math.h>
+  31:src/main.c    **** #include <stdio.h>
+  32:src/main.c    **** #include <stdlib.h>
+  33:src/main.c    **** 
+  34:src/main.c    **** #include "hw_config.h"  //all hardware configuration was setted here
+  35:src/main.c    **** #include "main.h"
+  36:src/main.c    **** 
+  37:src/main.c    **** #include "string-util.c"
+  38:src/main.c    **** 
+  39:src/main.c    **** /* variable parameter function*/
+  40:src/main.c    **** #include <stdarg.h>
+  41:src/main.c    **** 
+  42:src/main.c    **** /** @addtogroup STM32F4-Discovery_Demo
+  43:src/main.c    ****   * @{
+  44:src/main.c    ****   */
+  45:src/main.c    **** 
+  46:src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  47:src/main.c    **** /* Private define ------------------------------------------------------------*/
+  48:src/main.c    **** #define DELAY 125     /* msec */
+  49:src/main.c    **** #define queueSIZE	6
+  50:src/main.c    **** 
+  51:src/main.c    **** /*brushless motor PWM max and min duty cycle*/
+  52:src/main.c    **** #define PWM_MOTOR_MIN 100
+  53:src/main.c    **** #define PWM_MOTOR_MAX 1000
+  54:src/main.c    **** #define TEST 200
+  55:src/main.c    **** 
+  56:src/main.c    **** /* angle */
+  57:src/main.c    **** #define G 2
+  58:src/main.c    **** 
+  59:src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  60:src/main.c    **** /*PWM signal to drive brushless motor*/
+  61:src/main.c    **** #define PWM_Motor1 TIM4->CCR1   
+  62:src/main.c    **** #define PWM_Motor2 TIM4->CCR2   
+  63:src/main.c    **** #define PWM_Motor3 TIM4->CCR3   
+  64:src/main.c    **** #define PWM_Motor4 TIM4->CCR4   
+  65:src/main.c    **** 
+  66:src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  67:src/main.c    **** /* Queue structure used for passing messages. */
+  68:src/main.c    **** typedef struct {
+  69:src/main.c    **** 	char str[100];
+  70:src/main.c    **** } serial_str_msg;
+  71:src/main.c    **** 
+  72:src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+  73:src/main.c    **** 
+  74:src/main.c    **** /* Private functions ---------------------------------------------------------*/
+  75:src/main.c    **** 
+  76:src/main.c    **** void pwm(void)
+  77:src/main.c    **** {
+ 1865              		.loc 2 77 0
+ 1866              		.cfi_startproc
+ 1867              		@ args = 0, pretend = 0, frame = 8
+ 1868              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1869 0000 90B5     		push	{r4, r7, lr}
+ 1870              	.LCFI59:
+ 1871              		.cfi_def_cfa_offset 12
+ 1872              		.cfi_offset 14, -4
+ 1873              		.cfi_offset 7, -8
+ 1874              		.cfi_offset 4, -12
+ 1875 0002 83B0     		sub	sp, sp, #12
+ 1876              	.LCFI60:
+ 1877              		.cfi_def_cfa_offset 24
+ 1878 0004 00AF     		add	r7, sp, #0
+ 1879              	.LCFI61:
+ 1880              		.cfi_def_cfa_register 7
+  78:src/main.c    ****   const portTickType xDelay = 1000; // portTICK_RATE_MS;
+ 1881              		.loc 2 78 0
+ 1882 0006 4FF47A73 		mov	r3, #1000
+ 1883 000a 7B60     		str	r3, [r7, #4]
+  79:src/main.c    **** 
+  80:src/main.c    ****  //Delay_1ms(50);
+  81:src/main.c    **** 
+  82:src/main.c    ****   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+ 1884              		.loc 2 82 0
+ 1885 000c 40F20004 		movw	r4, #:lower16:Motor_Control
+ 1886 0010 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 1887 0014 4FF47A70 		mov	r0, #1000
+ 1888 0018 4FF47A71 		mov	r1, #1000
+ 1889 001c 4FF47A72 		mov	r2, #1000
+ 1890 0020 4FF47A73 		mov	r3, #1000
+ 1891 0024 A047     		blx	r4
+  83:src/main.c    **** 
+  84:src/main.c    ****   Delay_1ms(100);
+ 1892              		.loc 2 84 0
+ 1893 0026 4FF06400 		mov	r0, #100
+ 1894 002a FFF7FEFF 		bl	Delay_1ms
+  85:src/main.c    **** 
+  86:src/main.c    ****   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+ 1895              		.loc 2 86 0
+ 1896 002e 40F20004 		movw	r4, #:lower16:Motor_Control
+ 1897 0032 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 1898 0036 4FF06400 		mov	r0, #100
+ 1899 003a 4FF06401 		mov	r1, #100
+ 1900 003e 4FF06402 		mov	r2, #100
+ 1901 0042 4FF06403 		mov	r3, #100
+ 1902 0046 A047     		blx	r4
+  87:src/main.c    ****   
+  88:src/main.c    ****   Delay_1ms(100);
+ 1903              		.loc 2 88 0
+ 1904 0048 4FF06400 		mov	r0, #100
+ 1905 004c FFF7FEFF 		bl	Delay_1ms
+ 1906              	.L102:
+  89:src/main.c    **** 
+  90:src/main.c    ****   while(1)  // Do not exit
+  91:src/main.c    ****   {
+  92:src/main.c    ****    Motor_Control(TEST, TEST, TEST, TEST);
+ 1907              		.loc 2 92 0 discriminator 1
+ 1908 0050 40F20004 		movw	r4, #:lower16:Motor_Control
+ 1909 0054 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 1910 0058 4FF0C800 		mov	r0, #200
+ 1911 005c 4FF0C801 		mov	r1, #200
+ 1912 0060 4FF0C802 		mov	r2, #200
+ 1913 0064 4FF0C803 		mov	r3, #200
+ 1914 0068 A047     		blx	r4
+  93:src/main.c    ****    
+  94:src/main.c    ****    vTaskDelay( xDelay );
+ 1915              		.loc 2 94 0 discriminator 1
+ 1916 006a 7868     		ldr	r0, [r7, #4]
+ 1917 006c FFF7FEFF 		bl	vTaskDelay
+  95:src/main.c    **** 
+  96:src/main.c    ****    Motor_Control(TEST+50, TEST+50, TEST+50, TEST+50);
+ 1918              		.loc 2 96 0 discriminator 1
+ 1919 0070 40F20004 		movw	r4, #:lower16:Motor_Control
+ 1920 0074 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 1921 0078 4FF0FA00 		mov	r0, #250
+ 1922 007c 4FF0FA01 		mov	r1, #250
+ 1923 0080 4FF0FA02 		mov	r2, #250
+ 1924 0084 4FF0FA03 		mov	r3, #250
+ 1925 0088 A047     		blx	r4
+  97:src/main.c    **** 
+  98:src/main.c    ****    vTaskDelay( xDelay );
+ 1926              		.loc 2 98 0 discriminator 1
+ 1927 008a 7868     		ldr	r0, [r7, #4]
+ 1928 008c FFF7FEFF 		bl	vTaskDelay
+  99:src/main.c    **** 
+ 100:src/main.c    ****   }
+ 1929              		.loc 2 100 0 discriminator 1
+ 1930 0090 DEE7     		b	.L102
+ 1931              		.cfi_endproc
+ 1932              	.LFE129:
+ 1934 0092 00BF     		.section	.text.Motor_Control,"ax",%progbits
+ 1935              		.align	2
+ 1936              		.global	Motor_Control
+ 1937              		.thumb
+ 1938              		.thumb_func
+ 1940              	Motor_Control:
+ 1941              	.LFB130:
+ 101:src/main.c    ****  
+ 102:src/main.c    ****   return(0); // System will implode
+ 103:src/main.c    **** } 
+ 104:src/main.c    **** 
+ 105:src/main.c    **** void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
+ 106:src/main.c    **** {
+ 1942              		.loc 2 106 0
+ 1943              		.cfi_startproc
+ 1944              		@ args = 0, pretend = 0, frame = 8
+ 1945              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1946              		@ link register save eliminated.
+ 1947 0000 80B4     		push	{r7}
+ 1948              	.LCFI62:
+ 1949              		.cfi_def_cfa_offset 4
+ 1950              		.cfi_offset 7, -4
+ 1951 0002 83B0     		sub	sp, sp, #12
+ 1952              	.LCFI63:
+ 1953              		.cfi_def_cfa_offset 16
+ 1954 0004 00AF     		add	r7, sp, #0
+ 1955              	.LCFI64:
+ 1956              		.cfi_def_cfa_register 7
+ 1957 0006 F880     		strh	r0, [r7, #6]	@ movhi
+ 1958 0008 B980     		strh	r1, [r7, #4]	@ movhi
+ 1959 000a 7A80     		strh	r2, [r7, #2]	@ movhi
+ 1960 000c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 107:src/main.c    **** 	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
+ 1961              		.loc 2 107 0
+ 1962 000e FB88     		ldrh	r3, [r7, #6]
+ 1963 0010 B3F57A7F 		cmp	r3, #1000
+ 1964 0014 03D9     		bls	.L104
+ 1965              		.loc 2 107 0 is_stmt 0 discriminator 1
+ 1966 0016 4FF47A73 		mov	r3, #1000
+ 1967 001a FB80     		strh	r3, [r7, #6]	@ movhi
+ 1968 001c 05E0     		b	.L105
+ 1969              	.L104:
+ 108:src/main.c    **** 	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
+ 1970              		.loc 2 108 0 is_stmt 1
+ 1971 001e FB88     		ldrh	r3, [r7, #6]
+ 1972 0020 632B     		cmp	r3, #99
+ 1973 0022 02D8     		bhi	.L105
+ 1974              		.loc 2 108 0 is_stmt 0 discriminator 1
+ 1975 0024 4FF06403 		mov	r3, #100
+ 1976 0028 FB80     		strh	r3, [r7, #6]	@ movhi
+ 1977              	.L105:
+ 109:src/main.c    **** 		
+ 110:src/main.c    **** 	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
+ 1978              		.loc 2 110 0 is_stmt 1
+ 1979 002a BB88     		ldrh	r3, [r7, #4]
+ 1980 002c B3F57A7F 		cmp	r3, #1000
+ 1981 0030 03D9     		bls	.L106
+ 1982              		.loc 2 110 0 is_stmt 0 discriminator 1
+ 1983 0032 4FF47A73 		mov	r3, #1000
+ 1984 0036 BB80     		strh	r3, [r7, #4]	@ movhi
+ 1985 0038 05E0     		b	.L107
+ 1986              	.L106:
+ 111:src/main.c    **** 	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
+ 1987              		.loc 2 111 0 is_stmt 1
+ 1988 003a BB88     		ldrh	r3, [r7, #4]
+ 1989 003c 632B     		cmp	r3, #99
+ 1990 003e 02D8     		bhi	.L107
+ 1991              		.loc 2 111 0 is_stmt 0 discriminator 1
+ 1992 0040 4FF06403 		mov	r3, #100
+ 1993 0044 BB80     		strh	r3, [r7, #4]	@ movhi
+ 1994              	.L107:
+ 112:src/main.c    **** 				
+ 113:src/main.c    **** 	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
+ 1995              		.loc 2 113 0 is_stmt 1
+ 1996 0046 7B88     		ldrh	r3, [r7, #2]
+ 1997 0048 B3F57A7F 		cmp	r3, #1000
+ 1998 004c 03D9     		bls	.L108
+ 1999              		.loc 2 113 0 is_stmt 0 discriminator 1
+ 2000 004e 4FF47A73 		mov	r3, #1000
+ 2001 0052 7B80     		strh	r3, [r7, #2]	@ movhi
+ 2002 0054 05E0     		b	.L109
+ 2003              	.L108:
+ 114:src/main.c    **** 	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
+ 2004              		.loc 2 114 0 is_stmt 1
+ 2005 0056 7B88     		ldrh	r3, [r7, #2]
+ 2006 0058 632B     		cmp	r3, #99
+ 2007 005a 02D8     		bhi	.L109
+ 2008              		.loc 2 114 0 is_stmt 0 discriminator 1
+ 2009 005c 4FF06403 		mov	r3, #100
+ 2010 0060 7B80     		strh	r3, [r7, #2]	@ movhi
+ 2011              	.L109:
+ 115:src/main.c    **** 						
+ 116:src/main.c    **** 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
+ 2012              		.loc 2 116 0 is_stmt 1
+ 2013 0062 3B88     		ldrh	r3, [r7, #0]
+ 2014 0064 B3F57A7F 		cmp	r3, #1000
+ 2015 0068 03D9     		bls	.L110
+ 2016              		.loc 2 116 0 is_stmt 0 discriminator 1
+ 2017 006a 4FF47A73 		mov	r3, #1000
+ 2018 006e 3B80     		strh	r3, [r7, #0]	@ movhi
+ 2019 0070 05E0     		b	.L111
+ 2020              	.L110:
+ 117:src/main.c    **** 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
+ 2021              		.loc 2 117 0 is_stmt 1
+ 2022 0072 3B88     		ldrh	r3, [r7, #0]
+ 2023 0074 632B     		cmp	r3, #99
+ 2024 0076 02D8     		bhi	.L111
+ 2025              		.loc 2 117 0 is_stmt 0 discriminator 1
+ 2026 0078 4FF06403 		mov	r3, #100
+ 2027 007c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 2028              	.L111:
+ 118:src/main.c    **** 								
+ 119:src/main.c    **** 	PWM_Motor1 = Motor1;
+ 2029              		.loc 2 119 0 is_stmt 1
+ 2030 007e 4FF40063 		mov	r3, #2048
+ 2031 0082 C4F20003 		movt	r3, 16384
+ 2032 0086 FA88     		ldrh	r2, [r7, #6]
+ 2033 0088 5A63     		str	r2, [r3, #52]
+ 120:src/main.c    **** 	PWM_Motor2 = Motor2;
+ 2034              		.loc 2 120 0
+ 2035 008a 4FF40063 		mov	r3, #2048
+ 2036 008e C4F20003 		movt	r3, 16384
+ 2037 0092 BA88     		ldrh	r2, [r7, #4]
+ 2038 0094 9A63     		str	r2, [r3, #56]
+ 121:src/main.c    **** 	PWM_Motor3 = Motor3;
+ 2039              		.loc 2 121 0
+ 2040 0096 4FF40063 		mov	r3, #2048
+ 2041 009a C4F20003 		movt	r3, 16384
+ 2042 009e 7A88     		ldrh	r2, [r7, #2]
+ 2043 00a0 DA63     		str	r2, [r3, #60]
+ 122:src/main.c    **** 	PWM_Motor4 = Motor4;
+ 2044              		.loc 2 122 0
+ 2045 00a2 4FF40063 		mov	r3, #2048
+ 2046 00a6 C4F20003 		movt	r3, 16384
+ 2047 00aa 3A88     		ldrh	r2, [r7, #0]
+ 2048 00ac 1A64     		str	r2, [r3, #64]
+ 123:src/main.c    **** }
+ 2049              		.loc 2 123 0
+ 2050 00ae 07F10C07 		add	r7, r7, #12
+ 2051 00b2 BD46     		mov	sp, r7
+ 2052 00b4 80BC     		pop	{r7}
+ 2053 00b6 7047     		bx	lr
+ 2054              		.cfi_endproc
+ 2055              	.LFE130:
+ 2057              		.comm	xQueueUARTSend,4,4
+ 2058              		.section	.rodata
+ 2059 0003 00       		.align	2
+ 2060              	.LC1:
+ 2061 0004 4D454D53 		.ascii	"MEMS\000"
+ 2061      00
+ 2062 0009 000000   		.align	2
+ 2063              	.LC2:
+ 2064 000c 55534152 		.ascii	"USART\000"
+ 2064      5400
+ 2065              		.section	.text.main,"ax",%progbits
+ 2066              		.align	2
+ 2067              		.global	main
+ 2068              		.thumb
+ 2069              		.thumb_func
+ 2071              	main:
+ 2072              	.LFB131:
+ 124:src/main.c    **** 
+ 125:src/main.c    **** 
+ 126:src/main.c    **** /**************************************************************************************************
+ 127:src/main.c    **** /* Private functions ---------------------------------------------------------*/
+ 128:src/main.c    **** 
+ 129:src/main.c    **** /* Task functions declarations */
+ 130:src/main.c    **** static void vMEMSTask(void *pvParameters);
+ 131:src/main.c    **** static void UsartTask(void *pvParameters);
+ 132:src/main.c    **** 
+ 133:src/main.c    **** /* semaphores, queues declarations */
+ 134:src/main.c    **** xQueueHandle xQueueUARTSend;
+ 135:src/main.c    **** 
+ 136:src/main.c    **** /**
+ 137:src/main.c    ****   * @brief  Main program.
+ 138:src/main.c    ****   * @param  None
+ 139:src/main.c    ****   * @retval None
+ 140:src/main.c    ****   */
+ 141:src/main.c    **** int main(void)
+ 142:src/main.c    **** { 
+ 2073              		.loc 2 142 0
+ 2074              		.cfi_startproc
+ 2075              		@ args = 0, pretend = 0, frame = 0
+ 2076              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2077 0000 80B5     		push	{r7, lr}
+ 2078              	.LCFI65:
+ 2079              		.cfi_def_cfa_offset 8
+ 2080              		.cfi_offset 14, -4
+ 2081              		.cfi_offset 7, -8
+ 2082 0002 84B0     		sub	sp, sp, #16
+ 2083              	.LCFI66:
+ 2084              		.cfi_def_cfa_offset 24
+ 2085 0004 04AF     		add	r7, sp, #16
+ 2086              	.LCFI67:
+ 2087              		.cfi_def_cfa 7, 8
+ 143:src/main.c    **** 	
+ 144:src/main.c    **** 	/*a queue for tansfer the senddate to USART task*/
+ 145:src/main.c    **** 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
+ 2088              		.loc 2 145 0
+ 2089 0006 4FF00F00 		mov	r0, #15
+ 2090 000a 4FF06401 		mov	r1, #100
+ 2091 000e FFF7FEFF 		bl	xQueueCreate
+ 2092 0012 0246     		mov	r2, r0
+ 2093 0014 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 2094 0018 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 2095 001c 1A60     		str	r2, [r3, #0]
+ 146:src/main.c    **** 
+ 147:src/main.c    **** 	/* initialize hardware... */
+ 148:src/main.c    **** 	prvSetupHardware();
+ 2096              		.loc 2 148 0
+ 2097 001e FFF7FEFF 		bl	prvSetupHardware
+ 149:src/main.c    **** 
+ 150:src/main.c    **** 	/* Start the tasks defined within this file/specific to this demo. */
+ 151:src/main.c    **** 	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORI
+ 2098              		.loc 2 151 0
+ 2099 0022 4FF00003 		mov	r3, #0
+ 2100 0026 0093     		str	r3, [sp, #0]
+ 2101 0028 4FF00003 		mov	r3, #0
+ 2102 002c 0193     		str	r3, [sp, #4]
+ 2103 002e 4FF00003 		mov	r3, #0
+ 2104 0032 0293     		str	r3, [sp, #8]
+ 2105 0034 4FF00003 		mov	r3, #0
+ 2106 0038 0393     		str	r3, [sp, #12]
+ 2107 003a 40F20000 		movw	r0, #:lower16:vMEMSTask
+ 2108 003e C0F20000 		movt	r0, #:upper16:vMEMSTask
+ 2109 0042 40F20001 		movw	r1, #:lower16:.LC1
+ 2110 0046 C0F20001 		movt	r1, #:upper16:.LC1
+ 2111 004a 4FF48072 		mov	r2, #256
+ 2112 004e 4FF00003 		mov	r3, #0
+ 2113 0052 FFF7FEFF 		bl	xTaskGenericCreate
+ 152:src/main.c    **** 	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIOR
+ 2114              		.loc 2 152 0
+ 2115 0056 4FF00003 		mov	r3, #0
+ 2116 005a 0093     		str	r3, [sp, #0]
+ 2117 005c 4FF00003 		mov	r3, #0
+ 2118 0060 0193     		str	r3, [sp, #4]
+ 2119 0062 4FF00003 		mov	r3, #0
+ 2120 0066 0293     		str	r3, [sp, #8]
+ 2121 0068 4FF00003 		mov	r3, #0
+ 2122 006c 0393     		str	r3, [sp, #12]
+ 2123 006e 40F20000 		movw	r0, #:lower16:UsartTask
+ 2124 0072 C0F20000 		movt	r0, #:upper16:UsartTask
+ 2125 0076 40F20001 		movw	r1, #:lower16:.LC2
+ 2126 007a C0F20001 		movt	r1, #:upper16:.LC2
+ 2127 007e 4FF48072 		mov	r2, #256
+ 2128 0082 4FF00003 		mov	r3, #0
+ 2129 0086 FFF7FEFF 		bl	xTaskGenericCreate
+ 153:src/main.c    **** 
+ 154:src/main.c    **** 	/* Start the scheduler. */
+ 155:src/main.c    **** 	vTaskStartScheduler();
+ 2130              		.loc 2 155 0
+ 2131 008a FFF7FEFF 		bl	vTaskStartScheduler
+ 156:src/main.c    **** 
+ 157:src/main.c    **** 	/* Will only get here if there was not enough heap space to create the idle task. */
+ 158:src/main.c    **** 	return 0;  
+ 2132              		.loc 2 158 0
+ 2133 008e 4FF00003 		mov	r3, #0
+ 159:src/main.c    **** }
+ 2134              		.loc 2 159 0
+ 2135 0092 1846     		mov	r0, r3
+ 2136 0094 BD46     		mov	sp, r7
+ 2137 0096 80BD     		pop	{r7, pc}
+ 2138              		.cfi_endproc
+ 2139              	.LFE131:
+ 2141              		.section	.text.UsartTask,"ax",%progbits
+ 2142              		.align	2
+ 2143              		.thumb
+ 2144              		.thumb_func
+ 2146              	UsartTask:
+ 2147              	.LFB132:
+ 160:src/main.c    **** 
+ 161:src/main.c    **** 
+ 162:src/main.c    **** 
+ 163:src/main.c    **** /* Task functions ------------------------------------------------- */
+ 164:src/main.c    **** 
+ 165:src/main.c    **** //Task For Sending Data Via USART
+ 166:src/main.c    **** static void UsartTask(void *pvParameters)
+ 167:src/main.c    **** {
+ 2148              		.loc 2 167 0
+ 2149              		.cfi_startproc
+ 2150              		@ args = 0, pretend = 0, frame = 112
+ 2151              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2152 0000 80B5     		push	{r7, lr}
+ 2153              	.LCFI68:
+ 2154              		.cfi_def_cfa_offset 8
+ 2155              		.cfi_offset 14, -4
+ 2156              		.cfi_offset 7, -8
+ 2157 0002 9CB0     		sub	sp, sp, #112
+ 2158              	.LCFI69:
+ 2159              		.cfi_def_cfa_offset 120
+ 2160 0004 00AF     		add	r7, sp, #0
+ 2161              	.LCFI70:
+ 2162              		.cfi_def_cfa_register 7
+ 2163 0006 7860     		str	r0, [r7, #4]
+ 2164              	.LBB3:
+ 168:src/main.c    **** 	//Variable to store received data	
+ 169:src/main.c    **** 	uint32_t Data;
+ 170:src/main.c    **** 	uint8_t curr_char;	
+ 171:src/main.c    **** 
+ 172:src/main.c    **** 	while(1) {
+ 173:src/main.c    **** 
+ 174:src/main.c    **** 	
+ 175:src/main.c    **** 		serial_str_msg msg;
+ 176:src/main.c    **** 		//Wait for character
+ 177:src/main.c    **** 		// while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+ 178:src/main.c    ****   //           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | US
+ 179:src/main.c    **** 		// 		USART_ReceiveData(USART2); // Clear Error
+ 180:src/main.c    **** 		// }
+ 181:src/main.c    **** 
+ 182:src/main.c    **** 		//Collect the caracter
+ 183:src/main.c    **** 		//Data = USART_ReceiveData(USART2);
+ 184:src/main.c    **** 
+ 185:src/main.c    **** 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
+ 2165              		.loc 2 185 0
+ 2166 0008 FFE7     		b	.L120
+ 2167              	.L119:
+ 2168              	.L120:
+ 2169 000a 00BF     		nop
+ 2170              	.L114:
+ 2171              		.loc 2 185 0 is_stmt 0 discriminator 1
+ 2172 000c 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 2173 0010 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 2174 0014 1B68     		ldr	r3, [r3, #0]
+ 2175 0016 1846     		mov	r0, r3
+ 2176 0018 07F10803 		add	r3, r7, #8
+ 2177 001c 1946     		mov	r1, r3
+ 2178 001e 4FF0FF32 		mov	r2, #-1
+ 2179 0022 4FF00003 		mov	r3, #0
+ 2180 0026 FFF7FEFF 		bl	xQueueGenericReceive
+ 2181 002a 0346     		mov	r3, r0
+ 2182 002c 002B     		cmp	r3, #0
+ 2183 002e EDD0     		beq	.L114
+ 186:src/main.c    **** 
+ 187:src/main.c    **** 		/* Write each character of the message to the RS232 port. */
+ 188:src/main.c    **** 		curr_char = 0;
+ 2184              		.loc 2 188 0 is_stmt 1
+ 2185 0030 4FF00003 		mov	r3, #0
+ 2186 0034 87F86F30 		strb	r3, [r7, #111]
+ 189:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
+ 2187              		.loc 2 189 0
+ 2188 0038 1FE0     		b	.L115
+ 2189              	.L121:
+ 190:src/main.c    **** 			//Wait till the flag resets
+ 191:src/main.c    **** 			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
+ 2190              		.loc 2 191 0
+ 2191 003a 00BF     		nop
+ 2192              	.L116:
+ 2193              		.loc 2 191 0 is_stmt 0 discriminator 1
+ 2194 003c 4FF48840 		mov	r0, #17408
+ 2195 0040 C4F20000 		movt	r0, 16384
+ 2196 0044 4FF08001 		mov	r1, #128
+ 2197 0048 FFF7FEFF 		bl	USART_GetFlagStatus
+ 2198 004c 0346     		mov	r3, r0
+ 2199 004e 002B     		cmp	r3, #0
+ 2200 0050 F4D0     		beq	.L116
+ 192:src/main.c    **** 			//Send the data
+ 193:src/main.c    **** 			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
+ 2201              		.loc 2 193 0 is_stmt 1
+ 2202 0052 97F86F30 		ldrb	r3, [r7, #111]	@ zero_extendqisi2
+ 2203 0056 07F17002 		add	r2, r7, #112
+ 2204 005a D318     		adds	r3, r2, r3
+ 2205 005c 13F8683C 		ldrb	r3, [r3, #-104]	@ zero_extendqisi2
+ 2206 0060 4FF48840 		mov	r0, #17408
+ 2207 0064 C4F20000 		movt	r0, 16384
+ 2208 0068 1946     		mov	r1, r3
+ 2209 006a FFF7FEFF 		bl	USART_SendData
+ 194:src/main.c    **** 			curr_char++;
+ 2210              		.loc 2 194 0
+ 2211 006e 97F86F30 		ldrb	r3, [r7, #111]
+ 2212 0072 03F10103 		add	r3, r3, #1
+ 2213 0076 87F86F30 		strb	r3, [r7, #111]
+ 2214              	.L115:
+ 189:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
+ 2215              		.loc 2 189 0 discriminator 1
+ 2216 007a 97F86F30 		ldrb	r3, [r7, #111]	@ zero_extendqisi2
+ 2217 007e 07F17002 		add	r2, r7, #112
+ 2218 0082 D318     		adds	r3, r2, r3
+ 2219 0084 13F8683C 		ldrb	r3, [r3, #-104]	@ zero_extendqisi2
+ 2220 0088 002B     		cmp	r3, #0
+ 2221 008a D6D1     		bne	.L121
+ 2222              	.LBE3:
+ 195:src/main.c    **** 		}
+ 196:src/main.c    **** 	}
+ 2223              		.loc 2 196 0
+ 2224 008c BDE7     		b	.L119
+ 2225              		.cfi_endproc
+ 2226              	.LFE132:
+ 2228 008e 00BF     		.section	.rodata
+ 2229 0012 0000     		.align	2
+ 2230              	.LC3:
+ 2231 0014 783A2025 		.ascii	"x: %d, y: %d, z: %d\012\015\000"
+ 2231      642C2079 
+ 2231      3A202564 
+ 2231      2C207A3A 
+ 2231      2025640A 
+ 2232 002a 0000     		.section	.text.vMEMSTask,"ax",%progbits
+ 2233              		.align	2
+ 2234              		.thumb
+ 2235              		.thumb_func
+ 2237              	vMEMSTask:
+ 2238              	.LFB133:
+ 197:src/main.c    **** 
+ 198:src/main.c    **** 	while(1);
+ 199:src/main.c    **** }
+ 200:src/main.c    **** 
+ 201:src/main.c    **** 
+ 202:src/main.c    **** 
+ 203:src/main.c    **** void vMEMSTask(void *pvParameters)
+ 204:src/main.c    **** {
+ 2239              		.loc 2 204 0
+ 2240              		.cfi_startproc
+ 2241              		@ args = 0, pretend = 0, frame = 64
+ 2242              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2243 0000 80B5     		push	{r7, lr}
+ 2244              	.LCFI71:
+ 2245              		.cfi_def_cfa_offset 8
+ 2246              		.cfi_offset 14, -4
+ 2247              		.cfi_offset 7, -8
+ 2248 0002 92B0     		sub	sp, sp, #72
+ 2249              	.LCFI72:
+ 2250              		.cfi_def_cfa_offset 80
+ 2251 0004 02AF     		add	r7, sp, #8
+ 2252              	.LCFI73:
+ 2253              		.cfi_def_cfa 7, 72
+ 2254 0006 7860     		str	r0, [r7, #4]
+ 205:src/main.c    **** 	/* queue for MEMS data length */
+ 206:src/main.c    ****     volatile int *LED;
+ 207:src/main.c    ****     LED = (int *) pvParameters;
+ 2255              		.loc 2 207 0
+ 2256 0008 7B68     		ldr	r3, [r7, #4]
+ 2257 000a BB63     		str	r3, [r7, #56]
+ 208:src/main.c    **** 
+ 209:src/main.c    **** 	uint8_t Buffer_Hx[1];
+ 210:src/main.c    **** 	uint8_t Buffer_Hy[1];
+ 211:src/main.c    **** 	uint8_t Buffer_Hz[1];
+ 212:src/main.c    **** 	uint8_t Buffer_Lx[1];
+ 213:src/main.c    **** 	uint8_t Buffer_Ly[1];
+ 214:src/main.c    **** 	uint8_t Buffer_Lz[1];
+ 215:src/main.c    **** 
+ 216:src/main.c    **** 	uint8_t counter  = 0;
+ 2258              		.loc 2 216 0
+ 2259 000c 4FF00003 		mov	r3, #0
+ 2260 0010 87F83F30 		strb	r3, [r7, #63]
+ 217:src/main.c    **** 	__IO uint32_t TimingDelay = 0;
+ 2261              		.loc 2 217 0
+ 2262 0014 4FF00003 		mov	r3, #0
+ 2263 0018 3B61     		str	r3, [r7, #16]
+ 218:src/main.c    **** 	__IO int8_t XOffset;
+ 219:src/main.c    **** 	__IO int8_t YOffset;
+ 220:src/main.c    **** 	__IO int8_t ZOffset;
+ 221:src/main.c    **** 
+ 222:src/main.c    **** 
+ 223:src/main.c    **** 	int16_t temp1 = 0;
+ 2264              		.loc 2 223 0
+ 2265 001a 4FF00003 		mov	r3, #0
+ 2266 001e FB86     		strh	r3, [r7, #54]	@ movhi
+ 224:src/main.c    **** 	int16_t temp2 = 0;
+ 2267              		.loc 2 224 0
+ 2268 0020 4FF00003 		mov	r3, #0
+ 2269 0024 BB86     		strh	r3, [r7, #52]	@ movhi
+ 225:src/main.c    **** 	int16_t temp3 = 0;
+ 2270              		.loc 2 225 0
+ 2271 0026 4FF00003 		mov	r3, #0
+ 2272 002a 7B86     		strh	r3, [r7, #50]	@ movhi
+ 226:src/main.c    **** 
+ 227:src/main.c    **** 	int16_t temp4 = 0;
+ 2273              		.loc 2 227 0
+ 2274 002c 4FF00003 		mov	r3, #0
+ 2275 0030 3B86     		strh	r3, [r7, #48]	@ movhi
+ 228:src/main.c    **** 	int16_t temp5 = 0;
+ 2276              		.loc 2 228 0
+ 2277 0032 4FF00003 		mov	r3, #0
+ 2278 0036 FB85     		strh	r3, [r7, #46]	@ movhi
+ 229:src/main.c    **** 	int16_t temp6 = 0;
+ 2279              		.loc 2 229 0
+ 2280 0038 4FF00003 		mov	r3, #0
+ 2281 003c BB85     		strh	r3, [r7, #44]	@ movhi
+ 230:src/main.c    **** 
+ 231:src/main.c    ****   	uint16_t TempAcceleration = 0;   
+ 2282              		.loc 2 231 0
+ 2283 003e 4FF00003 		mov	r3, #0
+ 2284 0042 7B85     		strh	r3, [r7, #42]	@ movhi
+ 232:src/main.c    **** 
+ 233:src/main.c    **** 	/* reset offset */
+ 234:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 2285              		.loc 2 234 0
+ 2286 0044 07F12803 		add	r3, r7, #40
+ 2287 0048 1846     		mov	r0, r3
+ 2288 004a 4FF02901 		mov	r1, #41
+ 2289 004e 4FF00102 		mov	r2, #1
+ 2290 0052 FFF7FEFF 		bl	LIS3DSH_Read
+ 235:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 2291              		.loc 2 235 0
+ 2292 0056 07F12403 		add	r3, r7, #36
+ 2293 005a 1846     		mov	r0, r3
+ 2294 005c 4FF02B01 		mov	r1, #43
+ 2295 0060 4FF00102 		mov	r2, #1
+ 2296 0064 FFF7FEFF 		bl	LIS3DSH_Read
+ 236:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 2297              		.loc 2 236 0
+ 2298 0068 07F12003 		add	r3, r7, #32
+ 2299 006c 1846     		mov	r0, r3
+ 2300 006e 4FF02D01 		mov	r1, #45
+ 2301 0072 4FF00102 		mov	r2, #1
+ 2302 0076 FFF7FEFF 		bl	LIS3DSH_Read
+ 237:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 2303              		.loc 2 237 0
+ 2304 007a 07F11C03 		add	r3, r7, #28
+ 2305 007e 1846     		mov	r0, r3
+ 2306 0080 4FF02801 		mov	r1, #40
+ 2307 0084 4FF00102 		mov	r2, #1
+ 2308 0088 FFF7FEFF 		bl	LIS3DSH_Read
+ 238:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 2309              		.loc 2 238 0
+ 2310 008c 07F11803 		add	r3, r7, #24
+ 2311 0090 1846     		mov	r0, r3
+ 2312 0092 4FF02A01 		mov	r1, #42
+ 2313 0096 4FF00102 		mov	r2, #1
+ 2314 009a FFF7FEFF 		bl	LIS3DSH_Read
+ 239:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 2315              		.loc 2 239 0
+ 2316 009e 07F11403 		add	r3, r7, #20
+ 2317 00a2 1846     		mov	r0, r3
+ 2318 00a4 4FF02C01 		mov	r1, #44
+ 2319 00a8 4FF00102 		mov	r2, #1
+ 2320 00ac FFF7FEFF 		bl	LIS3DSH_Read
+ 240:src/main.c    ****             
+ 241:src/main.c    ****   	XOffset = (int8_t)Buffer_Hx[0];
+ 2321              		.loc 2 241 0
+ 2322 00b0 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2323 00b4 DBB2     		uxtb	r3, r3
+ 2324 00b6 FB73     		strb	r3, [r7, #15]
+ 242:src/main.c    ****   	YOffset = (int8_t)Buffer_Hy[0];
+ 2325              		.loc 2 242 0
+ 2326 00b8 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2327 00bc DBB2     		uxtb	r3, r3
+ 2328 00be BB73     		strb	r3, [r7, #14]
+ 243:src/main.c    ****   	ZOffset = (int8_t)Buffer_Hz[0];
+ 2329              		.loc 2 243 0
+ 2330 00c0 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2331 00c4 DBB2     		uxtb	r3, r3
+ 2332 00c6 7B73     		strb	r3, [r7, #13]
+ 2333 00c8 00E0     		b	.L142
+ 2334              	.L143:
+ 244:src/main.c    ****  
+ 245:src/main.c    **** 	/* reset */
+ 246:src/main.c    **** 
+ 247:src/main.c    **** 	for( ;; )
+ 248:src/main.c    **** 	{
+ 249:src/main.c    **** 		counter++;
+ 250:src/main.c    **** 		if (counter == 10)
+ 251:src/main.c    **** 		{
+ 252:src/main.c    **** 
+ 253:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 254:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 255:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 256:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 257:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 258:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 259:src/main.c    **** 
+ 260:src/main.c    **** 
+ 261:src/main.c    **** 	    /* Remove the offsets values from data */
+ 262:src/main.c    **** 	    //Buffer_x[0] -= XOffset;
+ 263:src/main.c    **** 	    //Buffer_y[0] -= YOffset;
+ 264:src/main.c    **** 	    //Buffer_z[0] -= ZOffset;
+ 265:src/main.c    **** 
+ 266:src/main.c    **** 	    /* Update autoreload and capture compare registers value*/
+ 267:src/main.c    **** 	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+ 268:src/main.c    **** 	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+ 269:src/main.c    **** 	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+ 270:src/main.c    **** 
+ 271:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0])<<8);
+ 272:src/main.c    **** 		temp4 = temp4 | (Buffer_Lx[0]);
+ 273:src/main.c    **** 
+ 274:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0])<<8);
+ 275:src/main.c    **** 		temp5 = temp5 | (Buffer_Ly[0]);
+ 276:src/main.c    **** 
+ 277:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hy[0])<<8);
+ 278:src/main.c    **** 		temp6 = temp6 | (Buffer_Ly[0]);
+ 279:src/main.c    **** 
+ 280:src/main.c    ****     	TempAcceleration = MAX(temp1, temp2);
+ 281:src/main.c    **** 		  
+ 282:src/main.c    **** 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
+ 283:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (i
+ 284:src/main.c    **** 		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", temp4, temp5, temp6);
+ 285:src/main.c    **** 		
+ 286:src/main.c    **** 		if(TempAcceleration != 0)
+ 287:src/main.c    **** 	      {
+ 288:src/main.c    **** 		
+ 289:src/main.c    **** 	        if ((int8_t)Buffer_Hx[0] < -G)
+ 290:src/main.c    **** 	        {
+ 291:src/main.c    **** 				STM_EVAL_LEDOn(LED4);
+ 292:src/main.c    **** 
+ 293:src/main.c    **** 
+ 294:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 295:src/main.c    **** 	            {
+ 296:src/main.c    **** 	                STM_EVAL_LEDOff(LED3);
+ 297:src/main.c    **** 
+ 298:src/main.c    **** 	            }
+ 299:src/main.c    **** 
+ 300:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 301:src/main.c    **** 	            {
+ 302:src/main.c    **** 	               STM_EVAL_LEDOff(LED6);
+ 303:src/main.c    **** 	            }
+ 304:src/main.c    **** 
+ 305:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 306:src/main.c    **** 	            {
+ 307:src/main.c    **** 	                STM_EVAL_LEDOff(LED5);
+ 308:src/main.c    **** 	            }
+ 309:src/main.c    **** 
+ 310:src/main.c    **** 	        }
+ 311:src/main.c    **** 	        if ((int8_t)Buffer_Hx[0] > G)
+ 312:src/main.c    **** 	        {
+ 313:src/main.c    **** 				STM_EVAL_LEDOn(LED5);
+ 314:src/main.c    **** 
+ 315:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 316:src/main.c    **** 	            {
+ 317:src/main.c    **** 		            STM_EVAL_LEDOff(LED4);
+ 318:src/main.c    **** 	            }
+ 319:src/main.c    **** 
+ 320:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 321:src/main.c    **** 	            {
+ 322:src/main.c    **** 	    			STM_EVAL_LEDOff(LED3);
+ 323:src/main.c    **** 	            }
+ 324:src/main.c    **** 
+ 325:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 326:src/main.c    **** 	            {
+ 327:src/main.c    **** 	        	    STM_EVAL_LEDOff(LED6);
+ 328:src/main.c    **** 	            }
+ 329:src/main.c    **** 
+ 330:src/main.c    **** 	        }
+ 331:src/main.c    **** 	        if ((int8_t)Buffer_Hy[0] > G)
+ 332:src/main.c    **** 	        {
+ 333:src/main.c    **** 
+ 334:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
+ 335:src/main.c    **** 
+ 336:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 337:src/main.c    **** 	            {
+ 338:src/main.c    **** 	                STM_EVAL_LEDOff(LED4);
+ 339:src/main.c    **** 	            }
+ 340:src/main.c    **** 
+ 341:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 342:src/main.c    **** 	            {
+ 343:src/main.c    **** 	                STM_EVAL_LEDOff(LED5);
+ 344:src/main.c    **** 	            }
+ 345:src/main.c    **** 
+ 346:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 347:src/main.c    **** 	            {
+ 348:src/main.c    **** 	                STM_EVAL_LEDOff(LED6);
+ 349:src/main.c    **** 	            }
+ 350:src/main.c    **** 
+ 351:src/main.c    **** 	        }
+ 352:src/main.c    **** 	        if ((int8_t)Buffer_Hy[0] < -G)
+ 353:src/main.c    **** 	        {
+ 354:src/main.c    **** 
+ 355:src/main.c    **** 				STM_EVAL_LEDOn(LED6);
+ 356:src/main.c    **** 
+ 357:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 358:src/main.c    **** 	            {
+ 359:src/main.c    **** 	                STM_EVAL_LEDOff(LED3);
+ 360:src/main.c    **** 	            }
+ 361:src/main.c    **** 
+ 362:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 363:src/main.c    **** 	            {
+ 364:src/main.c    **** 		           STM_EVAL_LEDOff(LED4);
+ 365:src/main.c    **** 	            }
+ 366:src/main.c    **** 
+ 367:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 368:src/main.c    **** 	            {
+ 369:src/main.c    **** 	    	        STM_EVAL_LEDOff(LED5);
+ 370:src/main.c    **** 	            }
+ 371:src/main.c    **** 	        }
+ 372:src/main.c    **** 			counter = 0x00;
+ 373:src/main.c    **** 
+ 374:src/main.c    **** 	    }
+ 375:src/main.c    **** 	  }
+ 376:src/main.c    **** 	}
+ 2335              		.loc 2 376 0
+ 2336 00ca 00BF     		nop
+ 2337              	.L142:
+ 249:src/main.c    **** 		counter++;
+ 2338              		.loc 2 249 0
+ 2339 00cc 97F83F30 		ldrb	r3, [r7, #63]
+ 2340 00d0 03F10103 		add	r3, r3, #1
+ 2341 00d4 87F83F30 		strb	r3, [r7, #63]
+ 250:src/main.c    **** 		if (counter == 10)
+ 2342              		.loc 2 250 0
+ 2343 00d8 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
+ 2344 00dc 0A2B     		cmp	r3, #10
+ 2345 00de F4D1     		bne	.L143
+ 253:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 2346              		.loc 2 253 0
+ 2347 00e0 07F12803 		add	r3, r7, #40
+ 2348 00e4 1846     		mov	r0, r3
+ 2349 00e6 4FF02901 		mov	r1, #41
+ 2350 00ea 4FF00102 		mov	r2, #1
+ 2351 00ee FFF7FEFF 		bl	LIS3DSH_Read
+ 254:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 2352              		.loc 2 254 0
+ 2353 00f2 07F12403 		add	r3, r7, #36
+ 2354 00f6 1846     		mov	r0, r3
+ 2355 00f8 4FF02B01 		mov	r1, #43
+ 2356 00fc 4FF00102 		mov	r2, #1
+ 2357 0100 FFF7FEFF 		bl	LIS3DSH_Read
+ 255:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 2358              		.loc 2 255 0
+ 2359 0104 07F12003 		add	r3, r7, #32
+ 2360 0108 1846     		mov	r0, r3
+ 2361 010a 4FF02D01 		mov	r1, #45
+ 2362 010e 4FF00102 		mov	r2, #1
+ 2363 0112 FFF7FEFF 		bl	LIS3DSH_Read
+ 256:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 2364              		.loc 2 256 0
+ 2365 0116 07F11C03 		add	r3, r7, #28
+ 2366 011a 1846     		mov	r0, r3
+ 2367 011c 4FF02801 		mov	r1, #40
+ 2368 0120 4FF00102 		mov	r2, #1
+ 2369 0124 FFF7FEFF 		bl	LIS3DSH_Read
+ 257:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 2370              		.loc 2 257 0
+ 2371 0128 07F11803 		add	r3, r7, #24
+ 2372 012c 1846     		mov	r0, r3
+ 2373 012e 4FF02A01 		mov	r1, #42
+ 2374 0132 4FF00102 		mov	r2, #1
+ 2375 0136 FFF7FEFF 		bl	LIS3DSH_Read
+ 258:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 2376              		.loc 2 258 0
+ 2377 013a 07F11403 		add	r3, r7, #20
+ 2378 013e 1846     		mov	r0, r3
+ 2379 0140 4FF02C01 		mov	r1, #44
+ 2380 0144 4FF00102 		mov	r2, #1
+ 2381 0148 FFF7FEFF 		bl	LIS3DSH_Read
+ 267:src/main.c    **** 	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+ 2382              		.loc 2 267 0
+ 2383 014c 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2384 0150 DBB2     		uxtb	r3, r3
+ 2385 0152 5BB2     		sxtb	r3, r3
+ 2386 0154 4FEA0322 		lsl	r2, r3, #8
+ 2387 0158 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2388 015a DBB2     		uxtb	r3, r3
+ 2389 015c 5BB2     		sxtb	r3, r3
+ 2390 015e 4FEAD373 		lsr	r3, r3, #31
+ 2391 0162 1343     		orrs	r3, r3, r2
+ 2392 0164 002B     		cmp	r3, #0
+ 2393 0166 0FD0     		beq	.L124
+ 267:src/main.c    **** 	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+ 2394              		.loc 2 267 0 is_stmt 0 discriminator 1
+ 2395 0168 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2396 016c DBB2     		uxtb	r3, r3
+ 2397 016e 5BB2     		sxtb	r3, r3
+ 2398 0170 C3F10003 		rsb	r3, r3, #0
+ 2399 0174 4FEA0323 		lsl	r3, r3, #8
+ 2400 0178 9AB2     		uxth	r2, r3
+ 2401 017a 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2402 017c DBB2     		uxtb	r3, r3
+ 2403 017e 5BB2     		sxtb	r3, r3
+ 2404 0180 9BB2     		uxth	r3, r3
+ 2405 0182 1343     		orrs	r3, r3, r2
+ 2406 0184 9BB2     		uxth	r3, r3
+ 2407 0186 0CE0     		b	.L125
+ 2408              	.L124:
+ 267:src/main.c    **** 	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+ 2409              		.loc 2 267 0 discriminator 2
+ 2410 0188 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2411 018c DBB2     		uxtb	r3, r3
+ 2412 018e 5BB2     		sxtb	r3, r3
+ 2413 0190 4FEA0323 		lsl	r3, r3, #8
+ 2414 0194 9AB2     		uxth	r2, r3
+ 2415 0196 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2416 0198 DBB2     		uxtb	r3, r3
+ 2417 019a 5BB2     		sxtb	r3, r3
+ 2418 019c 9BB2     		uxth	r3, r3
+ 2419 019e 1343     		orrs	r3, r3, r2
+ 2420 01a0 9BB2     		uxth	r3, r3
+ 2421              	.L125:
+ 267:src/main.c    **** 	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
+ 2422              		.loc 2 267 0 discriminator 3
+ 2423 01a2 FB86     		strh	r3, [r7, #54]	@ movhi
+ 268:src/main.c    **** 	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+ 2424              		.loc 2 268 0 is_stmt 1 discriminator 3
+ 2425 01a4 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2426 01a8 DBB2     		uxtb	r3, r3
+ 2427 01aa 5BB2     		sxtb	r3, r3
+ 2428 01ac 4FEA0322 		lsl	r2, r3, #8
+ 2429 01b0 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2430 01b2 DBB2     		uxtb	r3, r3
+ 2431 01b4 5BB2     		sxtb	r3, r3
+ 2432 01b6 4FEAD373 		lsr	r3, r3, #31
+ 2433 01ba 1343     		orrs	r3, r3, r2
+ 2434 01bc 002B     		cmp	r3, #0
+ 2435 01be 0FD0     		beq	.L126
+ 268:src/main.c    **** 	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+ 2436              		.loc 2 268 0 is_stmt 0 discriminator 1
+ 2437 01c0 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2438 01c4 DBB2     		uxtb	r3, r3
+ 2439 01c6 5BB2     		sxtb	r3, r3
+ 2440 01c8 C3F10003 		rsb	r3, r3, #0
+ 2441 01cc 4FEA0323 		lsl	r3, r3, #8
+ 2442 01d0 9AB2     		uxth	r2, r3
+ 2443 01d2 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2444 01d4 DBB2     		uxtb	r3, r3
+ 2445 01d6 5BB2     		sxtb	r3, r3
+ 2446 01d8 9BB2     		uxth	r3, r3
+ 2447 01da 1343     		orrs	r3, r3, r2
+ 2448 01dc 9BB2     		uxth	r3, r3
+ 2449 01de 0CE0     		b	.L127
+ 2450              	.L126:
+ 268:src/main.c    **** 	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+ 2451              		.loc 2 268 0 discriminator 2
+ 2452 01e0 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2453 01e4 DBB2     		uxtb	r3, r3
+ 2454 01e6 5BB2     		sxtb	r3, r3
+ 2455 01e8 4FEA0323 		lsl	r3, r3, #8
+ 2456 01ec 9AB2     		uxth	r2, r3
+ 2457 01ee 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2458 01f0 DBB2     		uxtb	r3, r3
+ 2459 01f2 5BB2     		sxtb	r3, r3
+ 2460 01f4 9BB2     		uxth	r3, r3
+ 2461 01f6 1343     		orrs	r3, r3, r2
+ 2462 01f8 9BB2     		uxth	r3, r3
+ 2463              	.L127:
+ 268:src/main.c    **** 	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
+ 2464              		.loc 2 268 0 discriminator 3
+ 2465 01fa BB86     		strh	r3, [r7, #52]	@ movhi
+ 269:src/main.c    **** 	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+ 2466              		.loc 2 269 0 is_stmt 1 discriminator 3
+ 2467 01fc 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2468 0200 DBB2     		uxtb	r3, r3
+ 2469 0202 5BB2     		sxtb	r3, r3
+ 2470 0204 4FEA0322 		lsl	r2, r3, #8
+ 2471 0208 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 2472 020a DBB2     		uxtb	r3, r3
+ 2473 020c 5BB2     		sxtb	r3, r3
+ 2474 020e 4FEAD373 		lsr	r3, r3, #31
+ 2475 0212 1343     		orrs	r3, r3, r2
+ 2476 0214 002B     		cmp	r3, #0
+ 2477 0216 0FD0     		beq	.L128
+ 269:src/main.c    **** 	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+ 2478              		.loc 2 269 0 is_stmt 0 discriminator 1
+ 2479 0218 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2480 021c DBB2     		uxtb	r3, r3
+ 2481 021e 5BB2     		sxtb	r3, r3
+ 2482 0220 C3F10003 		rsb	r3, r3, #0
+ 2483 0224 4FEA0323 		lsl	r3, r3, #8
+ 2484 0228 9AB2     		uxth	r2, r3
+ 2485 022a 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 2486 022c DBB2     		uxtb	r3, r3
+ 2487 022e 5BB2     		sxtb	r3, r3
+ 2488 0230 9BB2     		uxth	r3, r3
+ 2489 0232 1343     		orrs	r3, r3, r2
+ 2490 0234 9BB2     		uxth	r3, r3
+ 2491 0236 0CE0     		b	.L129
+ 2492              	.L128:
+ 269:src/main.c    **** 	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+ 2493              		.loc 2 269 0 discriminator 2
+ 2494 0238 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2495 023c DBB2     		uxtb	r3, r3
+ 2496 023e 5BB2     		sxtb	r3, r3
+ 2497 0240 4FEA0323 		lsl	r3, r3, #8
+ 2498 0244 9AB2     		uxth	r2, r3
+ 2499 0246 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 2500 0248 DBB2     		uxtb	r3, r3
+ 2501 024a 5BB2     		sxtb	r3, r3
+ 2502 024c 9BB2     		uxth	r3, r3
+ 2503 024e 1343     		orrs	r3, r3, r2
+ 2504 0250 9BB2     		uxth	r3, r3
+ 2505              	.L129:
+ 269:src/main.c    **** 	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
+ 2506              		.loc 2 269 0 discriminator 3
+ 2507 0252 7B86     		strh	r3, [r7, #50]	@ movhi
+ 271:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0])<<8);
+ 2508              		.loc 2 271 0 is_stmt 1 discriminator 3
+ 2509 0254 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2510 0258 4FEA0323 		lsl	r3, r3, #8
+ 2511 025c 3B86     		strh	r3, [r7, #48]	@ movhi
+ 272:src/main.c    **** 		temp4 = temp4 | (Buffer_Lx[0]);
+ 2512              		.loc 2 272 0 discriminator 3
+ 2513 025e 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2514 0260 1A46     		mov	r2, r3	@ movhi
+ 2515 0262 3B8E     		ldrh	r3, [r7, #48]	@ movhi
+ 2516 0264 1343     		orrs	r3, r3, r2
+ 2517 0266 3B86     		strh	r3, [r7, #48]	@ movhi
+ 274:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0])<<8);
+ 2518              		.loc 2 274 0 discriminator 3
+ 2519 0268 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2520 026c 4FEA0323 		lsl	r3, r3, #8
+ 2521 0270 FB85     		strh	r3, [r7, #46]	@ movhi
+ 275:src/main.c    **** 		temp5 = temp5 | (Buffer_Ly[0]);
+ 2522              		.loc 2 275 0 discriminator 3
+ 2523 0272 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2524 0274 1A46     		mov	r2, r3	@ movhi
+ 2525 0276 FB8D     		ldrh	r3, [r7, #46]	@ movhi
+ 2526 0278 1343     		orrs	r3, r3, r2
+ 2527 027a FB85     		strh	r3, [r7, #46]	@ movhi
+ 277:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hy[0])<<8);
+ 2528              		.loc 2 277 0 discriminator 3
+ 2529 027c 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2530 0280 4FEA0323 		lsl	r3, r3, #8
+ 2531 0284 BB85     		strh	r3, [r7, #44]	@ movhi
+ 278:src/main.c    **** 		temp6 = temp6 | (Buffer_Ly[0]);
+ 2532              		.loc 2 278 0 discriminator 3
+ 2533 0286 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2534 0288 1A46     		mov	r2, r3	@ movhi
+ 2535 028a BB8D     		ldrh	r3, [r7, #44]	@ movhi
+ 2536 028c 1343     		orrs	r3, r3, r2
+ 2537 028e BB85     		strh	r3, [r7, #44]	@ movhi
+ 280:src/main.c    ****     	TempAcceleration = MAX(temp1, temp2);
+ 2538              		.loc 2 280 0 discriminator 3
+ 2539 0290 B7F93620 		ldrsh	r2, [r7, #54]
+ 2540 0294 B7F93430 		ldrsh	r3, [r7, #52]
+ 2541 0298 9A42     		cmp	r2, r3
+ 2542 029a A8BF     		it	ge
+ 2543 029c 1346     		movge	r3, r2
+ 2544 029e 9BB2     		uxth	r3, r3
+ 2545 02a0 7B85     		strh	r3, [r7, #42]	@ movhi
+ 284:src/main.c    **** 		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", temp4, temp5, temp6);
+ 2546              		.loc 2 284 0 discriminator 3
+ 2547 02a2 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 2548 02a6 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 2549 02aa 1968     		ldr	r1, [r3, #0]
+ 2550 02ac B7F93020 		ldrsh	r2, [r7, #48]
+ 2551 02b0 B7F92E30 		ldrsh	r3, [r7, #46]
+ 2552 02b4 B7F92C00 		ldrsh	r0, [r7, #44]
+ 2553 02b8 0090     		str	r0, [sp, #0]
+ 2554 02ba 0846     		mov	r0, r1
+ 2555 02bc 40F20001 		movw	r1, #:lower16:.LC3
+ 2556 02c0 C0F20001 		movt	r1, #:upper16:.LC3
+ 2557 02c4 FFF7FEFF 		bl	qprintf
+ 286:src/main.c    **** 		if(TempAcceleration != 0)
+ 2558              		.loc 2 286 0 discriminator 3
+ 2559 02c8 7B8D     		ldrh	r3, [r7, #42]
+ 2560 02ca 002B     		cmp	r3, #0
+ 2561 02cc 3FF4FDAE 		beq	.L143
+ 289:src/main.c    **** 	        if ((int8_t)Buffer_Hx[0] < -G)
+ 2562              		.loc 2 289 0
+ 2563 02d0 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2564 02d4 DBB2     		uxtb	r3, r3
+ 2565 02d6 5BB2     		sxtb	r3, r3
+ 2566 02d8 13F1020F 		cmn	r3, #2
+ 2567 02dc 22DA     		bge	.L130
+ 291:src/main.c    **** 				STM_EVAL_LEDOn(LED4);
+ 2568              		.loc 2 291 0
+ 2569 02de 4FF00000 		mov	r0, #0
+ 2570 02e2 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 294:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 2571              		.loc 2 294 0
+ 2572 02e6 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2573 02ea DBB2     		uxtb	r3, r3
+ 2574 02ec 5BB2     		sxtb	r3, r3
+ 2575 02ee 022B     		cmp	r3, #2
+ 2576 02f0 03DC     		bgt	.L131
+ 296:src/main.c    **** 	                STM_EVAL_LEDOff(LED3);
+ 2577              		.loc 2 296 0
+ 2578 02f2 4FF00100 		mov	r0, #1
+ 2579 02f6 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2580              	.L131:
+ 300:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 2581              		.loc 2 300 0
+ 2582 02fa 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2583 02fe DBB2     		uxtb	r3, r3
+ 2584 0300 5BB2     		sxtb	r3, r3
+ 2585 0302 022B     		cmp	r3, #2
+ 2586 0304 03DC     		bgt	.L132
+ 302:src/main.c    **** 	               STM_EVAL_LEDOff(LED6);
+ 2587              		.loc 2 302 0
+ 2588 0306 4FF00300 		mov	r0, #3
+ 2589 030a FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2590              	.L132:
+ 305:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 2591              		.loc 2 305 0
+ 2592 030e 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2593 0312 DBB2     		uxtb	r3, r3
+ 2594 0314 5BB2     		sxtb	r3, r3
+ 2595 0316 13F1020F 		cmn	r3, #2
+ 2596 031a 03DB     		blt	.L130
+ 307:src/main.c    **** 	                STM_EVAL_LEDOff(LED5);
+ 2597              		.loc 2 307 0
+ 2598 031c 4FF00200 		mov	r0, #2
+ 2599 0320 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2600              	.L130:
+ 311:src/main.c    **** 	        if ((int8_t)Buffer_Hx[0] > G)
+ 2601              		.loc 2 311 0
+ 2602 0324 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2603 0328 DBB2     		uxtb	r3, r3
+ 2604 032a 5BB2     		sxtb	r3, r3
+ 2605 032c 022B     		cmp	r3, #2
+ 2606 032e 23DD     		ble	.L133
+ 313:src/main.c    **** 				STM_EVAL_LEDOn(LED5);
+ 2607              		.loc 2 313 0
+ 2608 0330 4FF00200 		mov	r0, #2
+ 2609 0334 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 315:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 2610              		.loc 2 315 0
+ 2611 0338 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2612 033c DBB2     		uxtb	r3, r3
+ 2613 033e 5BB2     		sxtb	r3, r3
+ 2614 0340 022B     		cmp	r3, #2
+ 2615 0342 03DC     		bgt	.L134
+ 317:src/main.c    **** 		            STM_EVAL_LEDOff(LED4);
+ 2616              		.loc 2 317 0
+ 2617 0344 4FF00000 		mov	r0, #0
+ 2618 0348 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2619              	.L134:
+ 320:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 2620              		.loc 2 320 0
+ 2621 034c 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2622 0350 DBB2     		uxtb	r3, r3
+ 2623 0352 5BB2     		sxtb	r3, r3
+ 2624 0354 13F1020F 		cmn	r3, #2
+ 2625 0358 03DB     		blt	.L135
+ 322:src/main.c    **** 	    			STM_EVAL_LEDOff(LED3);
+ 2626              		.loc 2 322 0
+ 2627 035a 4FF00100 		mov	r0, #1
+ 2628 035e FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2629              	.L135:
+ 325:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 2630              		.loc 2 325 0
+ 2631 0362 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2632 0366 DBB2     		uxtb	r3, r3
+ 2633 0368 5BB2     		sxtb	r3, r3
+ 2634 036a 13F1020F 		cmn	r3, #2
+ 2635 036e 03DB     		blt	.L133
+ 327:src/main.c    **** 	        	    STM_EVAL_LEDOff(LED6);
+ 2636              		.loc 2 327 0
+ 2637 0370 4FF00300 		mov	r0, #3
+ 2638 0374 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2639              	.L133:
+ 331:src/main.c    **** 	        if ((int8_t)Buffer_Hy[0] > G)
+ 2640              		.loc 2 331 0
+ 2641 0378 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2642 037c DBB2     		uxtb	r3, r3
+ 2643 037e 5BB2     		sxtb	r3, r3
+ 2644 0380 022B     		cmp	r3, #2
+ 2645 0382 23DD     		ble	.L136
+ 334:src/main.c    **** 				STM_EVAL_LEDOn(LED3);
+ 2646              		.loc 2 334 0
+ 2647 0384 4FF00100 		mov	r0, #1
+ 2648 0388 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 336:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 2649              		.loc 2 336 0
+ 2650 038c 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2651 0390 DBB2     		uxtb	r3, r3
+ 2652 0392 5BB2     		sxtb	r3, r3
+ 2653 0394 022B     		cmp	r3, #2
+ 2654 0396 03DC     		bgt	.L137
+ 338:src/main.c    **** 	                STM_EVAL_LEDOff(LED4);
+ 2655              		.loc 2 338 0
+ 2656 0398 4FF00000 		mov	r0, #0
+ 2657 039c FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2658              	.L137:
+ 341:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] >= -G)
+ 2659              		.loc 2 341 0
+ 2660 03a0 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2661 03a4 DBB2     		uxtb	r3, r3
+ 2662 03a6 5BB2     		sxtb	r3, r3
+ 2663 03a8 13F1020F 		cmn	r3, #2
+ 2664 03ac 03DB     		blt	.L138
+ 343:src/main.c    **** 	                STM_EVAL_LEDOff(LED5);
+ 2665              		.loc 2 343 0
+ 2666 03ae 4FF00200 		mov	r0, #2
+ 2667 03b2 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2668              	.L138:
+ 346:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 2669              		.loc 2 346 0
+ 2670 03b6 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2671 03ba DBB2     		uxtb	r3, r3
+ 2672 03bc 5BB2     		sxtb	r3, r3
+ 2673 03be 13F1020F 		cmn	r3, #2
+ 2674 03c2 03DB     		blt	.L136
+ 348:src/main.c    **** 	                STM_EVAL_LEDOff(LED6);
+ 2675              		.loc 2 348 0
+ 2676 03c4 4FF00300 		mov	r0, #3
+ 2677 03c8 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2678              	.L136:
+ 352:src/main.c    **** 	        if ((int8_t)Buffer_Hy[0] < -G)
+ 2679              		.loc 2 352 0
+ 2680 03cc 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2681 03d0 DBB2     		uxtb	r3, r3
+ 2682 03d2 5BB2     		sxtb	r3, r3
+ 2683 03d4 13F1020F 		cmn	r3, #2
+ 2684 03d8 22DA     		bge	.L139
+ 355:src/main.c    **** 				STM_EVAL_LEDOn(LED6);
+ 2685              		.loc 2 355 0
+ 2686 03da 4FF00300 		mov	r0, #3
+ 2687 03de FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 357:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] <= G)
+ 2688              		.loc 2 357 0
+ 2689 03e2 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2690 03e6 DBB2     		uxtb	r3, r3
+ 2691 03e8 5BB2     		sxtb	r3, r3
+ 2692 03ea 022B     		cmp	r3, #2
+ 2693 03ec 03DC     		bgt	.L140
+ 359:src/main.c    **** 	                STM_EVAL_LEDOff(LED3);
+ 2694              		.loc 2 359 0
+ 2695 03ee 4FF00100 		mov	r0, #1
+ 2696 03f2 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2697              	.L140:
+ 362:src/main.c    **** 	            if ((int8_t)Buffer_Hy[0] <= G)
+ 2698              		.loc 2 362 0
+ 2699 03f6 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2700 03fa DBB2     		uxtb	r3, r3
+ 2701 03fc 5BB2     		sxtb	r3, r3
+ 2702 03fe 022B     		cmp	r3, #2
+ 2703 0400 03DC     		bgt	.L141
+ 364:src/main.c    **** 		           STM_EVAL_LEDOff(LED4);
+ 2704              		.loc 2 364 0
+ 2705 0402 4FF00000 		mov	r0, #0
+ 2706 0406 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2707              	.L141:
+ 367:src/main.c    **** 	            if ((int8_t)Buffer_Hx[0] >= -G)
+ 2708              		.loc 2 367 0
+ 2709 040a 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2710 040e DBB2     		uxtb	r3, r3
+ 2711 0410 5BB2     		sxtb	r3, r3
+ 2712 0412 13F1020F 		cmn	r3, #2
+ 2713 0416 03DB     		blt	.L139
+ 369:src/main.c    **** 	    	        STM_EVAL_LEDOff(LED5);
+ 2714              		.loc 2 369 0
+ 2715 0418 4FF00200 		mov	r0, #2
+ 2716 041c FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2717              	.L139:
+ 372:src/main.c    **** 			counter = 0x00;
+ 2718              		.loc 2 372 0
+ 2719 0420 4FF00003 		mov	r3, #0
+ 2720 0424 87F83F30 		strb	r3, [r7, #63]
+ 2721              		.loc 2 376 0
+ 2722 0428 4FE6     		b	.L143
+ 2723              		.cfi_endproc
+ 2724              	.LFE133:
+ 2726 042a 00BF     		.section	.text.vApplicationIdleHook,"ax",%progbits
+ 2727              		.align	2
+ 2728              		.global	vApplicationIdleHook
+ 2729              		.thumb
+ 2730              		.thumb_func
+ 2732              	vApplicationIdleHook:
+ 2733              	.LFB134:
+ 377:src/main.c    **** }
+ 378:src/main.c    **** 
+ 379:src/main.c    **** /*-----------------------------------------------------------*/
+ 380:src/main.c    **** 
+ 381:src/main.c    **** 
+ 382:src/main.c    **** 
+ 383:src/main.c    **** // void vSWITCHTask( void *pvParameters )
+ 384:src/main.c    **** // {
+ 385:src/main.c    **** // 	static int i=0;
+ 386:src/main.c    **** // 	for( ;; )
+ 387:src/main.c    **** // 	{
+ 388:src/main.c    **** // 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
+ 389:src/main.c    **** // 		{
+ 390:src/main.c    **** // 			i^=1;		//just switch the state if semaphore was given
+ 391:src/main.c    **** 
+ 392:src/main.c    **** // 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
+ 393:src/main.c    **** // 			{
+ 394:src/main.c    **** // 				vTaskSuspend(xBALANCE_Task);
+ 395:src/main.c    **** // 				TIM_Cmd(TIM4, DISABLE);
+ 396:src/main.c    **** // 				vTaskSuspend(xMEMS_Task);
+ 397:src/main.c    **** // 				prvLED_Config(GPIO);
+ 398:src/main.c    **** // 				vTaskResume(xLED_Tasks[0]);
+ 399:src/main.c    **** // 				vTaskResume(xLED_Tasks[1]);
+ 400:src/main.c    **** // 				vTaskResume(xLED_Tasks[2]);
+ 401:src/main.c    **** // 				vTaskResume(xLED_Tasks[3]);
+ 402:src/main.c    **** // 			}
+ 403:src/main.c    **** // 			else		//MEMS and BALANCE ready, LED tasks suspended
+ 404:src/main.c    **** // 			{
+ 405:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[0]);
+ 406:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[1]);
+ 407:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[2]);
+ 408:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[3]);
+ 409:src/main.c    **** // 				prvLED_Config(TIMER);
+ 410:src/main.c    **** // 				TIM_Cmd(TIM4, ENABLE);
+ 411:src/main.c    **** // 				vTaskResume(xBALANCE_Task);
+ 412:src/main.c    **** // 				vTaskResume(xMEMS_Task);
+ 413:src/main.c    **** // 			}
+ 414:src/main.c    **** // 		}
+ 415:src/main.c    **** // 		taskYIELD(); 	//task is going to ready state to allow next one to run
+ 416:src/main.c    **** // 	}
+ 417:src/main.c    **** // }
+ 418:src/main.c    **** 
+ 419:src/main.c    **** /*-----------------------------------------------------------*/
+ 420:src/main.c    **** 
+ 421:src/main.c    **** void vApplicationIdleHook( void )
+ 422:src/main.c    **** {
+ 2734              		.loc 2 422 0
+ 2735              		.cfi_startproc
+ 2736              		@ args = 0, pretend = 0, frame = 8
+ 2737              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2738 0000 80B5     		push	{r7, lr}
+ 2739              	.LCFI74:
+ 2740              		.cfi_def_cfa_offset 8
+ 2741              		.cfi_offset 14, -4
+ 2742              		.cfi_offset 7, -8
+ 2743 0002 82B0     		sub	sp, sp, #8
+ 2744              	.LCFI75:
+ 2745              		.cfi_def_cfa_offset 16
+ 2746 0004 00AF     		add	r7, sp, #0
+ 2747              	.LCFI76:
+ 2748              		.cfi_def_cfa_register 7
+ 423:src/main.c    **** volatile size_t xFreeStackSpace;
+ 424:src/main.c    **** 
+ 425:src/main.c    **** 	/* This function is called on each cycle of the idle task.  In this case it
+ 426:src/main.c    **** 	does nothing useful, other than report the amout of FreeRTOS heap that 
+ 427:src/main.c    **** 	remains unallocated. */
+ 428:src/main.c    **** 	xFreeStackSpace = xPortGetFreeHeapSize();
+ 2749              		.loc 2 428 0
+ 2750 0006 FFF7FEFF 		bl	xPortGetFreeHeapSize
+ 2751 000a 0346     		mov	r3, r0
+ 2752 000c 7B60     		str	r3, [r7, #4]
+ 429:src/main.c    **** 
+ 430:src/main.c    **** 	if( xFreeStackSpace > 100 )
+ 2753              		.loc 2 430 0
+ 2754 000e 7B68     		ldr	r3, [r7, #4]
+ 431:src/main.c    **** 	{
+ 432:src/main.c    **** 		/* By now, the kernel has allocated everything it is going to, so
+ 433:src/main.c    **** 		if there is a lot of heap remaining unallocated then
+ 434:src/main.c    **** 		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
+ 435:src/main.c    **** 		reduced accordingly. */
+ 436:src/main.c    **** 	}
+ 437:src/main.c    **** }
+ 2755              		.loc 2 437 0
+ 2756 0010 07F10807 		add	r7, r7, #8
+ 2757 0014 BD46     		mov	sp, r7
+ 2758 0016 80BD     		pop	{r7, pc}
+ 2759              		.cfi_endproc
+ 2760              	.LFE134:
+ 2762              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
+ 2763              		.align	2
+ 2764              		.global	vApplicationMallocFailedHook
+ 2765              		.thumb
+ 2766              		.thumb_func
+ 2768              	vApplicationMallocFailedHook:
+ 2769              	.LFB135:
+ 438:src/main.c    **** 
+ 439:src/main.c    **** /*-----------------------------------------------------------*/
+ 440:src/main.c    **** 
+ 441:src/main.c    **** void vApplicationMallocFailedHook( void )
+ 442:src/main.c    **** {
+ 2770              		.loc 2 442 0
+ 2771              		.cfi_startproc
+ 2772              		@ args = 0, pretend = 0, frame = 0
+ 2773              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2774              		@ link register save eliminated.
+ 2775 0000 80B4     		push	{r7}
+ 2776              	.LCFI77:
+ 2777              		.cfi_def_cfa_offset 4
+ 2778              		.cfi_offset 7, -4
+ 2779 0002 00AF     		add	r7, sp, #0
+ 2780              	.LCFI78:
+ 2781              		.cfi_def_cfa_register 7
+ 2782              	.L146:
+ 443:src/main.c    **** 	/* Called if a call to pvPortMalloc() fails because there is insufficient
+ 444:src/main.c    **** 	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
+ 445:src/main.c    **** 	internally by FreeRTOS API functions that create tasks, queues, software 
+ 446:src/main.c    **** 	timers, and semaphores.  The size of the FreeRTOS heap is set by the
+ 447:src/main.c    **** 	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+ 448:src/main.c    **** 	for( ;; );
+ 2783              		.loc 2 448 0 discriminator 1
+ 2784 0004 FEE7     		b	.L146
+ 2785              		.cfi_endproc
+ 2786              	.LFE135:
+ 2788 0006 00BF     		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
+ 2789              		.align	2
+ 2790              		.global	vApplicationStackOverflowHook
+ 2791              		.thumb
+ 2792              		.thumb_func
+ 2794              	vApplicationStackOverflowHook:
+ 2795              	.LFB136:
+ 449:src/main.c    **** }
+ 450:src/main.c    **** /*-----------------------------------------------------------*/
+ 451:src/main.c    **** 
+ 452:src/main.c    **** void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
+ 453:src/main.c    **** {
+ 2796              		.loc 2 453 0
+ 2797              		.cfi_startproc
+ 2798              		@ args = 0, pretend = 0, frame = 8
+ 2799              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2800              		@ link register save eliminated.
+ 2801 0000 80B4     		push	{r7}
+ 2802              	.LCFI79:
+ 2803              		.cfi_def_cfa_offset 4
+ 2804              		.cfi_offset 7, -4
+ 2805 0002 83B0     		sub	sp, sp, #12
+ 2806              	.LCFI80:
+ 2807              		.cfi_def_cfa_offset 16
+ 2808 0004 00AF     		add	r7, sp, #0
+ 2809              	.LCFI81:
+ 2810              		.cfi_def_cfa_register 7
+ 2811 0006 7860     		str	r0, [r7, #4]
+ 2812 0008 3960     		str	r1, [r7, #0]
+ 2813              	.L148:
+ 454:src/main.c    **** 	( void ) pcTaskName;
+ 455:src/main.c    **** 	( void ) pxTask;
+ 456:src/main.c    **** 
+ 457:src/main.c    **** 	/* Run time stack overflow checking is performed if
+ 458:src/main.c    **** 	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+ 459:src/main.c    **** 	function is called if a stack overflow is detected. */
+ 460:src/main.c    **** 	for( ;; );
+ 2814              		.loc 2 460 0 discriminator 1
+ 2815 000a FEE7     		b	.L148
+ 2816              		.cfi_endproc
+ 2817              	.LFE136:
+ 2819              		.text
+ 2820              	.Letext0:
+ 2821              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 2822              		.file 4 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 2823              		.file 5 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
+ 2824              		.file 6 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 2825              		.file 7 "FreeRTOS/Source/include/task.h"
+ 2826              		.file 8 "FreeRTOS/Source/include/queue.h"
+ 2827              		.file 9 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stdarg.h"
+ 2828              		.file 10 "src/include/stm32f4_discovery.h"
+ 2829              		.file 11 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
+ 2830              		.file 12 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
+ 2831              		.file 13 "libs/CMSIS/Include/core_cm4.h"
+ 2832              		.file 14 "<built-in>"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/cc7CsJNf.s:20     .text.memset:00000000 $t
+     /tmp/cc7CsJNf.s:25     .text.memset:00000000 memset
+     /tmp/cc7CsJNf.s:145    .text.memcpy:00000000 $t
+     /tmp/cc7CsJNf.s:150    .text.memcpy:00000000 memcpy
+     /tmp/cc7CsJNf.s:275    .text.strchr:00000000 $t
+     /tmp/cc7CsJNf.s:280    .text.strchr:00000000 strchr
+     /tmp/cc7CsJNf.s:343    .text.strcpy:00000000 $t
+     /tmp/cc7CsJNf.s:348    .text.strcpy:00000000 strcpy
+     /tmp/cc7CsJNf.s:408    .text.strncpy:00000000 $t
+     /tmp/cc7CsJNf.s:413    .text.strncpy:00000000 strncpy
+     /tmp/cc7CsJNf.s:487    .text.strncmp:00000000 $t
+     /tmp/cc7CsJNf.s:492    .text.strncmp:00000000 strncmp
+     /tmp/cc7CsJNf.s:568    .text.strcmp:00000000 $t
+     /tmp/cc7CsJNf.s:573    .text.strcmp:00000000 strcmp
+     /tmp/cc7CsJNf.s:638    .text.atoi:00000000 $t
+     /tmp/cc7CsJNf.s:643    .text.atoi:00000000 atoi
+     /tmp/cc7CsJNf.s:704    .text._toa:00000000 $t
+     /tmp/cc7CsJNf.s:709    .text._toa:00000000 _toa
+     /tmp/cc7CsJNf.s:913    .text.xtoa:00000000 $t
+     /tmp/cc7CsJNf.s:918    .text.xtoa:00000000 xtoa
+     /tmp/cc7CsJNf.s:951    .text.itoa:00000000 $t
+     /tmp/cc7CsJNf.s:956    .text.itoa:00000000 itoa
+     /tmp/cc7CsJNf.s:989    .rodata:00000000 $d
+     /tmp/cc7CsJNf.s:990    .rodata:00000000 .LC0
+     /tmp/cc7CsJNf.s:995    .text.qprintf:00000000 $t
+     /tmp/cc7CsJNf.s:1000   .text.qprintf:00000000 qprintf
+     /tmp/cc7CsJNf.s:1281   .text.strlen:00000000 $t
+     /tmp/cc7CsJNf.s:1286   .text.strlen:00000000 strlen
+     /tmp/cc7CsJNf.s:1340   .text.strcat:00000000 $t
+     /tmp/cc7CsJNf.s:1345   .text.strcat:00000000 strcat
+     /tmp/cc7CsJNf.s:1407   .text.puts:00000000 $t
+     /tmp/cc7CsJNf.s:1412   .text.puts:00000000 puts
+     /tmp/cc7CsJNf.s:1457   .text.printf_cb:00000000 $t
+     /tmp/cc7CsJNf.s:1461   .text.printf_cb:00000000 printf_cb
+     /tmp/cc7CsJNf.s:1493   .text.sprintf_cb:00000000 $t
+     /tmp/cc7CsJNf.s:1497   .text.sprintf_cb:00000000 sprintf_cb
+     /tmp/cc7CsJNf.s:1530   .text.base_printf:00000000 $t
+     /tmp/cc7CsJNf.s:1534   .text.base_printf:00000000 base_printf
+     /tmp/cc7CsJNf.s:1639   .text.base_printf:000000cc $d
+     /tmp/cc7CsJNf.s:1695   .text.base_printf:000001a4 $t
+     /tmp/cc7CsJNf.s:1798   .text.sprintf:00000000 $t
+     /tmp/cc7CsJNf.s:1803   .text.sprintf:00000000 sprintf
+     /tmp/cc7CsJNf.s:1857   .text.pwm:00000000 $t
+     /tmp/cc7CsJNf.s:1862   .text.pwm:00000000 pwm
+     /tmp/cc7CsJNf.s:1940   .text.Motor_Control:00000000 Motor_Control
+     /tmp/cc7CsJNf.s:1935   .text.Motor_Control:00000000 $t
+                            *COM*:00000004 xQueueUARTSend
+     /tmp/cc7CsJNf.s:2060   .rodata:00000004 .LC1
+     /tmp/cc7CsJNf.s:2063   .rodata:0000000c .LC2
+     /tmp/cc7CsJNf.s:2066   .text.main:00000000 $t
+     /tmp/cc7CsJNf.s:2071   .text.main:00000000 main
+     /tmp/cc7CsJNf.s:2237   .text.vMEMSTask:00000000 vMEMSTask
+     /tmp/cc7CsJNf.s:2146   .text.UsartTask:00000000 UsartTask
+     /tmp/cc7CsJNf.s:2142   .text.UsartTask:00000000 $t
+     /tmp/cc7CsJNf.s:2230   .rodata:00000014 .LC3
+     /tmp/cc7CsJNf.s:2233   .text.vMEMSTask:00000000 $t
+     /tmp/cc7CsJNf.s:2727   .text.vApplicationIdleHook:00000000 $t
+     /tmp/cc7CsJNf.s:2732   .text.vApplicationIdleHook:00000000 vApplicationIdleHook
+     /tmp/cc7CsJNf.s:2763   .text.vApplicationMallocFailedHook:00000000 $t
+     /tmp/cc7CsJNf.s:2768   .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
+     /tmp/cc7CsJNf.s:2789   .text.vApplicationStackOverflowHook:00000000 $t
+     /tmp/cc7CsJNf.s:2794   .text.vApplicationStackOverflowHook:00000000 vApplicationStackOverflowHook
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay
+xQueueGenericSend
+fio_write
+Delay_1ms
+xQueueCreate
+prvSetupHardware
+xTaskGenericCreate
+vTaskStartScheduler
+xQueueGenericReceive
+USART_GetFlagStatus
+USART_SendData
+LIS3DSH_Read
+STM_EVAL_LEDOn
+STM_EVAL_LEDOff
+xPortGetFreeHeapSize

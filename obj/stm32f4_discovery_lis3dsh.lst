@@ -1,0 +1,835 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 6
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.file	"stm32f4_discovery_lis3dsh.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	LIS3DSHTimeout
+  20              		.section	.data.LIS3DSHTimeout,"aw",%progbits
+  21              		.align	2
+  24              	LIS3DSHTimeout:
+  25 0000 00100000 		.word	4096
+  26              		.section	.text.LIS3DSH_Init,"ax",%progbits
+  27              		.align	2
+  28              		.global	LIS3DSH_Init
+  29              		.thumb
+  30              		.thumb_func
+  32              	LIS3DSH_Init:
+  33              	.LFB110:
+  34              		.file 1 "src/stm32f4_discovery_lis3dsh.c"
+   1:src/stm32f4_discovery_lis3dsh.c **** /* Includes ------------------------------------------------------------------*/
+   2:src/stm32f4_discovery_lis3dsh.c **** #include "stm32f4_discovery_lis3dsh.h"
+   3:src/stm32f4_discovery_lis3dsh.c **** 
+   4:src/stm32f4_discovery_lis3dsh.c **** 
+   5:src/stm32f4_discovery_lis3dsh.c **** 
+   6:src/stm32f4_discovery_lis3dsh.c **** __IO uint32_t  LIS3DSHTimeout = LIS3DSH_FLAG_TIMEOUT;   
+   7:src/stm32f4_discovery_lis3dsh.c **** 
+   8:src/stm32f4_discovery_lis3dsh.c **** /* Read/Write command */
+   9:src/stm32f4_discovery_lis3dsh.c **** #define READWRITE_CMD              ((uint8_t)0x80) 
+  10:src/stm32f4_discovery_lis3dsh.c **** /* Multiple byte read/write command */ 
+  11:src/stm32f4_discovery_lis3dsh.c **** #define MULTIPLEBYTE_CMD           ((uint8_t)0x40)
+  12:src/stm32f4_discovery_lis3dsh.c **** /* Dummy Byte Send by the SPI Master device in order to generate the Clock to the Slave device */
+  13:src/stm32f4_discovery_lis3dsh.c **** #define DUMMY_BYTE                 ((uint8_t)0x00)
+  14:src/stm32f4_discovery_lis3dsh.c **** 
+  15:src/stm32f4_discovery_lis3dsh.c **** static void LIS3DSH_LowLevel_Init(void);
+  16:src/stm32f4_discovery_lis3dsh.c **** static uint8_t LIS3DSH_SendByte(uint8_t byte);
+  17:src/stm32f4_discovery_lis3dsh.c **** 
+  18:src/stm32f4_discovery_lis3dsh.c **** /**
+  19:src/stm32f4_discovery_lis3dsh.c ****   * @brief  Set LIS3DSH Initialization.
+  20:src/stm32f4_discovery_lis3dsh.c ****   * @param  LIS3DSH_Config_Struct: pointer to a LIS3DSH_Config_TypeDef structure 
+  21:src/stm32f4_discovery_lis3dsh.c ****   *         that contains the configuration setting for the LIS3DSH.
+  22:src/stm32f4_discovery_lis3dsh.c ****   * @retval None
+  23:src/stm32f4_discovery_lis3dsh.c ****   */
+  24:src/stm32f4_discovery_lis3dsh.c **** void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
+  25:src/stm32f4_discovery_lis3dsh.c **** {
+  35              		.loc 1 25 0
+  36              		.cfi_startproc
+  37              		@ args = 0, pretend = 0, frame = 16
+  38              		@ frame_needed = 1, uses_anonymous_args = 0
+  39 0000 80B5     		push	{r7, lr}
+  40              	.LCFI0:
+  41              		.cfi_def_cfa_offset 8
+  42              		.cfi_offset 14, -4
+  43              		.cfi_offset 7, -8
+  44 0002 84B0     		sub	sp, sp, #16
+  45              	.LCFI1:
+  46              		.cfi_def_cfa_offset 24
+  47 0004 00AF     		add	r7, sp, #0
+  48              	.LCFI2:
+  49              		.cfi_def_cfa_register 7
+  50 0006 7860     		str	r0, [r7, #4]
+  26:src/stm32f4_discovery_lis3dsh.c **** 	uint8_t ctrl = 0x00;	//?????
+  51              		.loc 1 26 0
+  52 0008 4FF00003 		mov	r3, #0
+  53 000c FB72     		strb	r3, [r7, #11]
+  27:src/stm32f4_discovery_lis3dsh.c ****   	uint32_t i=0;		//simple index for software delay
+  54              		.loc 1 27 0
+  55 000e 4FF00003 		mov	r3, #0
+  56 0012 FB60     		str	r3, [r7, #12]
+  28:src/stm32f4_discovery_lis3dsh.c ****   
+  29:src/stm32f4_discovery_lis3dsh.c **** 	/* Configure the low level interface ---------------------------------------*/
+  30:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_LowLevel_Init();
+  57              		.loc 1 30 0
+  58 0014 FFF7FEFF 		bl	LIS3DSH_LowLevel_Init
+  31:src/stm32f4_discovery_lis3dsh.c ****   
+  32:src/stm32f4_discovery_lis3dsh.c **** 	/* Required delay for the MEMS Accelerometer: Turn-on time = 3/Output data Rate
+  33:src/stm32f4_discovery_lis3dsh.c **** 	                                                            = 3/100 = 30ms */
+  34:src/stm32f4_discovery_lis3dsh.c **** //	for(i=0;i<0x1FFFF;i++);
+  35:src/stm32f4_discovery_lis3dsh.c **** 
+  36:src/stm32f4_discovery_lis3dsh.c ****   /* 0x20 */  
+  37:src/stm32f4_discovery_lis3dsh.c ****   /* 
+  38:src/stm32f4_discovery_lis3dsh.c ****   ctrl=(uint8_t) (LIS3DSH_InitStruct->CR4_Odr|LIS3DSH_InitStruct->CR4_Bdu|
+  39:src/stm32f4_discovery_lis3dsh.c ****      LIS3DSH_InitStruct->CR4_Zen|LIS3DSH_InitStruct->CR4_Yen|
+  40:src/stm32f4_discovery_lis3dsh.c ****      LIS3DSH_InitStruct->CR4_Xen);
+  41:src/stm32f4_discovery_lis3dsh.c **** */
+  42:src/stm32f4_discovery_lis3dsh.c ****   ctrl = 0x47;  
+  59              		.loc 1 42 0
+  60 0018 4FF04703 		mov	r3, #71
+  61 001c FB72     		strb	r3, [r7, #11]
+  43:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
+  62              		.loc 1 43 0
+  63 001e 07F10B03 		add	r3, r7, #11
+  64 0022 1846     		mov	r0, r3
+  65 0024 4FF02001 		mov	r1, #32
+  66 0028 4FF00102 		mov	r2, #1
+  67 002c FFF7FEFF 		bl	LIS3DSH_Write
+  44:src/stm32f4_discovery_lis3dsh.c **** 
+  45:src/stm32f4_discovery_lis3dsh.c **** #if 0
+  46:src/stm32f4_discovery_lis3dsh.c ****   /* 0x21 */  
+  47:src/stm32f4_discovery_lis3dsh.c **** 	ctrl=LIS3DSH_InitStruct->SM1_Hysteresis|LIS3DSH_InitStruct->SM1_Pin|LIS3DSH_InitStruct->SM1_Enable
+  48:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG1_ADDR, 1);
+  49:src/stm32f4_discovery_lis3dsh.c **** 	
+  50:src/stm32f4_discovery_lis3dsh.c ****   /* 0x22 */  
+  51:src/stm32f4_discovery_lis3dsh.c **** 	ctrl=LIS3DSH_InitStruct->SM2_Hysteresis|LIS3DSH_InitStruct->SM2_Pin|LIS3DSH_InitStruct->SM2_Enable
+  52:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG2_ADDR, 1);
+  53:src/stm32f4_discovery_lis3dsh.c **** 	
+  54:src/stm32f4_discovery_lis3dsh.c ****   /* 0x23 */  
+  55:src/stm32f4_discovery_lis3dsh.c **** 	ctrl=LIS3DSH_InitStruct->CR3_Dren|LIS3DSH_InitStruct->CR3_Iea|LIS3DSH_InitStruct->CR3_Iel|
+  56:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR3_Int2En|LIS3DSH_InitStruct->CR3_Int1En|LIS3DSH_InitStruct->CR3_Vfilt|
+  57:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR3_Strt;
+  58:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG3_ADDR, 1);
+  59:src/stm32f4_discovery_lis3dsh.c **** 	
+  60:src/stm32f4_discovery_lis3dsh.c ****   /* 0x24 */  
+  61:src/stm32f4_discovery_lis3dsh.c **** 	ctrl=LIS3DSH_InitStruct->CR5_Bw|LIS3DSH_InitStruct->CR5_Fscale|
+  62:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR5_St|LIS3DSH_InitStruct->CR5_Sim;
+  63:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG5_ADDR, 1);
+  64:src/stm32f4_discovery_lis3dsh.c **** 	
+  65:src/stm32f4_discovery_lis3dsh.c ****   /* 0x25 */  
+  66:src/stm32f4_discovery_lis3dsh.c **** 	ctrl=LIS3DSH_InitStruct->CR6_Boot|LIS3DSH_InitStruct->CR6_FifoEn|
+  67:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR6_WtmEn|LIS3DSH_InitStruct->CR6_AddInc|
+  68:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR6_P1Empty|LIS3DSH_InitStruct->CR6_P1Wtm|
+  69:src/stm32f4_discovery_lis3dsh.c **** 		 LIS3DSH_InitStruct->CR6_P1OverRun|LIS3DSH_InitStruct->CR6_P2Boot;
+  70:src/stm32f4_discovery_lis3dsh.c **** 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG6_ADDR, 1);
+  71:src/stm32f4_discovery_lis3dsh.c **** #endif
+  72:src/stm32f4_discovery_lis3dsh.c **** }
+  68              		.loc 1 72 0
+  69 0030 07F11007 		add	r7, r7, #16
+  70 0034 BD46     		mov	sp, r7
+  71 0036 80BD     		pop	{r7, pc}
+  72              		.cfi_endproc
+  73              	.LFE110:
+  75              		.section	.text.LIS3DSH_Write,"ax",%progbits
+  76              		.align	2
+  77              		.global	LIS3DSH_Write
+  78              		.thumb
+  79              		.thumb_func
+  81              	LIS3DSH_Write:
+  82              	.LFB111:
+  73:src/stm32f4_discovery_lis3dsh.c **** 
+  74:src/stm32f4_discovery_lis3dsh.c **** 
+  75:src/stm32f4_discovery_lis3dsh.c **** void LIS3DSH_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite)
+  76:src/stm32f4_discovery_lis3dsh.c **** {
+  83              		.loc 1 76 0
+  84              		.cfi_startproc
+  85              		@ args = 0, pretend = 0, frame = 8
+  86              		@ frame_needed = 1, uses_anonymous_args = 0
+  87 0000 80B5     		push	{r7, lr}
+  88              	.LCFI3:
+  89              		.cfi_def_cfa_offset 8
+  90              		.cfi_offset 14, -4
+  91              		.cfi_offset 7, -8
+  92 0002 82B0     		sub	sp, sp, #8
+  93              	.LCFI4:
+  94              		.cfi_def_cfa_offset 16
+  95 0004 00AF     		add	r7, sp, #0
+  96              	.LCFI5:
+  97              		.cfi_def_cfa_register 7
+  98 0006 7860     		str	r0, [r7, #4]
+  99 0008 1346     		mov	r3, r2
+ 100 000a 0A46     		mov	r2, r1
+ 101 000c FA70     		strb	r2, [r7, #3]
+ 102 000e 3B80     		strh	r3, [r7, #0]	@ movhi
+  77:src/stm32f4_discovery_lis3dsh.c ****     if(NumByteToWrite>0x01)
+ 103              		.loc 1 77 0
+ 104 0010 3B88     		ldrh	r3, [r7, #0]
+ 105 0012 012B     		cmp	r3, #1
+ 106 0014 03D9     		bls	.L3
+  78:src/stm32f4_discovery_lis3dsh.c ****     {
+  79:src/stm32f4_discovery_lis3dsh.c ****         WriteAddr|=(uint8_t)MULTIPLEBYTE_CMD;
+ 107              		.loc 1 79 0
+ 108 0016 FB78     		ldrb	r3, [r7, #3]
+ 109 0018 43F04003 		orr	r3, r3, #64
+ 110 001c FB70     		strb	r3, [r7, #3]
+ 111              	.L3:
+  80:src/stm32f4_discovery_lis3dsh.c ****     }
+  81:src/stm32f4_discovery_lis3dsh.c **** 
+  82:src/stm32f4_discovery_lis3dsh.c ****     LIS3DSH_CS_LOW();
+ 112              		.loc 1 82 0
+ 113 001e 4FF48050 		mov	r0, #4096
+ 114 0022 C4F20200 		movt	r0, 16386
+ 115 0026 4FF00801 		mov	r1, #8
+ 116 002a FFF7FEFF 		bl	GPIO_ResetBits
+  83:src/stm32f4_discovery_lis3dsh.c **** 
+  84:src/stm32f4_discovery_lis3dsh.c ****     LIS3DSH_SendByte(WriteAddr);
+ 117              		.loc 1 84 0
+ 118 002e FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 119 0030 1846     		mov	r0, r3
+ 120 0032 FFF7FEFF 		bl	LIS3DSH_SendByte
+  85:src/stm32f4_discovery_lis3dsh.c ****     while(NumByteToWrite>=0x01)
+ 121              		.loc 1 85 0
+ 122 0036 0CE0     		b	.L4
+ 123              	.L5:
+  86:src/stm32f4_discovery_lis3dsh.c ****     {
+  87:src/stm32f4_discovery_lis3dsh.c ****         LIS3DSH_SendByte(*pBuffer);
+ 124              		.loc 1 87 0
+ 125 0038 7B68     		ldr	r3, [r7, #4]
+ 126 003a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 127 003c 1846     		mov	r0, r3
+ 128 003e FFF7FEFF 		bl	LIS3DSH_SendByte
+  88:src/stm32f4_discovery_lis3dsh.c ****         NumByteToWrite--;
+ 129              		.loc 1 88 0
+ 130 0042 3B88     		ldrh	r3, [r7, #0]	@ movhi
+ 131 0044 03F1FF33 		add	r3, r3, #-1
+ 132 0048 3B80     		strh	r3, [r7, #0]	@ movhi
+  89:src/stm32f4_discovery_lis3dsh.c ****         pBuffer++;
+ 133              		.loc 1 89 0
+ 134 004a 7B68     		ldr	r3, [r7, #4]
+ 135 004c 03F10103 		add	r3, r3, #1
+ 136 0050 7B60     		str	r3, [r7, #4]
+ 137              	.L4:
+  85:src/stm32f4_discovery_lis3dsh.c ****     while(NumByteToWrite>=0x01)
+ 138              		.loc 1 85 0 discriminator 1
+ 139 0052 3B88     		ldrh	r3, [r7, #0]
+ 140 0054 002B     		cmp	r3, #0
+ 141 0056 EFD1     		bne	.L5
+  90:src/stm32f4_discovery_lis3dsh.c ****     }
+  91:src/stm32f4_discovery_lis3dsh.c **** 
+  92:src/stm32f4_discovery_lis3dsh.c ****     LIS3DSH_CS_HIGH();
+ 142              		.loc 1 92 0
+ 143 0058 4FF48050 		mov	r0, #4096
+ 144 005c C4F20200 		movt	r0, 16386
+ 145 0060 4FF00801 		mov	r1, #8
+ 146 0064 FFF7FEFF 		bl	GPIO_SetBits
+  93:src/stm32f4_discovery_lis3dsh.c **** }   // LIS3DSH_Write
+ 147              		.loc 1 93 0
+ 148 0068 07F10807 		add	r7, r7, #8
+ 149 006c BD46     		mov	sp, r7
+ 150 006e 80BD     		pop	{r7, pc}
+ 151              		.cfi_endproc
+ 152              	.LFE111:
+ 154              		.section	.text.LIS3DSH_Read,"ax",%progbits
+ 155              		.align	2
+ 156              		.global	LIS3DSH_Read
+ 157              		.thumb
+ 158              		.thumb_func
+ 160              	LIS3DSH_Read:
+ 161              	.LFB112:
+  94:src/stm32f4_discovery_lis3dsh.c **** 
+  95:src/stm32f4_discovery_lis3dsh.c **** /**
+  96:src/stm32f4_discovery_lis3dsh.c ****   * @brief  Reads a block of data from the LIS3DSH.
+  97:src/stm32f4_discovery_lis3dsh.c ****   * @param  pBuffer : pointer to the buffer that receives the data read from the LIS3DSH.
+  98:src/stm32f4_discovery_lis3dsh.c ****   * @param  ReadAddr : LIS3DSH's internal address to read from.
+  99:src/stm32f4_discovery_lis3dsh.c ****   * @param  NumByteToRead : number of bytes to read from the LIS3DSH.
+ 100:src/stm32f4_discovery_lis3dsh.c ****   * @retval None
+ 101:src/stm32f4_discovery_lis3dsh.c ****   */
+ 102:src/stm32f4_discovery_lis3dsh.c **** void LIS3DSH_Read(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteToRead)
+ 103:src/stm32f4_discovery_lis3dsh.c **** {  
+ 162              		.loc 1 103 0
+ 163              		.cfi_startproc
+ 164              		@ args = 0, pretend = 0, frame = 8
+ 165              		@ frame_needed = 1, uses_anonymous_args = 0
+ 166 0000 80B5     		push	{r7, lr}
+ 167              	.LCFI6:
+ 168              		.cfi_def_cfa_offset 8
+ 169              		.cfi_offset 14, -4
+ 170              		.cfi_offset 7, -8
+ 171 0002 82B0     		sub	sp, sp, #8
+ 172              	.LCFI7:
+ 173              		.cfi_def_cfa_offset 16
+ 174 0004 00AF     		add	r7, sp, #0
+ 175              	.LCFI8:
+ 176              		.cfi_def_cfa_register 7
+ 177 0006 7860     		str	r0, [r7, #4]
+ 178 0008 1346     		mov	r3, r2
+ 179 000a 0A46     		mov	r2, r1
+ 180 000c FA70     		strb	r2, [r7, #3]
+ 181 000e 3B80     		strh	r3, [r7, #0]	@ movhi
+ 104:src/stm32f4_discovery_lis3dsh.c ****   if(NumByteToRead > 0x01)
+ 182              		.loc 1 104 0
+ 183 0010 3B88     		ldrh	r3, [r7, #0]
+ 184 0012 012B     		cmp	r3, #1
+ 185 0014 04D9     		bls	.L7
+ 105:src/stm32f4_discovery_lis3dsh.c ****   {
+ 106:src/stm32f4_discovery_lis3dsh.c ****     ReadAddr |= (uint8_t)(READWRITE_CMD | MULTIPLEBYTE_CMD);
+ 186              		.loc 1 106 0
+ 187 0016 FB78     		ldrb	r3, [r7, #3]
+ 188 0018 63F03F03 		orn	r3, r3, #63
+ 189 001c FB70     		strb	r3, [r7, #3]
+ 190 001e 03E0     		b	.L8
+ 191              	.L7:
+ 107:src/stm32f4_discovery_lis3dsh.c ****   }
+ 108:src/stm32f4_discovery_lis3dsh.c ****   else
+ 109:src/stm32f4_discovery_lis3dsh.c ****   {
+ 110:src/stm32f4_discovery_lis3dsh.c ****     ReadAddr |= (uint8_t)READWRITE_CMD;
+ 192              		.loc 1 110 0
+ 193 0020 FB78     		ldrb	r3, [r7, #3]
+ 194 0022 63F07F03 		orn	r3, r3, #127
+ 195 0026 FB70     		strb	r3, [r7, #3]
+ 196              	.L8:
+ 111:src/stm32f4_discovery_lis3dsh.c ****   }
+ 112:src/stm32f4_discovery_lis3dsh.c ****   /* Set chip select Low at the start of the transmission */
+ 113:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSH_CS_LOW();
+ 197              		.loc 1 113 0
+ 198 0028 4FF48050 		mov	r0, #4096
+ 199 002c C4F20200 		movt	r0, 16386
+ 200 0030 4FF00801 		mov	r1, #8
+ 201 0034 FFF7FEFF 		bl	GPIO_ResetBits
+ 114:src/stm32f4_discovery_lis3dsh.c ****   
+ 115:src/stm32f4_discovery_lis3dsh.c ****   /* Send the Address of the indexed register */
+ 116:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSH_SendByte(ReadAddr);
+ 202              		.loc 1 116 0
+ 203 0038 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 204 003a 1846     		mov	r0, r3
+ 205 003c FFF7FEFF 		bl	LIS3DSH_SendByte
+ 117:src/stm32f4_discovery_lis3dsh.c ****   
+ 118:src/stm32f4_discovery_lis3dsh.c ****   /* Receive the data that will be read from the device (MSB First) */
+ 119:src/stm32f4_discovery_lis3dsh.c ****   while(NumByteToRead > 0x00)
+ 206              		.loc 1 119 0
+ 207 0040 0FE0     		b	.L9
+ 208              	.L10:
+ 120:src/stm32f4_discovery_lis3dsh.c ****   {
+ 121:src/stm32f4_discovery_lis3dsh.c ****     /* Send dummy byte (0x00) to generate the SPI clock to LIS3DSH (Slave device) */
+ 122:src/stm32f4_discovery_lis3dsh.c ****     *pBuffer = LIS3DSH_SendByte(DUMMY_BYTE);
+ 209              		.loc 1 122 0
+ 210 0042 4FF00000 		mov	r0, #0
+ 211 0046 FFF7FEFF 		bl	LIS3DSH_SendByte
+ 212 004a 0346     		mov	r3, r0
+ 213 004c 1A46     		mov	r2, r3
+ 214 004e 7B68     		ldr	r3, [r7, #4]
+ 215 0050 1A70     		strb	r2, [r3, #0]
+ 123:src/stm32f4_discovery_lis3dsh.c ****     NumByteToRead--;
+ 216              		.loc 1 123 0
+ 217 0052 3B88     		ldrh	r3, [r7, #0]	@ movhi
+ 218 0054 03F1FF33 		add	r3, r3, #-1
+ 219 0058 3B80     		strh	r3, [r7, #0]	@ movhi
+ 124:src/stm32f4_discovery_lis3dsh.c ****     pBuffer++;
+ 220              		.loc 1 124 0
+ 221 005a 7B68     		ldr	r3, [r7, #4]
+ 222 005c 03F10103 		add	r3, r3, #1
+ 223 0060 7B60     		str	r3, [r7, #4]
+ 224              	.L9:
+ 119:src/stm32f4_discovery_lis3dsh.c ****   while(NumByteToRead > 0x00)
+ 225              		.loc 1 119 0 discriminator 1
+ 226 0062 3B88     		ldrh	r3, [r7, #0]
+ 227 0064 002B     		cmp	r3, #0
+ 228 0066 ECD1     		bne	.L10
+ 125:src/stm32f4_discovery_lis3dsh.c ****   }
+ 126:src/stm32f4_discovery_lis3dsh.c ****   
+ 127:src/stm32f4_discovery_lis3dsh.c ****   /* Set chip select High at the end of the transmission */ 
+ 128:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSH_CS_HIGH();
+ 229              		.loc 1 128 0
+ 230 0068 4FF48050 		mov	r0, #4096
+ 231 006c C4F20200 		movt	r0, 16386
+ 232 0070 4FF00801 		mov	r1, #8
+ 233 0074 FFF7FEFF 		bl	GPIO_SetBits
+ 129:src/stm32f4_discovery_lis3dsh.c **** }
+ 234              		.loc 1 129 0
+ 235 0078 07F10807 		add	r7, r7, #8
+ 236 007c BD46     		mov	sp, r7
+ 237 007e 80BD     		pop	{r7, pc}
+ 238              		.cfi_endproc
+ 239              	.LFE112:
+ 241              		.section	.text.LIS3DSH_LowLevel_Init,"ax",%progbits
+ 242              		.align	2
+ 243              		.thumb
+ 244              		.thumb_func
+ 246              	LIS3DSH_LowLevel_Init:
+ 247              	.LFB113:
+ 130:src/stm32f4_discovery_lis3dsh.c **** 
+ 131:src/stm32f4_discovery_lis3dsh.c **** 
+ 132:src/stm32f4_discovery_lis3dsh.c **** /**
+ 133:src/stm32f4_discovery_lis3dsh.c ****   * @brief  Initializes the low level interface used to drive the LIS3DSH
+ 134:src/stm32f4_discovery_lis3dsh.c ****   * @param  None
+ 135:src/stm32f4_discovery_lis3dsh.c ****   * @retval None
+ 136:src/stm32f4_discovery_lis3dsh.c ****   */
+ 137:src/stm32f4_discovery_lis3dsh.c **** static void LIS3DSH_LowLevel_Init(void)
+ 138:src/stm32f4_discovery_lis3dsh.c **** {
+ 248              		.loc 1 138 0
+ 249              		.cfi_startproc
+ 250              		@ args = 0, pretend = 0, frame = 32
+ 251              		@ frame_needed = 1, uses_anonymous_args = 0
+ 252 0000 80B5     		push	{r7, lr}
+ 253              	.LCFI9:
+ 254              		.cfi_def_cfa_offset 8
+ 255              		.cfi_offset 14, -4
+ 256              		.cfi_offset 7, -8
+ 257 0002 88B0     		sub	sp, sp, #32
+ 258              	.LCFI10:
+ 259              		.cfi_def_cfa_offset 40
+ 260 0004 00AF     		add	r7, sp, #0
+ 261              	.LCFI11:
+ 262              		.cfi_def_cfa_register 7
+ 139:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitTypeDef GPIO_InitStructure;
+ 140:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitTypeDef  SPI_InitStructure;
+ 141:src/stm32f4_discovery_lis3dsh.c **** 
+ 142:src/stm32f4_discovery_lis3dsh.c ****   /* Enable the SPI periph */
+ 143:src/stm32f4_discovery_lis3dsh.c ****   RCC_APB2PeriphClockCmd(LIS3DSH_SPI_CLK, ENABLE);
+ 263              		.loc 1 143 0
+ 264 0006 4FF48050 		mov	r0, #4096
+ 265 000a 4FF00101 		mov	r1, #1
+ 266 000e FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 144:src/stm32f4_discovery_lis3dsh.c **** 
+ 145:src/stm32f4_discovery_lis3dsh.c ****   /* Enable SCK, MOSI and MISO GPIO clocks */
+ 146:src/stm32f4_discovery_lis3dsh.c ****   RCC_AHB1PeriphClockCmd(LIS3DSH_SPI_SCK_GPIO_CLK | LIS3DSH_SPI_MISO_GPIO_CLK | LIS3DSH_SPI_MOSI_GP
+ 267              		.loc 1 146 0
+ 268 0012 4FF00100 		mov	r0, #1
+ 269 0016 4FF00101 		mov	r1, #1
+ 270 001a FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 147:src/stm32f4_discovery_lis3dsh.c **** 
+ 148:src/stm32f4_discovery_lis3dsh.c ****   /* Enable CS  GPIO clock */
+ 149:src/stm32f4_discovery_lis3dsh.c ****   RCC_AHB1PeriphClockCmd(LIS3DSH_SPI_CS_GPIO_CLK, ENABLE);
+ 271              		.loc 1 149 0
+ 272 001e 4FF01000 		mov	r0, #16
+ 273 0022 4FF00101 		mov	r1, #1
+ 274 0026 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 150:src/stm32f4_discovery_lis3dsh.c ****   
+ 151:src/stm32f4_discovery_lis3dsh.c ****   /* Enable INT1 GPIO clock */
+ 152:src/stm32f4_discovery_lis3dsh.c ****   RCC_AHB1PeriphClockCmd(LIS3DSH_SPI_INT1_GPIO_CLK, ENABLE);
+ 275              		.loc 1 152 0
+ 276 002a 4FF01000 		mov	r0, #16
+ 277 002e 4FF00101 		mov	r1, #1
+ 278 0032 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 153:src/stm32f4_discovery_lis3dsh.c ****   
+ 154:src/stm32f4_discovery_lis3dsh.c ****   /* Enable INT2 GPIO clock */
+ 155:src/stm32f4_discovery_lis3dsh.c ****   RCC_AHB1PeriphClockCmd(LIS3DSH_SPI_INT2_GPIO_CLK, ENABLE);
+ 279              		.loc 1 155 0
+ 280 0036 4FF01000 		mov	r0, #16
+ 281 003a 4FF00101 		mov	r1, #1
+ 282 003e FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 156:src/stm32f4_discovery_lis3dsh.c **** 
+ 157:src/stm32f4_discovery_lis3dsh.c ****   GPIO_PinAFConfig(LIS3DSH_SPI_SCK_GPIO_PORT, LIS3DSH_SPI_SCK_SOURCE, LIS3DSH_SPI_SCK_AF);
+ 283              		.loc 1 157 0
+ 284 0042 4FF00000 		mov	r0, #0
+ 285 0046 C4F20200 		movt	r0, 16386
+ 286 004a 4FF00501 		mov	r1, #5
+ 287 004e 4FF00502 		mov	r2, #5
+ 288 0052 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 158:src/stm32f4_discovery_lis3dsh.c ****   GPIO_PinAFConfig(LIS3DSH_SPI_MISO_GPIO_PORT, LIS3DSH_SPI_MISO_SOURCE, LIS3DSH_SPI_MISO_AF);
+ 289              		.loc 1 158 0
+ 290 0056 4FF00000 		mov	r0, #0
+ 291 005a C4F20200 		movt	r0, 16386
+ 292 005e 4FF00601 		mov	r1, #6
+ 293 0062 4FF00502 		mov	r2, #5
+ 294 0066 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 159:src/stm32f4_discovery_lis3dsh.c ****   GPIO_PinAFConfig(LIS3DSH_SPI_MOSI_GPIO_PORT, LIS3DSH_SPI_MOSI_SOURCE, LIS3DSH_SPI_MOSI_AF);
+ 295              		.loc 1 159 0
+ 296 006a 4FF00000 		mov	r0, #0
+ 297 006e C4F20200 		movt	r0, 16386
+ 298 0072 4FF00701 		mov	r1, #7
+ 299 0076 4FF00502 		mov	r2, #5
+ 300 007a FFF7FEFF 		bl	GPIO_PinAFConfig
+ 160:src/stm32f4_discovery_lis3dsh.c **** 
+ 161:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 301              		.loc 1 161 0
+ 302 007e 4FF00203 		mov	r3, #2
+ 303 0082 3B77     		strb	r3, [r7, #28]
+ 162:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 304              		.loc 1 162 0
+ 305 0084 4FF00003 		mov	r3, #0
+ 306 0088 BB77     		strb	r3, [r7, #30]
+ 163:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
+ 307              		.loc 1 163 0
+ 308 008a 4FF00203 		mov	r3, #2
+ 309 008e FB77     		strb	r3, [r7, #31]
+ 164:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 310              		.loc 1 164 0
+ 311 0090 4FF00203 		mov	r3, #2
+ 312 0094 7B77     		strb	r3, [r7, #29]
+ 165:src/stm32f4_discovery_lis3dsh.c **** 
+ 166:src/stm32f4_discovery_lis3dsh.c ****   /* SPI SCK pin configuration */
+ 167:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_SCK_PIN;
+ 313              		.loc 1 167 0
+ 314 0096 4FF02003 		mov	r3, #32
+ 315 009a BB61     		str	r3, [r7, #24]
+ 168:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
+ 316              		.loc 1 168 0
+ 317 009c 4FF00000 		mov	r0, #0
+ 318 00a0 C4F20200 		movt	r0, 16386
+ 319 00a4 07F11803 		add	r3, r7, #24
+ 320 00a8 1946     		mov	r1, r3
+ 321 00aa FFF7FEFF 		bl	GPIO_Init
+ 169:src/stm32f4_discovery_lis3dsh.c **** 
+ 170:src/stm32f4_discovery_lis3dsh.c ****   /* SPI  MOSI pin configuration */
+ 171:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin =  LIS3DSH_SPI_MOSI_PIN;
+ 322              		.loc 1 171 0
+ 323 00ae 4FF08003 		mov	r3, #128
+ 324 00b2 BB61     		str	r3, [r7, #24]
+ 172:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+ 325              		.loc 1 172 0
+ 326 00b4 4FF00000 		mov	r0, #0
+ 327 00b8 C4F20200 		movt	r0, 16386
+ 328 00bc 07F11803 		add	r3, r7, #24
+ 329 00c0 1946     		mov	r1, r3
+ 330 00c2 FFF7FEFF 		bl	GPIO_Init
+ 173:src/stm32f4_discovery_lis3dsh.c **** 
+ 174:src/stm32f4_discovery_lis3dsh.c ****   /* SPI MISO pin configuration */
+ 175:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_MISO_PIN;
+ 331              		.loc 1 175 0
+ 332 00c6 4FF04003 		mov	r3, #64
+ 333 00ca BB61     		str	r3, [r7, #24]
+ 176:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
+ 334              		.loc 1 176 0
+ 335 00cc 4FF00000 		mov	r0, #0
+ 336 00d0 C4F20200 		movt	r0, 16386
+ 337 00d4 07F11803 		add	r3, r7, #24
+ 338 00d8 1946     		mov	r1, r3
+ 339 00da FFF7FEFF 		bl	GPIO_Init
+ 177:src/stm32f4_discovery_lis3dsh.c **** 
+ 178:src/stm32f4_discovery_lis3dsh.c ****   /* SPI configuration -------------------------------------------------------*/
+ 179:src/stm32f4_discovery_lis3dsh.c ****   SPI_I2S_DeInit(LIS3DSH_SPI);
+ 340              		.loc 1 179 0
+ 341 00de 4FF44050 		mov	r0, #12288
+ 342 00e2 C4F20100 		movt	r0, 16385
+ 343 00e6 FFF7FEFF 		bl	SPI_I2S_DeInit
+ 180:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 344              		.loc 1 180 0
+ 345 00ea 4FF00003 		mov	r3, #0
+ 346 00ee BB80     		strh	r3, [r7, #4]	@ movhi
+ 181:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 347              		.loc 1 181 0
+ 348 00f0 4FF00003 		mov	r3, #0
+ 349 00f4 3B81     		strh	r3, [r7, #8]	@ movhi
+ 182:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
+ 350              		.loc 1 182 0
+ 351 00f6 4FF00003 		mov	r3, #0
+ 352 00fa 7B81     		strh	r3, [r7, #10]	@ movhi
+ 183:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+ 353              		.loc 1 183 0
+ 354 00fc 4FF00003 		mov	r3, #0
+ 355 0100 BB81     		strh	r3, [r7, #12]	@ movhi
+ 184:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 356              		.loc 1 184 0
+ 357 0102 4FF40073 		mov	r3, #512
+ 358 0106 FB81     		strh	r3, [r7, #14]	@ movhi
+ 185:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+ 359              		.loc 1 185 0
+ 360 0108 4FF00803 		mov	r3, #8
+ 361 010c 3B82     		strh	r3, [r7, #16]	@ movhi
+ 186:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+ 362              		.loc 1 186 0
+ 363 010e 4FF00003 		mov	r3, #0
+ 364 0112 7B82     		strh	r3, [r7, #18]	@ movhi
+ 187:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_CRCPolynomial = 7;
+ 365              		.loc 1 187 0
+ 366 0114 4FF00703 		mov	r3, #7
+ 367 0118 BB82     		strh	r3, [r7, #20]	@ movhi
+ 188:src/stm32f4_discovery_lis3dsh.c ****   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 368              		.loc 1 188 0
+ 369 011a 4FF48273 		mov	r3, #260
+ 370 011e FB80     		strh	r3, [r7, #6]	@ movhi
+ 189:src/stm32f4_discovery_lis3dsh.c ****   SPI_Init(LIS3DSH_SPI, &SPI_InitStructure);
+ 371              		.loc 1 189 0
+ 372 0120 4FF44050 		mov	r0, #12288
+ 373 0124 C4F20100 		movt	r0, 16385
+ 374 0128 07F10403 		add	r3, r7, #4
+ 375 012c 1946     		mov	r1, r3
+ 376 012e FFF7FEFF 		bl	SPI_Init
+ 190:src/stm32f4_discovery_lis3dsh.c **** 
+ 191:src/stm32f4_discovery_lis3dsh.c ****   /* Enable SPI1  */
+ 192:src/stm32f4_discovery_lis3dsh.c ****   SPI_Cmd(LIS3DSH_SPI, ENABLE);
+ 377              		.loc 1 192 0
+ 378 0132 4FF44050 		mov	r0, #12288
+ 379 0136 C4F20100 		movt	r0, 16385
+ 380 013a 4FF00101 		mov	r1, #1
+ 381 013e FFF7FEFF 		bl	SPI_Cmd
+ 193:src/stm32f4_discovery_lis3dsh.c **** 
+ 194:src/stm32f4_discovery_lis3dsh.c ****   /* Configure GPIO PIN for Lis Chip select */
+ 195:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_CS_PIN;
+ 382              		.loc 1 195 0
+ 383 0142 4FF00803 		mov	r3, #8
+ 384 0146 BB61     		str	r3, [r7, #24]
+ 196:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 385              		.loc 1 196 0
+ 386 0148 4FF00103 		mov	r3, #1
+ 387 014c 3B77     		strb	r3, [r7, #28]
+ 197:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 388              		.loc 1 197 0
+ 389 014e 4FF00003 		mov	r3, #0
+ 390 0152 BB77     		strb	r3, [r7, #30]
+ 198:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 391              		.loc 1 198 0
+ 392 0154 4FF00203 		mov	r3, #2
+ 393 0158 7B77     		strb	r3, [r7, #29]
+ 199:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_CS_GPIO_PORT, &GPIO_InitStructure);
+ 394              		.loc 1 199 0
+ 395 015a 4FF48050 		mov	r0, #4096
+ 396 015e C4F20200 		movt	r0, 16386
+ 397 0162 07F11803 		add	r3, r7, #24
+ 398 0166 1946     		mov	r1, r3
+ 399 0168 FFF7FEFF 		bl	GPIO_Init
+ 200:src/stm32f4_discovery_lis3dsh.c **** 
+ 201:src/stm32f4_discovery_lis3dsh.c ****   /* Deselect : Chip Select high */
+ 202:src/stm32f4_discovery_lis3dsh.c ****   GPIO_SetBits(LIS3DSH_SPI_CS_GPIO_PORT, LIS3DSH_SPI_CS_PIN);
+ 400              		.loc 1 202 0
+ 401 016c 4FF48050 		mov	r0, #4096
+ 402 0170 C4F20200 		movt	r0, 16386
+ 403 0174 4FF00801 		mov	r1, #8
+ 404 0178 FFF7FEFF 		bl	GPIO_SetBits
+ 203:src/stm32f4_discovery_lis3dsh.c ****   
+ 204:src/stm32f4_discovery_lis3dsh.c ****   /* Configure GPIO PINs to detect Interrupts */
+ 205:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_INT1_PIN;
+ 405              		.loc 1 205 0
+ 406 017c 4FF00103 		mov	r3, #1
+ 407 0180 BB61     		str	r3, [r7, #24]
+ 206:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+ 408              		.loc 1 206 0
+ 409 0182 4FF00003 		mov	r3, #0
+ 410 0186 3B77     		strb	r3, [r7, #28]
+ 207:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 411              		.loc 1 207 0
+ 412 0188 4FF00003 		mov	r3, #0
+ 413 018c BB77     		strb	r3, [r7, #30]
+ 208:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 414              		.loc 1 208 0
+ 415 018e 4FF00203 		mov	r3, #2
+ 416 0192 7B77     		strb	r3, [r7, #29]
+ 209:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+ 417              		.loc 1 209 0
+ 418 0194 4FF00003 		mov	r3, #0
+ 419 0198 FB77     		strb	r3, [r7, #31]
+ 210:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_INT1_GPIO_PORT, &GPIO_InitStructure);
+ 420              		.loc 1 210 0
+ 421 019a 4FF48050 		mov	r0, #4096
+ 422 019e C4F20200 		movt	r0, 16386
+ 423 01a2 07F11803 		add	r3, r7, #24
+ 424 01a6 1946     		mov	r1, r3
+ 425 01a8 FFF7FEFF 		bl	GPIO_Init
+ 211:src/stm32f4_discovery_lis3dsh.c ****   
+ 212:src/stm32f4_discovery_lis3dsh.c ****   GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_INT2_PIN;
+ 426              		.loc 1 212 0
+ 427 01ac 4FF00203 		mov	r3, #2
+ 428 01b0 BB61     		str	r3, [r7, #24]
+ 213:src/stm32f4_discovery_lis3dsh.c ****   GPIO_Init(LIS3DSH_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
+ 429              		.loc 1 213 0
+ 430 01b2 4FF48050 		mov	r0, #4096
+ 431 01b6 C4F20200 		movt	r0, 16386
+ 432 01ba 07F11803 		add	r3, r7, #24
+ 433 01be 1946     		mov	r1, r3
+ 434 01c0 FFF7FEFF 		bl	GPIO_Init
+ 214:src/stm32f4_discovery_lis3dsh.c **** }
+ 435              		.loc 1 214 0
+ 436 01c4 07F12007 		add	r7, r7, #32
+ 437 01c8 BD46     		mov	sp, r7
+ 438 01ca 80BD     		pop	{r7, pc}
+ 439              		.cfi_endproc
+ 440              	.LFE113:
+ 442              		.section	.text.LIS3DSH_SendByte,"ax",%progbits
+ 443              		.align	2
+ 444              		.thumb
+ 445              		.thumb_func
+ 447              	LIS3DSH_SendByte:
+ 448              	.LFB114:
+ 215:src/stm32f4_discovery_lis3dsh.c **** 
+ 216:src/stm32f4_discovery_lis3dsh.c **** 
+ 217:src/stm32f4_discovery_lis3dsh.c **** /**
+ 218:src/stm32f4_discovery_lis3dsh.c ****   * @brief  Sends a Byte through the SPI interface and return the Byte received 
+ 219:src/stm32f4_discovery_lis3dsh.c ****   *         from the SPI bus.
+ 220:src/stm32f4_discovery_lis3dsh.c ****   * @param  Byte : Byte send.
+ 221:src/stm32f4_discovery_lis3dsh.c ****   * @retval The received byte value
+ 222:src/stm32f4_discovery_lis3dsh.c ****   */
+ 223:src/stm32f4_discovery_lis3dsh.c **** static uint8_t LIS3DSH_SendByte(uint8_t byte)
+ 224:src/stm32f4_discovery_lis3dsh.c **** {
+ 449              		.loc 1 224 0
+ 450              		.cfi_startproc
+ 451              		@ args = 0, pretend = 0, frame = 8
+ 452              		@ frame_needed = 1, uses_anonymous_args = 0
+ 453 0000 80B5     		push	{r7, lr}
+ 454              	.LCFI12:
+ 455              		.cfi_def_cfa_offset 8
+ 456              		.cfi_offset 14, -4
+ 457              		.cfi_offset 7, -8
+ 458 0002 82B0     		sub	sp, sp, #8
+ 459              	.LCFI13:
+ 460              		.cfi_def_cfa_offset 16
+ 461 0004 00AF     		add	r7, sp, #0
+ 462              	.LCFI14:
+ 463              		.cfi_def_cfa_register 7
+ 464 0006 0346     		mov	r3, r0
+ 465 0008 FB71     		strb	r3, [r7, #7]
+ 225:src/stm32f4_discovery_lis3dsh.c ****   /* Loop while DR register in not emplty */
+ 226:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSHTimeout = LIS3DSH_FLAG_TIMEOUT;
+ 466              		.loc 1 226 0
+ 467 000a 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 468 000e C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 469 0012 4FF48052 		mov	r2, #4096
+ 470 0016 1A60     		str	r2, [r3, #0]
+ 227:src/stm32f4_discovery_lis3dsh.c ****   while (SPI_I2S_GetFlagStatus(LIS3DSH_SPI, SPI_I2S_FLAG_TXE) == RESET)
+ 471              		.loc 1 227 0
+ 472 0018 17E0     		b	.L13
+ 473              	.L15:
+ 228:src/stm32f4_discovery_lis3dsh.c ****   {
+ 229:src/stm32f4_discovery_lis3dsh.c ****     if((LIS3DSHTimeout--) == 0) return LIS3DSH_TIMEOUT_UserCallback();
+ 474              		.loc 1 229 0
+ 475 001a 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 476 001e C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 477 0022 1B68     		ldr	r3, [r3, #0]
+ 478 0024 002B     		cmp	r3, #0
+ 479 0026 14BF     		ite	ne
+ 480 0028 0022     		movne	r2, #0
+ 481 002a 0122     		moveq	r2, #1
+ 482 002c D2B2     		uxtb	r2, r2
+ 483 002e 03F1FF31 		add	r1, r3, #-1
+ 484 0032 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 485 0036 C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 486 003a 1960     		str	r1, [r3, #0]
+ 487 003c 002A     		cmp	r2, #0
+ 488 003e 04D0     		beq	.L13
+ 489              		.loc 1 229 0 is_stmt 0 discriminator 1
+ 490 0040 FFF7FEFF 		bl	LIS3DSH_TIMEOUT_UserCallback
+ 491 0044 0346     		mov	r3, r0
+ 492 0046 DBB2     		uxtb	r3, r3
+ 493 0048 46E0     		b	.L14
+ 494              	.L13:
+ 227:src/stm32f4_discovery_lis3dsh.c ****   while (SPI_I2S_GetFlagStatus(LIS3DSH_SPI, SPI_I2S_FLAG_TXE) == RESET)
+ 495              		.loc 1 227 0 is_stmt 1 discriminator 1
+ 496 004a 4FF44050 		mov	r0, #12288
+ 497 004e C4F20100 		movt	r0, 16385
+ 498 0052 4FF00201 		mov	r1, #2
+ 499 0056 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 500 005a 0346     		mov	r3, r0
+ 501 005c 002B     		cmp	r3, #0
+ 502 005e DCD0     		beq	.L15
+ 230:src/stm32f4_discovery_lis3dsh.c ****   }
+ 231:src/stm32f4_discovery_lis3dsh.c ****   
+ 232:src/stm32f4_discovery_lis3dsh.c ****   /* Send a Byte through the SPI peripheral */
+ 233:src/stm32f4_discovery_lis3dsh.c ****   SPI_I2S_SendData(LIS3DSH_SPI, byte);
+ 503              		.loc 1 233 0
+ 504 0060 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 505 0062 9BB2     		uxth	r3, r3
+ 506 0064 4FF44050 		mov	r0, #12288
+ 507 0068 C4F20100 		movt	r0, 16385
+ 508 006c 1946     		mov	r1, r3
+ 509 006e FFF7FEFF 		bl	SPI_I2S_SendData
+ 234:src/stm32f4_discovery_lis3dsh.c ****   
+ 235:src/stm32f4_discovery_lis3dsh.c ****   /* Wait to receive a Byte */
+ 236:src/stm32f4_discovery_lis3dsh.c ****   LIS3DSHTimeout = LIS3DSH_FLAG_TIMEOUT;
+ 510              		.loc 1 236 0
+ 511 0072 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 512 0076 C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 513 007a 4FF48052 		mov	r2, #4096
+ 514 007e 1A60     		str	r2, [r3, #0]
+ 237:src/stm32f4_discovery_lis3dsh.c ****   while (SPI_I2S_GetFlagStatus(LIS3DSH_SPI, SPI_I2S_FLAG_RXNE) == RESET)
+ 515              		.loc 1 237 0
+ 516 0080 17E0     		b	.L16
+ 517              	.L17:
+ 238:src/stm32f4_discovery_lis3dsh.c ****   {
+ 239:src/stm32f4_discovery_lis3dsh.c ****     if((LIS3DSHTimeout--) == 0) return LIS3DSH_TIMEOUT_UserCallback();
+ 518              		.loc 1 239 0
+ 519 0082 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 520 0086 C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 521 008a 1B68     		ldr	r3, [r3, #0]
+ 522 008c 002B     		cmp	r3, #0
+ 523 008e 14BF     		ite	ne
+ 524 0090 0022     		movne	r2, #0
+ 525 0092 0122     		moveq	r2, #1
+ 526 0094 D2B2     		uxtb	r2, r2
+ 527 0096 03F1FF31 		add	r1, r3, #-1
+ 528 009a 40F20003 		movw	r3, #:lower16:LIS3DSHTimeout
+ 529 009e C0F20003 		movt	r3, #:upper16:LIS3DSHTimeout
+ 530 00a2 1960     		str	r1, [r3, #0]
+ 531 00a4 002A     		cmp	r2, #0
+ 532 00a6 04D0     		beq	.L16
+ 533              		.loc 1 239 0 is_stmt 0 discriminator 1
+ 534 00a8 FFF7FEFF 		bl	LIS3DSH_TIMEOUT_UserCallback
+ 535 00ac 0346     		mov	r3, r0
+ 536 00ae DBB2     		uxtb	r3, r3
+ 537 00b0 12E0     		b	.L14
+ 538              	.L16:
+ 237:src/stm32f4_discovery_lis3dsh.c ****   while (SPI_I2S_GetFlagStatus(LIS3DSH_SPI, SPI_I2S_FLAG_RXNE) == RESET)
+ 539              		.loc 1 237 0 is_stmt 1 discriminator 1
+ 540 00b2 4FF44050 		mov	r0, #12288
+ 541 00b6 C4F20100 		movt	r0, 16385
+ 542 00ba 4FF00101 		mov	r1, #1
+ 543 00be FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 544 00c2 0346     		mov	r3, r0
+ 545 00c4 002B     		cmp	r3, #0
+ 546 00c6 DCD0     		beq	.L17
+ 240:src/stm32f4_discovery_lis3dsh.c ****   }
+ 241:src/stm32f4_discovery_lis3dsh.c ****   
+ 242:src/stm32f4_discovery_lis3dsh.c ****   /* Return the Byte read from the SPI bus */
+ 243:src/stm32f4_discovery_lis3dsh.c ****   return (uint8_t)SPI_I2S_ReceiveData(LIS3DSH_SPI);
+ 547              		.loc 1 243 0
+ 548 00c8 4FF44050 		mov	r0, #12288
+ 549 00cc C4F20100 		movt	r0, 16385
+ 550 00d0 FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 551 00d4 0346     		mov	r3, r0
+ 552 00d6 DBB2     		uxtb	r3, r3
+ 553              	.L14:
+ 244:src/stm32f4_discovery_lis3dsh.c **** }
+ 554              		.loc 1 244 0
+ 555 00d8 1846     		mov	r0, r3
+ 556 00da 07F10807 		add	r7, r7, #8
+ 557 00de BD46     		mov	sp, r7
+ 558 00e0 80BD     		pop	{r7, pc}
+ 559              		.cfi_endproc
+ 560              	.LFE114:
+ 562 00e2 00BF     		.text
+ 563              	.Letext0:
+ 564              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 565              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 566              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
+ 567              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_spi.h"
+ 568              		.file 6 "src/include/stm32f4_discovery_lis3dsh.h"
+ 569              		.file 7 "libs/CMSIS/Include/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f4_discovery_lis3dsh.c
+     /tmp/ccwoHUiL.s:24     .data.LIS3DSHTimeout:00000000 LIS3DSHTimeout
+     /tmp/ccwoHUiL.s:21     .data.LIS3DSHTimeout:00000000 $d
+     /tmp/ccwoHUiL.s:27     .text.LIS3DSH_Init:00000000 $t
+     /tmp/ccwoHUiL.s:32     .text.LIS3DSH_Init:00000000 LIS3DSH_Init
+     /tmp/ccwoHUiL.s:246    .text.LIS3DSH_LowLevel_Init:00000000 LIS3DSH_LowLevel_Init
+     /tmp/ccwoHUiL.s:81     .text.LIS3DSH_Write:00000000 LIS3DSH_Write
+     /tmp/ccwoHUiL.s:76     .text.LIS3DSH_Write:00000000 $t
+     /tmp/ccwoHUiL.s:447    .text.LIS3DSH_SendByte:00000000 LIS3DSH_SendByte
+     /tmp/ccwoHUiL.s:155    .text.LIS3DSH_Read:00000000 $t
+     /tmp/ccwoHUiL.s:160    .text.LIS3DSH_Read:00000000 LIS3DSH_Read
+     /tmp/ccwoHUiL.s:242    .text.LIS3DSH_LowLevel_Init:00000000 $t
+     /tmp/ccwoHUiL.s:443    .text.LIS3DSH_SendByte:00000000 $t
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+GPIO_ResetBits
+GPIO_SetBits
+RCC_APB2PeriphClockCmd
+RCC_AHB1PeriphClockCmd
+GPIO_PinAFConfig
+GPIO_Init
+SPI_I2S_DeInit
+SPI_Init
+SPI_Cmd
+LIS3DSH_TIMEOUT_UserCallback
+SPI_I2S_GetFlagStatus
+SPI_I2S_SendData
+SPI_I2S_ReceiveData

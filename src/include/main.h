@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    LIS302DL/main.h 
+  * @file    LIS3DSH/main.h 
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    19-September-2011
@@ -25,7 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery.h"
-#include "stm32f4_discovery_lis302dl.h"
+#include "stm32f4_discovery_lis3dsh.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

@@ -1,7 +1,7 @@
 /* Library includes. */
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
-#include "stm32f4_discovery_lis302dl.h"
+#include "stm32f4_discovery_lis3dsh.h"
 
 
 #ifndef HW_CONFIG_H
@@ -22,7 +22,7 @@ void prvSetupHardware( void );
 void prvTIM4_Config(void);
 void prvMEMS_Config(void);
 void prvLED_Config(char state);
-uint32_t LIS302DL_TIMEOUT_UserCallback(void);
+uint32_t LIS3DSH_TIMEOUT_UserCallback(void);
 void RCC_Configuration(void);
 void GPIO_Configuration(void);
 void TIM_Configuration(void);

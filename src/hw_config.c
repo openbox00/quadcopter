@@ -209,56 +209,47 @@ void USART_Configuration(void)
 void prvMEMS_Config(void)
 {
 	uint8_t ctrl = 0;
-	uint32_t i=0;		//simple index for software delay
 
-	LIS302DL_InitTypeDef  LIS302DL_InitStruct;
-	LIS302DL_InterruptConfigTypeDef LIS302DL_InterruptStruct;
+	LIS3DSH_InitTypeDef  LIS3DSH_InitStruct;
+/*
+    LIS3DSH_InitStruct.SM1_Hysteresis=0x00;
+    LIS3DSH_InitStruct.SM1_Pin=LIS3DSH_SM1_INT_TO_PIN_INT1;
+    LIS3DSH_InitStruct.SM1_Enable=LIS3DSH_SM1_DISABLE;
 
-	/* Set configuration of LIS302DL*/
-	LIS302DL_InitStruct.Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
-	LIS302DL_InitStruct.Output_DataRate = LIS302DL_DATARATE_100;
-	LIS302DL_InitStruct.Axes_Enable = LIS302DL_X_ENABLE | LIS302DL_Y_ENABLE | LIS302DL_Z_ENABLE;
-	LIS302DL_InitStruct.Full_Scale = LIS302DL_FULLSCALE_2_3;
-	LIS302DL_InitStruct.Self_Test = LIS302DL_SELFTEST_NORMAL;
-	LIS302DL_Init(&LIS302DL_InitStruct);
+    LIS3DSH_InitStruct.SM2_Hysteresis=0x00;
+    LIS3DSH_InitStruct.SM2_Pin=LIS3DSH_SM2_INT_TO_PIN_INT1;
+    LIS3DSH_InitStruct.SM2_Enable=LIS3DSH_SM2_DISABLE;
 
-	/* Set configuration of Internal High Pass Filter of LIS302DL*/
-	LIS302DL_InterruptStruct.Latch_Request = LIS302DL_INTERRUPTREQUEST_LATCHED;
-	LIS302DL_InterruptStruct.SingleClick_Axes = LIS302DL_CLICKINTERRUPT_Z_ENABLE;
-	LIS302DL_InterruptStruct.DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
-	LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
+    LIS3DSH_InitStruct.CR3_Dren=LIS3DSH_CR3_DREN_TO_INT1_DISABLE;
+    LIS3DSH_InitStruct.CR3_Iea=LIS3DSH_CR3_IEA_ACTIVE_LOW;
+    LIS3DSH_InitStruct.CR3_Iel=LIS3DSH_CR3_IEL_LATCHED;
+    LIS3DSH_InitStruct.CR3_Int2En=LIS3DSH_CR3_INT2_DISABLED;
+    LIS3DSH_InitStruct.CR3_Int1En=LIS3DSH_CR3_INT1_DISABLED;
+    LIS3DSH_InitStruct.CR3_Vfilt=LIS3DSH_CR3_VFILT_DISABLED;
+    LIS3DSH_InitStruct.CR3_Strt=LIS3DSH_CR3_NO_SOFT_RESET;
 
-	/* Required delay for the MEMS Accelerometer: Turn-on time = 3/Output data Rate
-	                                                            = 3/100 = 30ms */
-	for(i=0;i<0x1FFFF;i++);
+    LIS3DSH_InitStruct.CR4_Odr=LIS3DSH_CR4_ODR_100HZ;
+    LIS3DSH_InitStruct.CR4_Bdu=LIS3DSH_CR4_BDU_ENABLED;
+    LIS3DSH_InitStruct.CR4_Zen=LIS3DSH_CR4_Z_AXIS_ENABLED;
+    LIS3DSH_InitStruct.CR4_Yen=LIS3DSH_CR4_Y_AXIS_ENABLED;
+    LIS3DSH_InitStruct.CR4_Xen=LIS3DSH_CR4_X_AXIS_ENABLED;
 
-	/* Configure Interrupt control register: enable Click interrupt1 */
-	ctrl = 0x07;
-	LIS302DL_Write(&ctrl, LIS302DL_CTRL_REG3_ADDR, 1);
+    LIS3DSH_InitStruct.CR5_Bw=LIS3DSH_CR5_BW_50HZ;
+    LIS3DSH_InitStruct.CR5_Fscale=LIS3DSH_CR5_FSCALE_2G;
+    LIS3DSH_InitStruct.CR5_St=LIS3DSH_CR5_ST_DISABLE;
+    LIS3DSH_InitStruct.CR5_Sim=LIS3DSH_CR5_MODE_4_WIRE_INTERFACE;
 
-	/* Enable Interrupt generation on click/double click on Z axis */
-	ctrl = 0x70;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_CFG_REG_ADDR, 1);
-
-	/* Configure Click Threshold on X/Y axis (10 x 0.5g) */
-	ctrl = 0xAA;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSY_X_REG_ADDR, 1);
-
-	/* Configure Click Threshold on Z axis (10 x 0.5g) */
-	ctrl = 0x0A;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSZ_REG_ADDR, 1);
-
-	/* Configure Time Limit */
-	ctrl = 0x03;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_TIMELIMIT_REG_ADDR, 1);
-
-	/* Configure Latency */
-	ctrl = 0x7F;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_LATENCY_REG_ADDR, 1);
-
-	/* Configure Click Window */
-	ctrl = 0x7F;
-	LIS302DL_Write(&ctrl, LIS302DL_CLICK_WINDOW_REG_ADDR, 1);
+    LIS3DSH_InitStruct.CR6_Boot=LIS3DSH_CR6_FORCE_REBOOT_DISABLE;
+    LIS3DSH_InitStruct.CR6_FifoEn=LIS3DSH_CR6_FIFO_DISABLED;
+    LIS3DSH_InitStruct.CR6_WtmEn=LIS3DSH_CR6_WTM_DISABLED;
+    LIS3DSH_InitStruct.CR6_AddInc=LIS3DSH_CR6_ADDINC_DISABLED;
+    LIS3DSH_InitStruct.CR6_P1Empty=LIS3DSH_CR6_FIFO_EMPTY_TO_INT1_DISABLED;
+    LIS3DSH_InitStruct.CR6_P1Wtm=LIS3DSH_CR6_FIFO_WTM_TO_INT1_DISABLED;
+    LIS3DSH_InitStruct.CR6_P1OverRun=LIS3DSH_CR6_FIFO_OVERRUN_TO_INT1_DISABLED;
+    LIS3DSH_InitStruct.CR6_P2Boot=LIS3DSH_CR6_BOOT_TO_INT2_DISABLED;
+*/
+	
+	LIS3DSH_Init(&LIS3DSH_InitStruct);	
 }
 
 /**
@@ -266,7 +257,7 @@ void prvMEMS_Config(void)
   * @param  None.
   * @retval None.
   */
-uint32_t LIS302DL_TIMEOUT_UserCallback(void)
+uint32_t LIS3DSH_TIMEOUT_UserCallback(void)
 {
   /* MEMS Accelerometer Timeout error has occured */
   while (1)

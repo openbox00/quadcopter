@@ -24,7 +24,7 @@ SOURCES += src/modbus.c
 SOURCES += src/test.c
 
 SOURCES += src/stm32f4_discovery.c
-SOURCES += src/stm32f4_discovery_lis302dl.c
+SOURCES += src/stm32f4_discovery_lis3dsh.c
 SOURCES += src/hw_config.c
 
 SOURCES += FreeRTOS/Source/tasks.c
