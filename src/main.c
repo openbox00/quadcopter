@@ -71,6 +71,7 @@ static void vMEMSTask(void *pvParameters);
 static void UsartTask(void *pvParameters);
 static void Usartrecive(void *pvParameters);
 
+
 /* semaphores, queues declarations */
 xQueueHandle xQueueUARTSend;
 xQueueHandle xQueueUARTRecvie;
@@ -80,7 +81,7 @@ xQueueHandle xQueueShell2PWM;
 /* Private variables ---------------------------------------------------------*/
 /* Queue structure used for passing messages. */
 typedef struct {
-	char str[100];
+	char str[50];
 } serial_str_msg;
 
 typedef struct {
@@ -115,24 +116,41 @@ int receive_byte_noblock(char *ch)
 
 static void pwmctrl(void *pvParameters)
 {
-  const portTickType xDelay = 1000; // portTICK_RATE_MS;
+  const portTickType xDelay = 3000; // portTICK_RATE_MS;
 
+  char pwm_speed_char[4];
+
+  int pwm_speed_int = 100;
+
+  int pwm_speed;
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-
+  vTaskDelay( xDelay );
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-  
+  vTaskDelay( xDelay );
 
 
   while(1)  // Do not exit
   {
-   Motor_Control(TEST, TEST, TEST, TEST);
-   
-   vTaskDelay( xDelay );
+  while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
 
-   Motor_Control(TEST+50, TEST+50, TEST+50, TEST+50);
+  pwm_speed_int = atoi(pwm_speed_char);
+	
+  qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
+	
+   pwm_speed = (pwm_speed_int *1000) / 100;
 
-   vTaskDelay( xDelay );
+   if (pwm_speed >1000) {
+	pwm_speed = 1000;
+	}else if (pwm_speed <100){
+	pwm_speed = 100;
+	}else{
+	pwm_speed = pwm_speed;
+	}
+	
+		
+   Motor_Control(pwm_speed, pwm_speed, pwm_speed, pwm_speed);
+
 
   }
  
@@ -175,14 +193,13 @@ int main(void)
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
     xQueueUARTRecvie = xQueueCreate(1, sizeof(serial_ch_msg));
-    xQueueShell2PWM = xQueueCreate(1, sizeof(serial_ch_msg));
-
+    xQueueShell2PWM = xQueueCreate(1, 24);
 
 	/* initialize hardware... */
 	prvSetupHardware();
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
 	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
@@ -209,7 +226,7 @@ static void UsartTask(void *pvParameters)
 
 	while(1) {
 
-	
+
 		serial_str_msg msg;
 
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));

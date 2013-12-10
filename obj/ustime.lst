@@ -371,18 +371,18 @@
  300              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 ustime.c
-     /tmp/cc51oTgZ.s:20     .text.get_us_time:00000000 $t
-     /tmp/cc51oTgZ.s:25     .text.get_us_time:00000000 get_us_time
-     /tmp/cc51oTgZ.s:287    .bss.t0.7203:00000000 t0.7203
-     /tmp/cc51oTgZ.s:293    .bss.tickcount.7204:00000000 tickcount.7204
-     /tmp/cc51oTgZ.s:101    .text.delay_us:00000000 $t
-     /tmp/cc51oTgZ.s:106    .text.delay_us:00000000 delay_us
-     /tmp/cc51oTgZ.s:183    .text.delay_ms:00000000 $t
-     /tmp/cc51oTgZ.s:188    .text.delay_ms:00000000 delay_ms
-     /tmp/cc51oTgZ.s:220    .text.init_us_timer:00000000 $t
-     /tmp/cc51oTgZ.s:225    .text.init_us_timer:00000000 init_us_timer
-     /tmp/cc51oTgZ.s:284    .bss.t0.7203:00000000 $d
-     /tmp/cc51oTgZ.s:290    .bss.tickcount.7204:00000000 $d
+     /tmp/ccZTOu76.s:20     .text.get_us_time:00000000 $t
+     /tmp/ccZTOu76.s:25     .text.get_us_time:00000000 get_us_time
+     /tmp/ccZTOu76.s:287    .bss.t0.7203:00000000 t0.7203
+     /tmp/ccZTOu76.s:293    .bss.tickcount.7204:00000000 tickcount.7204
+     /tmp/ccZTOu76.s:101    .text.delay_us:00000000 $t
+     /tmp/ccZTOu76.s:106    .text.delay_us:00000000 delay_us
+     /tmp/ccZTOu76.s:183    .text.delay_ms:00000000 $t
+     /tmp/ccZTOu76.s:188    .text.delay_ms:00000000 delay_ms
+     /tmp/ccZTOu76.s:220    .text.init_us_timer:00000000 $t
+     /tmp/ccZTOu76.s:225    .text.init_us_timer:00000000 init_us_timer
+     /tmp/ccZTOu76.s:284    .bss.t0.7203:00000000 $d
+     /tmp/ccZTOu76.s:290    .bss.tickcount.7204:00000000 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

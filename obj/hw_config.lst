@@ -77,180 +77,177 @@
   32:src/hw_config.c **** 
   33:src/hw_config.c **** 	/* Configure LED IOs as output push-pull */
   34:src/hw_config.c ****     /* Initialize LEDs on STM32F4_Discovery board */
-  35:src/hw_config.c **** 	prvLED_Config(GPIO);
-  47              		.loc 1 35 0
-  48 0018 4FF00000 		mov	r0, #0
-  49 001c FFF7FEFF 		bl	prvLED_Config
+  35:src/hw_config.c **** 	//prvLED_Config(GPIO);
   36:src/hw_config.c **** 	/* Configure User button pin (PA0) as external interrupt -> modes switching */
   37:src/hw_config.c **** 	STM_EVAL_PBInit(BUTTON_USER,BUTTON_MODE_EXTI);
-  50              		.loc 1 37 0
-  51 0020 4FF00000 		mov	r0, #0
-  52 0024 4FF00101 		mov	r1, #1
-  53 0028 FFF7FEFF 		bl	STM_EVAL_PBInit
+  47              		.loc 1 37 0
+  48 0018 4FF00000 		mov	r0, #0
+  49 001c 4FF00101 		mov	r1, #1
+  50 0020 FFF7FEFF 		bl	STM_EVAL_PBInit
   38:src/hw_config.c **** 
   39:src/hw_config.c **** 	/* Configuration of Timer4 to control LEDs based on MEMS data */
   40:src/hw_config.c **** 	//prvTIM4_Config();
   41:src/hw_config.c **** 
   42:src/hw_config.c **** 	/* Configure LIS302 in order to produce data used for TIM4 reconfiguration and LED control */
   43:src/hw_config.c **** 	prvMEMS_Config();
-  54              		.loc 1 43 0
-  55 002c FFF7FEFF 		bl	prvMEMS_Config
+  51              		.loc 1 43 0
+  52 0024 FFF7FEFF 		bl	prvMEMS_Config
   44:src/hw_config.c **** 
   45:src/hw_config.c ****   RCC_Configuration();
-  56              		.loc 1 45 0
-  57 0030 FFF7FEFF 		bl	RCC_Configuration
+  53              		.loc 1 45 0
+  54 0028 FFF7FEFF 		bl	RCC_Configuration
   46:src/hw_config.c ****   GPIO_Configuration();
-  58              		.loc 1 46 0
-  59 0034 FFF7FEFF 		bl	GPIO_Configuration
+  55              		.loc 1 46 0
+  56 002c FFF7FEFF 		bl	GPIO_Configuration
   47:src/hw_config.c ****   TIM_Configuration();
-  60              		.loc 1 47 0
-  61 0038 FFF7FEFF 		bl	TIM_Configuration
+  57              		.loc 1 47 0
+  58 0030 FFF7FEFF 		bl	TIM_Configuration
   48:src/hw_config.c ****   USART_Configuration();
-  62              		.loc 1 48 0
-  63 003c FFF7FEFF 		bl	USART_Configuration
+  59              		.loc 1 48 0
+  60 0034 FFF7FEFF 		bl	USART_Configuration
   49:src/hw_config.c **** }
-  64              		.loc 1 49 0
-  65 0040 80BD     		pop	{r7, pc}
-  66              		.cfi_endproc
-  67              	.LFE110:
-  69 0042 00BF     		.section	.text.prvLED_Config,"ax",%progbits
-  70              		.align	2
-  71              		.global	prvLED_Config
-  72              		.thumb
-  73              		.thumb_func
-  75              	prvLED_Config:
-  76              	.LFB111:
+  61              		.loc 1 49 0
+  62 0038 80BD     		pop	{r7, pc}
+  63              		.cfi_endproc
+  64              	.LFE110:
+  66              		.section	.text.prvLED_Config,"ax",%progbits
+  67              		.align	2
+  68              		.global	prvLED_Config
+  69              		.thumb
+  70              		.thumb_func
+  72              	prvLED_Config:
+  73              	.LFB111:
   50:src/hw_config.c **** 
   51:src/hw_config.c **** void prvLED_Config(char state)
   52:src/hw_config.c **** {
-  77              		.loc 1 52 0
-  78              		.cfi_startproc
-  79              		@ args = 0, pretend = 0, frame = 16
-  80              		@ frame_needed = 1, uses_anonymous_args = 0
-  81 0000 80B5     		push	{r7, lr}
-  82              	.LCFI2:
-  83              		.cfi_def_cfa_offset 8
-  84              		.cfi_offset 14, -4
-  85              		.cfi_offset 7, -8
-  86 0002 84B0     		sub	sp, sp, #16
-  87              	.LCFI3:
-  88              		.cfi_def_cfa_offset 24
-  89 0004 00AF     		add	r7, sp, #0
-  90              	.LCFI4:
-  91              		.cfi_def_cfa_register 7
-  92 0006 0346     		mov	r3, r0
-  93 0008 FB71     		strb	r3, [r7, #7]
+  74              		.loc 1 52 0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 16
+  77              		@ frame_needed = 1, uses_anonymous_args = 0
+  78 0000 80B5     		push	{r7, lr}
+  79              	.LCFI2:
+  80              		.cfi_def_cfa_offset 8
+  81              		.cfi_offset 14, -4
+  82              		.cfi_offset 7, -8
+  83 0002 84B0     		sub	sp, sp, #16
+  84              	.LCFI3:
+  85              		.cfi_def_cfa_offset 24
+  86 0004 00AF     		add	r7, sp, #0
+  87              	.LCFI4:
+  88              		.cfi_def_cfa_register 7
+  89 0006 0346     		mov	r3, r0
+  90 0008 FB71     		strb	r3, [r7, #7]
   53:src/hw_config.c ****   GPIO_InitTypeDef  GPIO_InitStructure;
   54:src/hw_config.c ****   /* GPIOD Periph clock enable */
   55:src/hw_config.c ****   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-  94              		.loc 1 55 0
-  95 000a 4FF00800 		mov	r0, #8
-  96 000e 4FF00101 		mov	r1, #1
-  97 0012 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+  91              		.loc 1 55 0
+  92 000a 4FF00800 		mov	r0, #8
+  93 000e 4FF00101 		mov	r1, #1
+  94 0012 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
   56:src/hw_config.c ****   /* Configure PD12, PD13, PD14 and PD15 in output push-pull mode */
   57:src/hw_config.c ****   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
-  98              		.loc 1 57 0
-  99 0016 4FF47043 		mov	r3, #61440
- 100 001a BB60     		str	r3, [r7, #8]
+  95              		.loc 1 57 0
+  96 0016 4FF47043 		mov	r3, #61440
+  97 001a BB60     		str	r3, [r7, #8]
   58:src/hw_config.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
- 101              		.loc 1 58 0
- 102 001c 4FF00003 		mov	r3, #0
- 103 0020 BB73     		strb	r3, [r7, #14]
+  98              		.loc 1 58 0
+  99 001c 4FF00003 		mov	r3, #0
+ 100 0020 BB73     		strb	r3, [r7, #14]
   59:src/hw_config.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
- 104              		.loc 1 59 0
- 105 0022 4FF00303 		mov	r3, #3
- 106 0026 7B73     		strb	r3, [r7, #13]
+ 101              		.loc 1 59 0
+ 102 0022 4FF00303 		mov	r3, #3
+ 103 0026 7B73     		strb	r3, [r7, #13]
   60:src/hw_config.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
- 107              		.loc 1 60 0
- 108 0028 4FF00003 		mov	r3, #0
- 109 002c FB73     		strb	r3, [r7, #15]
+ 104              		.loc 1 60 0
+ 105 0028 4FF00003 		mov	r3, #0
+ 106 002c FB73     		strb	r3, [r7, #15]
   61:src/hw_config.c **** 
   62:src/hw_config.c ****   if(state==GPIO)
- 110              		.loc 1 62 0
- 111 002e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
- 112 0030 002B     		cmp	r3, #0
- 113 0032 0CD1     		bne	.L3
+ 107              		.loc 1 62 0
+ 108 002e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 109 0030 002B     		cmp	r3, #0
+ 110 0032 0CD1     		bne	.L3
   63:src/hw_config.c ****   {
   64:src/hw_config.c **** 	  /* standard output pin */
   65:src/hw_config.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
- 114              		.loc 1 65 0
- 115 0034 4FF00103 		mov	r3, #1
- 116 0038 3B73     		strb	r3, [r7, #12]
+ 111              		.loc 1 65 0
+ 112 0034 4FF00103 		mov	r3, #1
+ 113 0038 3B73     		strb	r3, [r7, #12]
   66:src/hw_config.c **** 	  GPIO_Init(GPIOD, &GPIO_InitStructure);
- 117              		.loc 1 66 0
- 118 003a 4FF44060 		mov	r0, #3072
- 119 003e C4F20200 		movt	r0, 16386
- 120 0042 07F10803 		add	r3, r7, #8
- 121 0046 1946     		mov	r1, r3
- 122 0048 FFF7FEFF 		bl	GPIO_Init
- 123 004c 36E0     		b	.L2
- 124              	.L3:
+ 114              		.loc 1 66 0
+ 115 003a 4FF44060 		mov	r0, #3072
+ 116 003e C4F20200 		movt	r0, 16386
+ 117 0042 07F10803 		add	r3, r7, #8
+ 118 0046 1946     		mov	r1, r3
+ 119 0048 FFF7FEFF 		bl	GPIO_Init
+ 120 004c 36E0     		b	.L2
+ 121              	.L3:
   67:src/hw_config.c ****   }
   68:src/hw_config.c ****   else
   69:src/hw_config.c ****   {
   70:src/hw_config.c **** 	  /*-------------------------- GPIO Configuration ----------------------------*/
   71:src/hw_config.c **** 	  /* GPIOD Configuration: Pins 12, 13, 14 and 15 in output push-pull - alternative mode */
   72:src/hw_config.c **** 	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
- 125              		.loc 1 72 0
- 126 004e 4FF47043 		mov	r3, #61440
- 127 0052 BB60     		str	r3, [r7, #8]
+ 122              		.loc 1 72 0
+ 123 004e 4FF47043 		mov	r3, #61440
+ 124 0052 BB60     		str	r3, [r7, #8]
   73:src/hw_config.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
- 128              		.loc 1 73 0
- 129 0054 4FF00203 		mov	r3, #2
- 130 0058 3B73     		strb	r3, [r7, #12]
+ 125              		.loc 1 73 0
+ 126 0054 4FF00203 		mov	r3, #2
+ 127 0058 3B73     		strb	r3, [r7, #12]
   74:src/hw_config.c **** 	  GPIO_Init(GPIOD, &GPIO_InitStructure);
- 131              		.loc 1 74 0
- 132 005a 4FF44060 		mov	r0, #3072
- 133 005e C4F20200 		movt	r0, 16386
- 134 0062 07F10803 		add	r3, r7, #8
- 135 0066 1946     		mov	r1, r3
- 136 0068 FFF7FEFF 		bl	GPIO_Init
+ 128              		.loc 1 74 0
+ 129 005a 4FF44060 		mov	r0, #3072
+ 130 005e C4F20200 		movt	r0, 16386
+ 131 0062 07F10803 		add	r3, r7, #8
+ 132 0066 1946     		mov	r1, r3
+ 133 0068 FFF7FEFF 		bl	GPIO_Init
   75:src/hw_config.c **** 
   76:src/hw_config.c **** 	  /* Connect TIM4 pins to AF2 */
   77:src/hw_config.c **** 	  GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
- 137              		.loc 1 77 0
- 138 006c 4FF44060 		mov	r0, #3072
- 139 0070 C4F20200 		movt	r0, 16386
- 140 0074 4FF00C01 		mov	r1, #12
- 141 0078 4FF00202 		mov	r2, #2
- 142 007c FFF7FEFF 		bl	GPIO_PinAFConfig
+ 134              		.loc 1 77 0
+ 135 006c 4FF44060 		mov	r0, #3072
+ 136 0070 C4F20200 		movt	r0, 16386
+ 137 0074 4FF00C01 		mov	r1, #12
+ 138 0078 4FF00202 		mov	r2, #2
+ 139 007c FFF7FEFF 		bl	GPIO_PinAFConfig
   78:src/hw_config.c **** 	  GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
- 143              		.loc 1 78 0
- 144 0080 4FF44060 		mov	r0, #3072
- 145 0084 C4F20200 		movt	r0, 16386
- 146 0088 4FF00D01 		mov	r1, #13
- 147 008c 4FF00202 		mov	r2, #2
- 148 0090 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 140              		.loc 1 78 0
+ 141 0080 4FF44060 		mov	r0, #3072
+ 142 0084 C4F20200 		movt	r0, 16386
+ 143 0088 4FF00D01 		mov	r1, #13
+ 144 008c 4FF00202 		mov	r2, #2
+ 145 0090 FFF7FEFF 		bl	GPIO_PinAFConfig
   79:src/hw_config.c **** 	  GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
- 149              		.loc 1 79 0
- 150 0094 4FF44060 		mov	r0, #3072
- 151 0098 C4F20200 		movt	r0, 16386
- 152 009c 4FF00E01 		mov	r1, #14
- 153 00a0 4FF00202 		mov	r2, #2
- 154 00a4 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 146              		.loc 1 79 0
+ 147 0094 4FF44060 		mov	r0, #3072
+ 148 0098 C4F20200 		movt	r0, 16386
+ 149 009c 4FF00E01 		mov	r1, #14
+ 150 00a0 4FF00202 		mov	r2, #2
+ 151 00a4 FFF7FEFF 		bl	GPIO_PinAFConfig
   80:src/hw_config.c **** 	  GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
- 155              		.loc 1 80 0
- 156 00a8 4FF44060 		mov	r0, #3072
- 157 00ac C4F20200 		movt	r0, 16386
- 158 00b0 4FF00F01 		mov	r1, #15
- 159 00b4 4FF00202 		mov	r2, #2
- 160 00b8 FFF7FEFF 		bl	GPIO_PinAFConfig
- 161              	.L2:
+ 152              		.loc 1 80 0
+ 153 00a8 4FF44060 		mov	r0, #3072
+ 154 00ac C4F20200 		movt	r0, 16386
+ 155 00b0 4FF00F01 		mov	r1, #15
+ 156 00b4 4FF00202 		mov	r2, #2
+ 157 00b8 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 158              	.L2:
   81:src/hw_config.c ****   }
   82:src/hw_config.c **** }
- 162              		.loc 1 82 0
- 163 00bc 07F11007 		add	r7, r7, #16
- 164 00c0 BD46     		mov	sp, r7
- 165 00c2 80BD     		pop	{r7, pc}
- 166              		.cfi_endproc
- 167              	.LFE111:
- 169              		.section	.text.RCC_Configuration,"ax",%progbits
- 170              		.align	2
- 171              		.global	RCC_Configuration
- 172              		.thumb
- 173              		.thumb_func
- 175              	RCC_Configuration:
- 176              	.LFB112:
+ 159              		.loc 1 82 0
+ 160 00bc 07F11007 		add	r7, r7, #16
+ 161 00c0 BD46     		mov	sp, r7
+ 162 00c2 80BD     		pop	{r7, pc}
+ 163              		.cfi_endproc
+ 164              	.LFE111:
+ 166              		.section	.text.RCC_Configuration,"ax",%progbits
+ 167              		.align	2
+ 168              		.global	RCC_Configuration
+ 169              		.thumb
+ 170              		.thumb_func
+ 172              	RCC_Configuration:
+ 173              	.LFB112:
   83:src/hw_config.c **** 
   84:src/hw_config.c **** 
   85:src/hw_config.c **** /**
@@ -260,55 +257,55 @@
   89:src/hw_config.c ****   */
   90:src/hw_config.c **** void RCC_Configuration(void)
   91:src/hw_config.c **** {
- 177              		.loc 1 91 0
- 178              		.cfi_startproc
- 179              		@ args = 0, pretend = 0, frame = 0
- 180              		@ frame_needed = 1, uses_anonymous_args = 0
- 181 0000 80B5     		push	{r7, lr}
- 182              	.LCFI5:
- 183              		.cfi_def_cfa_offset 8
- 184              		.cfi_offset 14, -4
- 185              		.cfi_offset 7, -8
- 186 0002 00AF     		add	r7, sp, #0
- 187              	.LCFI6:
- 188              		.cfi_def_cfa_register 7
+ 174              		.loc 1 91 0
+ 175              		.cfi_startproc
+ 176              		@ args = 0, pretend = 0, frame = 0
+ 177              		@ frame_needed = 1, uses_anonymous_args = 0
+ 178 0000 80B5     		push	{r7, lr}
+ 179              	.LCFI5:
+ 180              		.cfi_def_cfa_offset 8
+ 181              		.cfi_offset 14, -4
+ 182              		.cfi_offset 7, -8
+ 183 0002 00AF     		add	r7, sp, #0
+ 184              	.LCFI6:
+ 185              		.cfi_def_cfa_register 7
   92:src/hw_config.c ****   
   93:src/hw_config.c ****   RCC_AHB1PeriphClockCmd(  RCC_AHB1Periph_GPIOD , ENABLE );
- 189              		.loc 1 93 0
- 190 0004 4FF00800 		mov	r0, #8
- 191 0008 4FF00101 		mov	r1, #1
- 192 000c FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 186              		.loc 1 93 0
+ 187 0004 4FF00800 		mov	r0, #8
+ 188 0008 4FF00101 		mov	r1, #1
+ 189 000c FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
   94:src/hw_config.c ****   RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM4, ENABLE );
- 193              		.loc 1 94 0
- 194 0010 4FF00400 		mov	r0, #4
- 195 0014 4FF00101 		mov	r1, #1
- 196 0018 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 190              		.loc 1 94 0
+ 191 0010 4FF00400 		mov	r0, #4
+ 192 0014 4FF00101 		mov	r1, #1
+ 193 0018 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
   95:src/hw_config.c **** 
   96:src/hw_config.c ****   //Enable GPIO Clocks For USART2
   97:src/hw_config.c ****   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
- 197              		.loc 1 97 0
- 198 001c 4FF00100 		mov	r0, #1
- 199 0020 4FF00101 		mov	r1, #1
- 200 0024 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 194              		.loc 1 97 0
+ 195 001c 4FF00100 		mov	r0, #1
+ 196 0020 4FF00101 		mov	r1, #1
+ 197 0024 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
   98:src/hw_config.c **** 
   99:src/hw_config.c ****   //Enable Clocks for USART2
  100:src/hw_config.c ****   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);    
- 201              		.loc 1 100 0
- 202 0028 4FF40030 		mov	r0, #131072
- 203 002c 4FF00101 		mov	r1, #1
- 204 0030 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 198              		.loc 1 100 0
+ 199 0028 4FF40030 		mov	r0, #131072
+ 200 002c 4FF00101 		mov	r1, #1
+ 201 0030 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
  101:src/hw_config.c **** }
- 205              		.loc 1 101 0
- 206 0034 80BD     		pop	{r7, pc}
- 207              		.cfi_endproc
- 208              	.LFE112:
- 210 0036 00BF     		.section	.text.GPIO_Configuration,"ax",%progbits
- 211              		.align	2
- 212              		.global	GPIO_Configuration
- 213              		.thumb
- 214              		.thumb_func
- 216              	GPIO_Configuration:
- 217              	.LFB113:
+ 202              		.loc 1 101 0
+ 203 0034 80BD     		pop	{r7, pc}
+ 204              		.cfi_endproc
+ 205              	.LFE112:
+ 207 0036 00BF     		.section	.text.GPIO_Configuration,"ax",%progbits
+ 208              		.align	2
+ 209              		.global	GPIO_Configuration
+ 210              		.thumb
+ 211              		.thumb_func
+ 213              	GPIO_Configuration:
+ 214              	.LFB113:
  102:src/hw_config.c **** 
  103:src/hw_config.c **** /**
  104:src/hw_config.c ****   * @brief  configure the PD12~15 to Timers
@@ -317,102 +314,154 @@
  107:src/hw_config.c ****   */
  108:src/hw_config.c **** void GPIO_Configuration(void)
  109:src/hw_config.c **** {
- 218              		.loc 1 109 0
- 219              		.cfi_startproc
- 220              		@ args = 0, pretend = 0, frame = 8
- 221              		@ frame_needed = 1, uses_anonymous_args = 0
- 222 0000 80B5     		push	{r7, lr}
- 223              	.LCFI7:
- 224              		.cfi_def_cfa_offset 8
- 225              		.cfi_offset 14, -4
- 226              		.cfi_offset 7, -8
- 227 0002 82B0     		sub	sp, sp, #8
- 228              	.LCFI8:
- 229              		.cfi_def_cfa_offset 16
- 230 0004 00AF     		add	r7, sp, #0
- 231              	.LCFI9:
- 232              		.cfi_def_cfa_register 7
+ 215              		.loc 1 109 0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 8
+ 218              		@ frame_needed = 1, uses_anonymous_args = 0
+ 219 0000 80B5     		push	{r7, lr}
+ 220              	.LCFI7:
+ 221              		.cfi_def_cfa_offset 8
+ 222              		.cfi_offset 14, -4
+ 223              		.cfi_offset 7, -8
+ 224 0002 82B0     		sub	sp, sp, #8
+ 225              	.LCFI8:
+ 226              		.cfi_def_cfa_offset 16
+ 227 0004 00AF     		add	r7, sp, #0
+ 228              	.LCFI9:
+ 229              		.cfi_def_cfa_register 7
  110:src/hw_config.c ****   GPIO_InitTypeDef GPIO_InitStructure;
  111:src/hw_config.c ****   //GPIO Configuration for TIM4
- 112:src/hw_config.c ****   //   GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
+ 112:src/hw_config.c ****      GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
+ 230              		.loc 1 112 0
+ 231 0006 3B46     		mov	r3, r7
+ 232 0008 1846     		mov	r0, r3
+ 233 000a FFF7FEFF 		bl	GPIO_StructInit
  113:src/hw_config.c ****  
- 114:src/hw_config.c ****   //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
- 115:src/hw_config.c ****   //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
- 116:src/hw_config.c ****   //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
- 117:src/hw_config.c ****   //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
+ 114:src/hw_config.c ****      GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+ 234              		.loc 1 114 0
+ 235 000e 4FF44060 		mov	r0, #3072
+ 236 0012 C4F20200 		movt	r0, 16386
+ 237 0016 4FF00C01 		mov	r1, #12
+ 238 001a 4FF00202 		mov	r2, #2
+ 239 001e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 115:src/hw_config.c ****      GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
+ 240              		.loc 1 115 0
+ 241 0022 4FF44060 		mov	r0, #3072
+ 242 0026 C4F20200 		movt	r0, 16386
+ 243 002a 4FF00D01 		mov	r1, #13
+ 244 002e 4FF00202 		mov	r2, #2
+ 245 0032 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 116:src/hw_config.c ****      GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
+ 246              		.loc 1 116 0
+ 247 0036 4FF44060 		mov	r0, #3072
+ 248 003a C4F20200 		movt	r0, 16386
+ 249 003e 4FF00E01 		mov	r1, #14
+ 250 0042 4FF00202 		mov	r2, #2
+ 251 0046 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 117:src/hw_config.c ****      GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
+ 252              		.loc 1 117 0
+ 253 004a 4FF44060 		mov	r0, #3072
+ 254 004e C4F20200 		movt	r0, 16386
+ 255 0052 4FF00F01 		mov	r1, #15
+ 256 0056 4FF00202 		mov	r2, #2
+ 257 005a FFF7FEFF 		bl	GPIO_PinAFConfig
  118:src/hw_config.c ****       
  119:src/hw_config.c **** 
  120:src/hw_config.c ****   //   // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
- 121:src/hw_config.c ****   //   GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; 
+ 121:src/hw_config.c ****      GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; 
+ 258              		.loc 1 121 0
+ 259 005e 4FF47043 		mov	r3, #61440
+ 260 0062 3B60     		str	r3, [r7, #0]
  122:src/hw_config.c ****   // //PD12->LED3 PD13->LED4 PD14->LED5 PD15->LED6
- 123:src/hw_config.c ****   // //GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
- 124:src/hw_config.c ****   // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; 
- 125:src/hw_config.c ****   //   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
- 126:src/hw_config.c ****   //   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
- 127:src/hw_config.c ****   //   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
- 128:src/hw_config.c ****   //   GPIO_Init( GPIOD, &GPIO_InitStructure );  
+ 123:src/hw_config.c ****      GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
+ 261              		.loc 1 123 0
+ 262 0064 4FF00203 		mov	r3, #2
+ 263 0068 3B71     		strb	r3, [r7, #4]
+ 124:src/hw_config.c ****   	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; 
+ 264              		.loc 1 124 0
+ 265 006a 4FF00203 		mov	r3, #2
+ 266 006e 3B71     		strb	r3, [r7, #4]
+ 125:src/hw_config.c ****      GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 267              		.loc 1 125 0
+ 268 0070 4FF00003 		mov	r3, #0
+ 269 0074 BB71     		strb	r3, [r7, #6]
+ 126:src/hw_config.c ****      GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+ 270              		.loc 1 126 0
+ 271 0076 4FF00303 		mov	r3, #3
+ 272 007a 7B71     		strb	r3, [r7, #5]
+ 127:src/hw_config.c ****      GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+ 273              		.loc 1 127 0
+ 274 007c 4FF00003 		mov	r3, #0
+ 275 0080 FB71     		strb	r3, [r7, #7]
+ 128:src/hw_config.c ****      GPIO_Init( GPIOD, &GPIO_InitStructure );  
+ 276              		.loc 1 128 0
+ 277 0082 4FF44060 		mov	r0, #3072
+ 278 0086 C4F20200 		movt	r0, 16386
+ 279 008a 3B46     		mov	r3, r7
+ 280 008c 1946     		mov	r1, r3
+ 281 008e FFF7FEFF 		bl	GPIO_Init
  129:src/hw_config.c **** 
  130:src/hw_config.c ****     /*----------------------------------------------------------------------*/
  131:src/hw_config.c **** 
  132:src/hw_config.c ****   //GPIO Configuration for USART - PA2, PA3
  133:src/hw_config.c ****   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
- 233              		.loc 1 133 0
- 234 0006 4FF00C03 		mov	r3, #12
- 235 000a 3B60     		str	r3, [r7, #0]
+ 282              		.loc 1 133 0
+ 283 0092 4FF00C03 		mov	r3, #12
+ 284 0096 3B60     		str	r3, [r7, #0]
  134:src/hw_config.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
- 236              		.loc 1 134 0
- 237 000c 4FF00203 		mov	r3, #2
- 238 0010 3B71     		strb	r3, [r7, #4]
+ 285              		.loc 1 134 0
+ 286 0098 4FF00203 		mov	r3, #2
+ 287 009c 3B71     		strb	r3, [r7, #4]
  135:src/hw_config.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
- 239              		.loc 1 135 0
- 240 0012 4FF00003 		mov	r3, #0
- 241 0016 BB71     		strb	r3, [r7, #6]
+ 288              		.loc 1 135 0
+ 289 009e 4FF00003 		mov	r3, #0
+ 290 00a2 BB71     		strb	r3, [r7, #6]
  136:src/hw_config.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
- 242              		.loc 1 136 0
- 243 0018 4FF00003 		mov	r3, #0
- 244 001c FB71     		strb	r3, [r7, #7]
+ 291              		.loc 1 136 0
+ 292 00a4 4FF00003 		mov	r3, #0
+ 293 00a8 FB71     		strb	r3, [r7, #7]
  137:src/hw_config.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
- 245              		.loc 1 137 0
- 246 001e 4FF00203 		mov	r3, #2
- 247 0022 7B71     		strb	r3, [r7, #5]
+ 294              		.loc 1 137 0
+ 295 00aa 4FF00203 		mov	r3, #2
+ 296 00ae 7B71     		strb	r3, [r7, #5]
  138:src/hw_config.c ****   GPIO_Init(GPIOA, &GPIO_InitStructure);
- 248              		.loc 1 138 0
- 249 0024 4FF00000 		mov	r0, #0
- 250 0028 C4F20200 		movt	r0, 16386
- 251 002c 3B46     		mov	r3, r7
- 252 002e 1946     		mov	r1, r3
- 253 0030 FFF7FEFF 		bl	GPIO_Init
+ 297              		.loc 1 138 0
+ 298 00b0 4FF00000 		mov	r0, #0
+ 299 00b4 C4F20200 		movt	r0, 16386
+ 300 00b8 3B46     		mov	r3, r7
+ 301 00ba 1946     		mov	r1, r3
+ 302 00bc FFF7FEFF 		bl	GPIO_Init
  139:src/hw_config.c **** 
  140:src/hw_config.c ****   //Connect USART pins to AF
  141:src/hw_config.c ****   GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2);
- 254              		.loc 1 141 0
- 255 0034 4FF00000 		mov	r0, #0
- 256 0038 C4F20200 		movt	r0, 16386
- 257 003c 4FF00201 		mov	r1, #2
- 258 0040 4FF00702 		mov	r2, #7
- 259 0044 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 303              		.loc 1 141 0
+ 304 00c0 4FF00000 		mov	r0, #0
+ 305 00c4 C4F20200 		movt	r0, 16386
+ 306 00c8 4FF00201 		mov	r1, #2
+ 307 00cc 4FF00702 		mov	r2, #7
+ 308 00d0 FFF7FEFF 		bl	GPIO_PinAFConfig
  142:src/hw_config.c ****   GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2);
- 260              		.loc 1 142 0
- 261 0048 4FF00000 		mov	r0, #0
- 262 004c C4F20200 		movt	r0, 16386
- 263 0050 4FF00301 		mov	r1, #3
- 264 0054 4FF00702 		mov	r2, #7
- 265 0058 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 309              		.loc 1 142 0
+ 310 00d4 4FF00000 		mov	r0, #0
+ 311 00d8 C4F20200 		movt	r0, 16386
+ 312 00dc 4FF00301 		mov	r1, #3
+ 313 00e0 4FF00702 		mov	r2, #7
+ 314 00e4 FFF7FEFF 		bl	GPIO_PinAFConfig
  143:src/hw_config.c **** 
  144:src/hw_config.c **** }
- 266              		.loc 1 144 0
- 267 005c 07F10807 		add	r7, r7, #8
- 268 0060 BD46     		mov	sp, r7
- 269 0062 80BD     		pop	{r7, pc}
- 270              		.cfi_endproc
- 271              	.LFE113:
- 273              		.section	.text.TIM_Configuration,"ax",%progbits
- 274              		.align	2
- 275              		.global	TIM_Configuration
- 276              		.thumb
- 277              		.thumb_func
- 279              	TIM_Configuration:
- 280              	.LFB114:
+ 315              		.loc 1 144 0
+ 316 00e8 07F10807 		add	r7, r7, #8
+ 317 00ec BD46     		mov	sp, r7
+ 318 00ee 80BD     		pop	{r7, pc}
+ 319              		.cfi_endproc
+ 320              	.LFE113:
+ 322              		.section	.text.TIM_Configuration,"ax",%progbits
+ 323              		.align	2
+ 324              		.global	TIM_Configuration
+ 325              		.thumb
+ 326              		.thumb_func
+ 328              	TIM_Configuration:
+ 329              	.LFB114:
  145:src/hw_config.c **** 
  146:src/hw_config.c **** /**
  147:src/hw_config.c ****   * @brief  configure the TIM4 for PWM mode
@@ -421,21 +470,21 @@
  150:src/hw_config.c ****   */
  151:src/hw_config.c **** void TIM_Configuration(void)
  152:src/hw_config.c **** {
- 281              		.loc 1 152 0
- 282              		.cfi_startproc
- 283              		@ args = 0, pretend = 0, frame = 32
- 284              		@ frame_needed = 1, uses_anonymous_args = 0
- 285 0000 80B5     		push	{r7, lr}
- 286              	.LCFI10:
- 287              		.cfi_def_cfa_offset 8
- 288              		.cfi_offset 14, -4
- 289              		.cfi_offset 7, -8
- 290 0002 88B0     		sub	sp, sp, #32
- 291              	.LCFI11:
- 292              		.cfi_def_cfa_offset 40
- 293 0004 00AF     		add	r7, sp, #0
- 294              	.LCFI12:
- 295              		.cfi_def_cfa_register 7
+ 330              		.loc 1 152 0
+ 331              		.cfi_startproc
+ 332              		@ args = 0, pretend = 0, frame = 32
+ 333              		@ frame_needed = 1, uses_anonymous_args = 0
+ 334 0000 80B5     		push	{r7, lr}
+ 335              	.LCFI10:
+ 336              		.cfi_def_cfa_offset 8
+ 337              		.cfi_offset 14, -4
+ 338              		.cfi_offset 7, -8
+ 339 0002 88B0     		sub	sp, sp, #32
+ 340              	.LCFI11:
+ 341              		.cfi_def_cfa_offset 40
+ 342 0004 00AF     		add	r7, sp, #0
+ 343              	.LCFI12:
+ 344              		.cfi_def_cfa_register 7
  153:src/hw_config.c ****     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
  154:src/hw_config.c ****     TIM_OCInitTypeDef TIM_OCInitStruct;
  155:src/hw_config.c **** 
@@ -443,104 +492,104 @@
  157:src/hw_config.c ****     // Let period equal 1000. Therefore, timer runs from zero to 1000. Gives 0.1Hz resolution.
  158:src/hw_config.c ****     // Solving for prescaler gives 240.
  159:src/hw_config.c ****     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
- 296              		.loc 1 159 0
- 297 0006 07F11403 		add	r3, r7, #20
- 298 000a 1846     		mov	r0, r3
- 299 000c FFF7FEFF 		bl	TIM_TimeBaseStructInit
+ 345              		.loc 1 159 0
+ 346 0006 07F11403 		add	r3, r7, #20
+ 347 000a 1846     		mov	r0, r3
+ 348 000c FFF7FEFF 		bl	TIM_TimeBaseStructInit
  160:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
- 300              		.loc 1 160 0
- 301 0010 4FF40073 		mov	r3, #512
- 302 0014 BB83     		strh	r3, [r7, #28]	@ movhi
+ 349              		.loc 1 160 0
+ 350 0010 4FF40073 		mov	r3, #512
+ 351 0014 BB83     		strh	r3, [r7, #28]	@ movhi
  161:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
- 303              		.loc 1 161 0
- 304 0016 40F61F53 		movw	r3, #3359
- 305 001a BB61     		str	r3, [r7, #24]
+ 352              		.loc 1 161 0
+ 353 0016 40F61F53 		movw	r3, #3359
+ 354 001a BB61     		str	r3, [r7, #24]
  162:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
- 306              		.loc 1 162 0
- 307 001c 40F2F313 		movw	r3, #499
- 308 0020 BB82     		strh	r3, [r7, #20]	@ movhi
+ 355              		.loc 1 162 0
+ 356 001c 40F2F313 		movw	r3, #499
+ 357 0020 BB82     		strh	r3, [r7, #20]	@ movhi
  163:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
- 309              		.loc 1 163 0
- 310 0022 4FF00003 		mov	r3, #0
- 311 0026 FB82     		strh	r3, [r7, #22]	@ movhi
+ 358              		.loc 1 163 0
+ 359 0022 4FF00003 		mov	r3, #0
+ 360 0026 FB82     		strh	r3, [r7, #22]	@ movhi
  164:src/hw_config.c ****     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );
- 312              		.loc 1 164 0
- 313 0028 4FF40060 		mov	r0, #2048
- 314 002c C4F20000 		movt	r0, 16384
- 315 0030 07F11403 		add	r3, r7, #20
- 316 0034 1946     		mov	r1, r3
- 317 0036 FFF7FEFF 		bl	TIM_TimeBaseInit
+ 361              		.loc 1 164 0
+ 362 0028 4FF40060 		mov	r0, #2048
+ 363 002c C4F20000 		movt	r0, 16384
+ 364 0030 07F11403 		add	r3, r7, #20
+ 365 0034 1946     		mov	r1, r3
+ 366 0036 FFF7FEFF 		bl	TIM_TimeBaseInit
  165:src/hw_config.c ****     
  166:src/hw_config.c ****     TIM_OCStructInit( &TIM_OCInitStruct );
- 318              		.loc 1 166 0
- 319 003a 3B46     		mov	r3, r7
- 320 003c 1846     		mov	r0, r3
- 321 003e FFF7FEFF 		bl	TIM_OCStructInit
+ 367              		.loc 1 166 0
+ 368 003a 3B46     		mov	r3, r7
+ 369 003c 1846     		mov	r0, r3
+ 370 003e FFF7FEFF 		bl	TIM_OCStructInit
  167:src/hw_config.c ****     TIM_OCInitStruct.TIM_OutputState = TIM_OutputState_Enable;
- 322              		.loc 1 167 0
- 323 0042 4FF00103 		mov	r3, #1
- 324 0046 7B80     		strh	r3, [r7, #2]	@ movhi
+ 371              		.loc 1 167 0
+ 372 0042 4FF00103 		mov	r3, #1
+ 373 0046 7B80     		strh	r3, [r7, #2]	@ movhi
  168:src/hw_config.c ****     TIM_OCInitStruct.TIM_OCMode = TIM_OCMode_PWM1;
- 325              		.loc 1 168 0
- 326 0048 4FF06003 		mov	r3, #96
- 327 004c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 374              		.loc 1 168 0
+ 375 0048 4FF06003 		mov	r3, #96
+ 376 004c 3B80     		strh	r3, [r7, #0]	@ movhi
  169:src/hw_config.c ****     
  170:src/hw_config.c ****     // Initial duty cycle equals 0%. Value can range from zero to 65535.
  171:src/hw_config.c ****     //TIM_Pulse = TIM4_CCR1 register (16 bits)
  172:src/hw_config.c ****     TIM_OCInitStruct.TIM_Pulse = 0; //(0=Always Off, 65535=Always On)
- 328              		.loc 1 172 0
- 329 004e 4FF00003 		mov	r3, #0
- 330 0052 BB60     		str	r3, [r7, #8]
+ 377              		.loc 1 172 0
+ 378 004e 4FF00003 		mov	r3, #0
+ 379 0052 BB60     		str	r3, [r7, #8]
  173:src/hw_config.c ****  
  174:src/hw_config.c ****     TIM_OC1Init( TIM4, &TIM_OCInitStruct ); // Channel 1  LED
- 331              		.loc 1 174 0
- 332 0054 4FF40060 		mov	r0, #2048
- 333 0058 C4F20000 		movt	r0, 16384
- 334 005c 3B46     		mov	r3, r7
- 335 005e 1946     		mov	r1, r3
- 336 0060 FFF7FEFF 		bl	TIM_OC1Init
+ 380              		.loc 1 174 0
+ 381 0054 4FF40060 		mov	r0, #2048
+ 382 0058 C4F20000 		movt	r0, 16384
+ 383 005c 3B46     		mov	r3, r7
+ 384 005e 1946     		mov	r1, r3
+ 385 0060 FFF7FEFF 		bl	TIM_OC1Init
  175:src/hw_config.c ****     TIM_OC2Init( TIM4, &TIM_OCInitStruct ); // Channel 2  LED
- 337              		.loc 1 175 0
- 338 0064 4FF40060 		mov	r0, #2048
- 339 0068 C4F20000 		movt	r0, 16384
- 340 006c 3B46     		mov	r3, r7
- 341 006e 1946     		mov	r1, r3
- 342 0070 FFF7FEFF 		bl	TIM_OC2Init
+ 386              		.loc 1 175 0
+ 387 0064 4FF40060 		mov	r0, #2048
+ 388 0068 C4F20000 		movt	r0, 16384
+ 389 006c 3B46     		mov	r3, r7
+ 390 006e 1946     		mov	r1, r3
+ 391 0070 FFF7FEFF 		bl	TIM_OC2Init
  176:src/hw_config.c ****     TIM_OC3Init( TIM4, &TIM_OCInitStruct ); // Channel 3  LED
- 343              		.loc 1 176 0
- 344 0074 4FF40060 		mov	r0, #2048
- 345 0078 C4F20000 		movt	r0, 16384
- 346 007c 3B46     		mov	r3, r7
- 347 007e 1946     		mov	r1, r3
- 348 0080 FFF7FEFF 		bl	TIM_OC3Init
+ 392              		.loc 1 176 0
+ 393 0074 4FF40060 		mov	r0, #2048
+ 394 0078 C4F20000 		movt	r0, 16384
+ 395 007c 3B46     		mov	r3, r7
+ 396 007e 1946     		mov	r1, r3
+ 397 0080 FFF7FEFF 		bl	TIM_OC3Init
  177:src/hw_config.c ****     TIM_OC4Init( TIM4, &TIM_OCInitStruct ); // Channel 4  LED
- 349              		.loc 1 177 0
- 350 0084 4FF40060 		mov	r0, #2048
- 351 0088 C4F20000 		movt	r0, 16384
- 352 008c 3B46     		mov	r3, r7
- 353 008e 1946     		mov	r1, r3
- 354 0090 FFF7FEFF 		bl	TIM_OC4Init
+ 398              		.loc 1 177 0
+ 399 0084 4FF40060 		mov	r0, #2048
+ 400 0088 C4F20000 		movt	r0, 16384
+ 401 008c 3B46     		mov	r3, r7
+ 402 008e 1946     		mov	r1, r3
+ 403 0090 FFF7FEFF 		bl	TIM_OC4Init
  178:src/hw_config.c ****  
  179:src/hw_config.c ****     TIM_Cmd( TIM4, ENABLE );
- 355              		.loc 1 179 0
- 356 0094 4FF40060 		mov	r0, #2048
- 357 0098 C4F20000 		movt	r0, 16384
- 358 009c 4FF00101 		mov	r1, #1
- 359 00a0 FFF7FEFF 		bl	TIM_Cmd
+ 404              		.loc 1 179 0
+ 405 0094 4FF40060 		mov	r0, #2048
+ 406 0098 C4F20000 		movt	r0, 16384
+ 407 009c 4FF00101 		mov	r1, #1
+ 408 00a0 FFF7FEFF 		bl	TIM_Cmd
  180:src/hw_config.c **** }
- 360              		.loc 1 180 0
- 361 00a4 07F12007 		add	r7, r7, #32
- 362 00a8 BD46     		mov	sp, r7
- 363 00aa 80BD     		pop	{r7, pc}
- 364              		.cfi_endproc
- 365              	.LFE114:
- 367              		.section	.text.USART_Configuration,"ax",%progbits
- 368              		.align	2
- 369              		.global	USART_Configuration
- 370              		.thumb
- 371              		.thumb_func
- 373              	USART_Configuration:
- 374              	.LFB115:
+ 409              		.loc 1 180 0
+ 410 00a4 07F12007 		add	r7, r7, #32
+ 411 00a8 BD46     		mov	sp, r7
+ 412 00aa 80BD     		pop	{r7, pc}
+ 413              		.cfi_endproc
+ 414              	.LFE114:
+ 416              		.section	.text.USART_Configuration,"ax",%progbits
+ 417              		.align	2
+ 418              		.global	USART_Configuration
+ 419              		.thumb
+ 420              		.thumb_func
+ 422              	USART_Configuration:
+ 423              	.LFB115:
  181:src/hw_config.c **** 
  182:src/hw_config.c **** /**
  183:src/hw_config.c ****   * @brief  configure the USART
@@ -549,104 +598,104 @@
  186:src/hw_config.c ****   */
  187:src/hw_config.c **** void USART_Configuration(void)
  188:src/hw_config.c **** {
- 375              		.loc 1 188 0
- 376              		.cfi_startproc
- 377              		@ args = 0, pretend = 0, frame = 16
- 378              		@ frame_needed = 1, uses_anonymous_args = 0
- 379 0000 80B5     		push	{r7, lr}
- 380              	.LCFI13:
- 381              		.cfi_def_cfa_offset 8
- 382              		.cfi_offset 14, -4
- 383              		.cfi_offset 7, -8
- 384 0002 84B0     		sub	sp, sp, #16
- 385              	.LCFI14:
- 386              		.cfi_def_cfa_offset 24
- 387 0004 00AF     		add	r7, sp, #0
- 388              	.LCFI15:
- 389              		.cfi_def_cfa_register 7
+ 424              		.loc 1 188 0
+ 425              		.cfi_startproc
+ 426              		@ args = 0, pretend = 0, frame = 16
+ 427              		@ frame_needed = 1, uses_anonymous_args = 0
+ 428 0000 80B5     		push	{r7, lr}
+ 429              	.LCFI13:
+ 430              		.cfi_def_cfa_offset 8
+ 431              		.cfi_offset 14, -4
+ 432              		.cfi_offset 7, -8
+ 433 0002 84B0     		sub	sp, sp, #16
+ 434              	.LCFI14:
+ 435              		.cfi_def_cfa_offset 24
+ 436 0004 00AF     		add	r7, sp, #0
+ 437              	.LCFI15:
+ 438              		.cfi_def_cfa_register 7
  189:src/hw_config.c ****   //Structure With Data For USART Configuration
  190:src/hw_config.c ****   USART_InitTypeDef USART_InitStructure;
  191:src/hw_config.c ****   
  192:src/hw_config.c ****   //USART Parameters
  193:src/hw_config.c ****   USART_InitStructure.USART_BaudRate = 19200;
- 390              		.loc 1 193 0
- 391 0006 4FF49643 		mov	r3, #19200
- 392 000a 3B60     		str	r3, [r7, #0]
+ 439              		.loc 1 193 0
+ 440 0006 4FF49643 		mov	r3, #19200
+ 441 000a 3B60     		str	r3, [r7, #0]
  194:src/hw_config.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b;
- 393              		.loc 1 194 0
- 394 000c 4FF00003 		mov	r3, #0
- 395 0010 BB80     		strh	r3, [r7, #4]	@ movhi
+ 442              		.loc 1 194 0
+ 443 000c 4FF00003 		mov	r3, #0
+ 444 0010 BB80     		strh	r3, [r7, #4]	@ movhi
  195:src/hw_config.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;
- 396              		.loc 1 195 0
- 397 0012 4FF00003 		mov	r3, #0
- 398 0016 FB80     		strh	r3, [r7, #6]	@ movhi
+ 445              		.loc 1 195 0
+ 446 0012 4FF00003 		mov	r3, #0
+ 447 0016 FB80     		strh	r3, [r7, #6]	@ movhi
  196:src/hw_config.c ****   USART_InitStructure.USART_Parity = USART_Parity_No ;
- 399              		.loc 1 196 0
- 400 0018 4FF00003 		mov	r3, #0
- 401 001c 3B81     		strh	r3, [r7, #8]	@ movhi
+ 448              		.loc 1 196 0
+ 449 0018 4FF00003 		mov	r3, #0
+ 450 001c 3B81     		strh	r3, [r7, #8]	@ movhi
  197:src/hw_config.c ****   USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  
- 402              		.loc 1 197 0
- 403 001e 4FF00003 		mov	r3, #0
- 404 0022 BB81     		strh	r3, [r7, #12]	@ movhi
+ 451              		.loc 1 197 0
+ 452 001e 4FF00003 		mov	r3, #0
+ 453 0022 BB81     		strh	r3, [r7, #12]	@ movhi
  198:src/hw_config.c ****   USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx ;
- 405              		.loc 1 198 0
- 406 0024 4FF00C03 		mov	r3, #12
- 407 0028 7B81     		strh	r3, [r7, #10]	@ movhi
+ 454              		.loc 1 198 0
+ 455 0024 4FF00C03 		mov	r3, #12
+ 456 0028 7B81     		strh	r3, [r7, #10]	@ movhi
  199:src/hw_config.c **** 
  200:src/hw_config.c ****   //Configuring And Enabling USART2
  201:src/hw_config.c ****   USART_Init(USART2, &USART_InitStructure);
- 408              		.loc 1 201 0
- 409 002a 4FF48840 		mov	r0, #17408
- 410 002e C4F20000 		movt	r0, 16384
- 411 0032 3B46     		mov	r3, r7
- 412 0034 1946     		mov	r1, r3
- 413 0036 FFF7FEFF 		bl	USART_Init
+ 457              		.loc 1 201 0
+ 458 002a 4FF48840 		mov	r0, #17408
+ 459 002e C4F20000 		movt	r0, 16384
+ 460 0032 3B46     		mov	r3, r7
+ 461 0034 1946     		mov	r1, r3
+ 462 0036 FFF7FEFF 		bl	USART_Init
  202:src/hw_config.c ****   USART_Cmd(USART2, ENABLE);
- 414              		.loc 1 202 0
- 415 003a 4FF48840 		mov	r0, #17408
- 416 003e C4F20000 		movt	r0, 16384
- 417 0042 4FF00101 		mov	r1, #1
- 418 0046 FFF7FEFF 		bl	USART_Cmd
+ 463              		.loc 1 202 0
+ 464 003a 4FF48840 		mov	r0, #17408
+ 465 003e C4F20000 		movt	r0, 16384
+ 466 0042 4FF00101 		mov	r1, #1
+ 467 0046 FFF7FEFF 		bl	USART_Cmd
  203:src/hw_config.c **** 
  204:src/hw_config.c **** 
  205:src/hw_config.c **** }
- 419              		.loc 1 205 0
- 420 004a 07F11007 		add	r7, r7, #16
- 421 004e BD46     		mov	sp, r7
- 422 0050 80BD     		pop	{r7, pc}
- 423              		.cfi_endproc
- 424              	.LFE115:
- 426 0052 00BF     		.section	.text.prvMEMS_Config,"ax",%progbits
- 427              		.align	2
- 428              		.global	prvMEMS_Config
- 429              		.thumb
- 430              		.thumb_func
- 432              	prvMEMS_Config:
- 433              	.LFB116:
+ 468              		.loc 1 205 0
+ 469 004a 07F11007 		add	r7, r7, #16
+ 470 004e BD46     		mov	sp, r7
+ 471 0050 80BD     		pop	{r7, pc}
+ 472              		.cfi_endproc
+ 473              	.LFE115:
+ 475 0052 00BF     		.section	.text.prvMEMS_Config,"ax",%progbits
+ 476              		.align	2
+ 477              		.global	prvMEMS_Config
+ 478              		.thumb
+ 479              		.thumb_func
+ 481              	prvMEMS_Config:
+ 482              	.LFB116:
  206:src/hw_config.c **** 
  207:src/hw_config.c **** /*------------below is original code------------*/
  208:src/hw_config.c **** 
  209:src/hw_config.c **** void prvMEMS_Config(void)
  210:src/hw_config.c **** {
- 434              		.loc 1 210 0
- 435              		.cfi_startproc
- 436              		@ args = 0, pretend = 0, frame = 32
- 437              		@ frame_needed = 1, uses_anonymous_args = 0
- 438 0000 80B5     		push	{r7, lr}
- 439              	.LCFI16:
- 440              		.cfi_def_cfa_offset 8
- 441              		.cfi_offset 14, -4
- 442              		.cfi_offset 7, -8
- 443 0002 88B0     		sub	sp, sp, #32
- 444              	.LCFI17:
- 445              		.cfi_def_cfa_offset 40
- 446 0004 00AF     		add	r7, sp, #0
- 447              	.LCFI18:
- 448              		.cfi_def_cfa_register 7
+ 483              		.loc 1 210 0
+ 484              		.cfi_startproc
+ 485              		@ args = 0, pretend = 0, frame = 32
+ 486              		@ frame_needed = 1, uses_anonymous_args = 0
+ 487 0000 80B5     		push	{r7, lr}
+ 488              	.LCFI16:
+ 489              		.cfi_def_cfa_offset 8
+ 490              		.cfi_offset 14, -4
+ 491              		.cfi_offset 7, -8
+ 492 0002 88B0     		sub	sp, sp, #32
+ 493              	.LCFI17:
+ 494              		.cfi_def_cfa_offset 40
+ 495 0004 00AF     		add	r7, sp, #0
+ 496              	.LCFI18:
+ 497              		.cfi_def_cfa_register 7
  211:src/hw_config.c **** 	uint8_t ctrl = 0;
- 449              		.loc 1 211 0
- 450 0006 4FF00003 		mov	r3, #0
- 451 000a FB77     		strb	r3, [r7, #31]
+ 498              		.loc 1 211 0
+ 499 0006 4FF00003 		mov	r3, #0
+ 500 000a FB77     		strb	r3, [r7, #31]
  212:src/hw_config.c **** 
  213:src/hw_config.c **** 	LIS3DSH_InitTypeDef  LIS3DSH_InitStruct;
  214:src/hw_config.c **** /*
@@ -688,24 +737,24 @@
  250:src/hw_config.c **** */
  251:src/hw_config.c **** 	
  252:src/hw_config.c **** 	LIS3DSH_Init(&LIS3DSH_InitStruct);	
- 452              		.loc 1 252 0
- 453 000c 3B46     		mov	r3, r7
- 454 000e 1846     		mov	r0, r3
- 455 0010 FFF7FEFF 		bl	LIS3DSH_Init
+ 501              		.loc 1 252 0
+ 502 000c 3B46     		mov	r3, r7
+ 503 000e 1846     		mov	r0, r3
+ 504 0010 FFF7FEFF 		bl	LIS3DSH_Init
  253:src/hw_config.c **** }
- 456              		.loc 1 253 0
- 457 0014 07F12007 		add	r7, r7, #32
- 458 0018 BD46     		mov	sp, r7
- 459 001a 80BD     		pop	{r7, pc}
- 460              		.cfi_endproc
- 461              	.LFE116:
- 463              		.section	.text.LIS3DSH_TIMEOUT_UserCallback,"ax",%progbits
- 464              		.align	2
- 465              		.global	LIS3DSH_TIMEOUT_UserCallback
- 466              		.thumb
- 467              		.thumb_func
- 469              	LIS3DSH_TIMEOUT_UserCallback:
- 470              	.LFB117:
+ 505              		.loc 1 253 0
+ 506 0014 07F12007 		add	r7, r7, #32
+ 507 0018 BD46     		mov	sp, r7
+ 508 001a 80BD     		pop	{r7, pc}
+ 509              		.cfi_endproc
+ 510              	.LFE116:
+ 512              		.section	.text.LIS3DSH_TIMEOUT_UserCallback,"ax",%progbits
+ 513              		.align	2
+ 514              		.global	LIS3DSH_TIMEOUT_UserCallback
+ 515              		.thumb
+ 516              		.thumb_func
+ 518              	LIS3DSH_TIMEOUT_UserCallback:
+ 519              	.LFB117:
  254:src/hw_config.c **** 
  255:src/hw_config.c **** /**
  256:src/hw_config.c ****   * @brief  MEMS accelerometer management of the timeout situation.
@@ -714,67 +763,67 @@
  259:src/hw_config.c ****   */
  260:src/hw_config.c **** uint32_t LIS3DSH_TIMEOUT_UserCallback(void)
  261:src/hw_config.c **** {
- 471              		.loc 1 261 0
- 472              		.cfi_startproc
- 473              		@ args = 0, pretend = 0, frame = 0
- 474              		@ frame_needed = 1, uses_anonymous_args = 0
- 475              		@ link register save eliminated.
- 476 0000 80B4     		push	{r7}
- 477              	.LCFI19:
- 478              		.cfi_def_cfa_offset 4
- 479              		.cfi_offset 7, -4
- 480 0002 00AF     		add	r7, sp, #0
- 481              	.LCFI20:
- 482              		.cfi_def_cfa_register 7
- 483              	.L11:
+ 520              		.loc 1 261 0
+ 521              		.cfi_startproc
+ 522              		@ args = 0, pretend = 0, frame = 0
+ 523              		@ frame_needed = 1, uses_anonymous_args = 0
+ 524              		@ link register save eliminated.
+ 525 0000 80B4     		push	{r7}
+ 526              	.LCFI19:
+ 527              		.cfi_def_cfa_offset 4
+ 528              		.cfi_offset 7, -4
+ 529 0002 00AF     		add	r7, sp, #0
+ 530              	.LCFI20:
+ 531              		.cfi_def_cfa_register 7
+ 532              	.L11:
  262:src/hw_config.c ****   /* MEMS Accelerometer Timeout error has occured */
  263:src/hw_config.c ****   while (1)
  264:src/hw_config.c ****   {
  265:src/hw_config.c ****   }
- 484              		.loc 1 265 0 discriminator 1
- 485 0004 FEE7     		b	.L11
- 486              		.cfi_endproc
- 487              	.LFE117:
- 489 0006 00BF     		.section	.text.prvTIM4_Config,"ax",%progbits
- 490              		.align	2
- 491              		.global	prvTIM4_Config
- 492              		.thumb
- 493              		.thumb_func
- 495              	prvTIM4_Config:
- 496              	.LFB118:
+ 533              		.loc 1 265 0 discriminator 1
+ 534 0004 FEE7     		b	.L11
+ 535              		.cfi_endproc
+ 536              	.LFE117:
+ 538 0006 00BF     		.section	.text.prvTIM4_Config,"ax",%progbits
+ 539              		.align	2
+ 540              		.global	prvTIM4_Config
+ 541              		.thumb
+ 542              		.thumb_func
+ 544              	prvTIM4_Config:
+ 545              	.LFB118:
  266:src/hw_config.c **** }
  267:src/hw_config.c **** 
  268:src/hw_config.c **** void prvTIM4_Config(void)
  269:src/hw_config.c **** {
- 497              		.loc 1 269 0
- 498              		.cfi_startproc
- 499              		@ args = 0, pretend = 0, frame = 40
- 500              		@ frame_needed = 1, uses_anonymous_args = 0
- 501 0000 80B5     		push	{r7, lr}
- 502              	.LCFI21:
- 503              		.cfi_def_cfa_offset 8
- 504              		.cfi_offset 14, -4
- 505              		.cfi_offset 7, -8
- 506 0002 8AB0     		sub	sp, sp, #40
- 507              	.LCFI22:
- 508              		.cfi_def_cfa_offset 48
- 509 0004 00AF     		add	r7, sp, #0
- 510              	.LCFI23:
- 511              		.cfi_def_cfa_register 7
+ 546              		.loc 1 269 0
+ 547              		.cfi_startproc
+ 548              		@ args = 0, pretend = 0, frame = 40
+ 549              		@ frame_needed = 1, uses_anonymous_args = 0
+ 550 0000 80B5     		push	{r7, lr}
+ 551              	.LCFI21:
+ 552              		.cfi_def_cfa_offset 8
+ 553              		.cfi_offset 14, -4
+ 554              		.cfi_offset 7, -8
+ 555 0002 8AB0     		sub	sp, sp, #40
+ 556              	.LCFI22:
+ 557              		.cfi_def_cfa_offset 48
+ 558 0004 00AF     		add	r7, sp, #0
+ 559              	.LCFI23:
+ 560              		.cfi_def_cfa_register 7
  270:src/hw_config.c ****   uint16_t PrescalerValue = 0;
- 512              		.loc 1 270 0
- 513 0006 4FF00003 		mov	r3, #0
- 514 000a FB84     		strh	r3, [r7, #38]	@ movhi
+ 561              		.loc 1 270 0
+ 562 0006 4FF00003 		mov	r3, #0
+ 563 000a FB84     		strh	r3, [r7, #38]	@ movhi
  271:src/hw_config.c ****   TIM_OCInitTypeDef  TIM_OCInitStructure;
  272:src/hw_config.c ****   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
  273:src/hw_config.c **** 
  274:src/hw_config.c ****   /* --------------------------- System Clocks Configuration -----------------*/
  275:src/hw_config.c ****   /* TIM4 clock enable */
  276:src/hw_config.c ****   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
- 515              		.loc 1 276 0
- 516 000c 4FF00400 		mov	r0, #4
- 517 0010 4FF00101 		mov	r1, #1
- 518 0014 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 564              		.loc 1 276 0
+ 565 000c 4FF00400 		mov	r0, #4
+ 566 0010 4FF00101 		mov	r1, #1
+ 567 0014 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
  277:src/hw_config.c **** 
  278:src/hw_config.c ****     /* -----------------------------------------------------------------------
  279:src/hw_config.c ****     TIM4 Configuration: Output Compare Timing Mode:
@@ -809,198 +858,198 @@
  308:src/hw_config.c **** 
  309:src/hw_config.c ****   /* Compute the prescaler value */
  310:src/hw_config.c ****   PrescalerValue = (uint16_t) ((SystemCoreClock /2) / 2000) - 1;
- 519              		.loc 1 310 0
- 520 0018 40F20003 		movw	r3, #:lower16:SystemCoreClock
- 521 001c C0F20003 		movt	r3, #:upper16:SystemCoreClock
- 522 0020 1A68     		ldr	r2, [r3, #0]
- 523 0022 44F6D353 		movw	r3, #19923
- 524 0026 C1F26203 		movt	r3, 4194
- 525 002a A3FB0213 		umull	r1, r3, r3, r2
- 526 002e 4FEA1323 		lsr	r3, r3, #8
- 527 0032 9BB2     		uxth	r3, r3
- 528 0034 03F1FF33 		add	r3, r3, #-1
- 529 0038 FB84     		strh	r3, [r7, #38]	@ movhi
+ 568              		.loc 1 310 0
+ 569 0018 40F20003 		movw	r3, #:lower16:SystemCoreClock
+ 570 001c C0F20003 		movt	r3, #:upper16:SystemCoreClock
+ 571 0020 1A68     		ldr	r2, [r3, #0]
+ 572 0022 44F6D353 		movw	r3, #19923
+ 573 0026 C1F26203 		movt	r3, 4194
+ 574 002a A3FB0213 		umull	r1, r3, r3, r2
+ 575 002e 4FEA1323 		lsr	r3, r3, #8
+ 576 0032 9BB2     		uxth	r3, r3
+ 577 0034 03F1FF33 		add	r3, r3, #-1
+ 578 0038 FB84     		strh	r3, [r7, #38]	@ movhi
  311:src/hw_config.c **** 
  312:src/hw_config.c ****   /* Time base configuration */
  313:src/hw_config.c ****   TIM_TimeBaseStructure.TIM_Period = TIM_ARR;
- 530              		.loc 1 313 0
- 531 003a 40F26C73 		movw	r3, #1900
- 532 003e BB60     		str	r3, [r7, #8]
+ 579              		.loc 1 313 0
+ 580 003a 40F26C73 		movw	r3, #1900
+ 581 003e BB60     		str	r3, [r7, #8]
  314:src/hw_config.c ****   TIM_TimeBaseStructure.TIM_Prescaler = PrescalerValue;
- 533              		.loc 1 314 0
- 534 0040 FB8C     		ldrh	r3, [r7, #38]	@ movhi
- 535 0042 BB80     		strh	r3, [r7, #4]	@ movhi
+ 582              		.loc 1 314 0
+ 583 0040 FB8C     		ldrh	r3, [r7, #38]	@ movhi
+ 584 0042 BB80     		strh	r3, [r7, #4]	@ movhi
  315:src/hw_config.c ****   TIM_TimeBaseStructure.TIM_ClockDivision = 0;
- 536              		.loc 1 315 0
- 537 0044 4FF00003 		mov	r3, #0
- 538 0048 BB81     		strh	r3, [r7, #12]	@ movhi
+ 585              		.loc 1 315 0
+ 586 0044 4FF00003 		mov	r3, #0
+ 587 0048 BB81     		strh	r3, [r7, #12]	@ movhi
  316:src/hw_config.c ****   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
- 539              		.loc 1 316 0
- 540 004a 4FF00003 		mov	r3, #0
- 541 004e FB80     		strh	r3, [r7, #6]	@ movhi
+ 588              		.loc 1 316 0
+ 589 004a 4FF00003 		mov	r3, #0
+ 590 004e FB80     		strh	r3, [r7, #6]	@ movhi
  317:src/hw_config.c ****   TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
- 542              		.loc 1 317 0
- 543 0050 4FF40060 		mov	r0, #2048
- 544 0054 C4F20000 		movt	r0, 16384
- 545 0058 07F10403 		add	r3, r7, #4
- 546 005c 1946     		mov	r1, r3
- 547 005e FFF7FEFF 		bl	TIM_TimeBaseInit
+ 591              		.loc 1 317 0
+ 592 0050 4FF40060 		mov	r0, #2048
+ 593 0054 C4F20000 		movt	r0, 16384
+ 594 0058 07F10403 		add	r3, r7, #4
+ 595 005c 1946     		mov	r1, r3
+ 596 005e FFF7FEFF 		bl	TIM_TimeBaseInit
  318:src/hw_config.c **** 
  319:src/hw_config.c ****   /* Enable TIM4 Preload register on ARR */
  320:src/hw_config.c ****   TIM_ARRPreloadConfig(TIM4, ENABLE);
- 548              		.loc 1 320 0
- 549 0062 4FF40060 		mov	r0, #2048
- 550 0066 C4F20000 		movt	r0, 16384
- 551 006a 4FF00101 		mov	r1, #1
- 552 006e FFF7FEFF 		bl	TIM_ARRPreloadConfig
+ 597              		.loc 1 320 0
+ 598 0062 4FF40060 		mov	r0, #2048
+ 599 0066 C4F20000 		movt	r0, 16384
+ 600 006a 4FF00101 		mov	r1, #1
+ 601 006e FFF7FEFF 		bl	TIM_ARRPreloadConfig
  321:src/hw_config.c **** 
  322:src/hw_config.c ****   /* TIM PWM1 Mode configuration: Channel */
  323:src/hw_config.c ****   TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
- 553              		.loc 1 323 0
- 554 0072 4FF06003 		mov	r3, #96
- 555 0076 3B82     		strh	r3, [r7, #16]	@ movhi
+ 602              		.loc 1 323 0
+ 603 0072 4FF06003 		mov	r3, #96
+ 604 0076 3B82     		strh	r3, [r7, #16]	@ movhi
  324:src/hw_config.c ****   TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
- 556              		.loc 1 324 0
- 557 0078 4FF00103 		mov	r3, #1
- 558 007c 7B82     		strh	r3, [r7, #18]	@ movhi
+ 605              		.loc 1 324 0
+ 606 0078 4FF00103 		mov	r3, #1
+ 607 007c 7B82     		strh	r3, [r7, #18]	@ movhi
  325:src/hw_config.c ****   TIM_OCInitStructure.TIM_Pulse = TIM_CCR;
- 559              		.loc 1 325 0
- 560 007e 4FF47A73 		mov	r3, #1000
- 561 0082 BB61     		str	r3, [r7, #24]
+ 608              		.loc 1 325 0
+ 609 007e 4FF47A73 		mov	r3, #1000
+ 610 0082 BB61     		str	r3, [r7, #24]
  326:src/hw_config.c ****   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
- 562              		.loc 1 326 0
- 563 0084 4FF00003 		mov	r3, #0
- 564 0088 BB83     		strh	r3, [r7, #28]	@ movhi
+ 611              		.loc 1 326 0
+ 612 0084 4FF00003 		mov	r3, #0
+ 613 0088 BB83     		strh	r3, [r7, #28]	@ movhi
  327:src/hw_config.c **** 
  328:src/hw_config.c ****   /* Output Compare PWM1 Mode configuration: Channel1 */
  329:src/hw_config.c ****   TIM_OC1Init(TIM4, &TIM_OCInitStructure);
- 565              		.loc 1 329 0
- 566 008a 4FF40060 		mov	r0, #2048
- 567 008e C4F20000 		movt	r0, 16384
- 568 0092 07F11003 		add	r3, r7, #16
- 569 0096 1946     		mov	r1, r3
- 570 0098 FFF7FEFF 		bl	TIM_OC1Init
+ 614              		.loc 1 329 0
+ 615 008a 4FF40060 		mov	r0, #2048
+ 616 008e C4F20000 		movt	r0, 16384
+ 617 0092 07F11003 		add	r3, r7, #16
+ 618 0096 1946     		mov	r1, r3
+ 619 0098 FFF7FEFF 		bl	TIM_OC1Init
  330:src/hw_config.c ****   TIM_CCxCmd(TIM4, TIM_Channel_1, DISABLE);
- 571              		.loc 1 330 0
- 572 009c 4FF40060 		mov	r0, #2048
- 573 00a0 C4F20000 		movt	r0, 16384
- 574 00a4 4FF00001 		mov	r1, #0
- 575 00a8 4FF00002 		mov	r2, #0
- 576 00ac FFF7FEFF 		bl	TIM_CCxCmd
+ 620              		.loc 1 330 0
+ 621 009c 4FF40060 		mov	r0, #2048
+ 622 00a0 C4F20000 		movt	r0, 16384
+ 623 00a4 4FF00001 		mov	r1, #0
+ 624 00a8 4FF00002 		mov	r2, #0
+ 625 00ac FFF7FEFF 		bl	TIM_CCxCmd
  331:src/hw_config.c **** 
  332:src/hw_config.c ****   TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
- 577              		.loc 1 332 0
- 578 00b0 4FF40060 		mov	r0, #2048
- 579 00b4 C4F20000 		movt	r0, 16384
- 580 00b8 4FF00801 		mov	r1, #8
- 581 00bc FFF7FEFF 		bl	TIM_OC1PreloadConfig
+ 626              		.loc 1 332 0
+ 627 00b0 4FF40060 		mov	r0, #2048
+ 628 00b4 C4F20000 		movt	r0, 16384
+ 629 00b8 4FF00801 		mov	r1, #8
+ 630 00bc FFF7FEFF 		bl	TIM_OC1PreloadConfig
  333:src/hw_config.c **** 
  334:src/hw_config.c ****   /* Output Compare PWM1 Mode configuration: Channel2 */
  335:src/hw_config.c ****   TIM_OC2Init(TIM4, &TIM_OCInitStructure);
- 582              		.loc 1 335 0
- 583 00c0 4FF40060 		mov	r0, #2048
- 584 00c4 C4F20000 		movt	r0, 16384
- 585 00c8 07F11003 		add	r3, r7, #16
- 586 00cc 1946     		mov	r1, r3
- 587 00ce FFF7FEFF 		bl	TIM_OC2Init
+ 631              		.loc 1 335 0
+ 632 00c0 4FF40060 		mov	r0, #2048
+ 633 00c4 C4F20000 		movt	r0, 16384
+ 634 00c8 07F11003 		add	r3, r7, #16
+ 635 00cc 1946     		mov	r1, r3
+ 636 00ce FFF7FEFF 		bl	TIM_OC2Init
  336:src/hw_config.c ****   TIM_CCxCmd(TIM4, TIM_Channel_2, DISABLE);
- 588              		.loc 1 336 0
- 589 00d2 4FF40060 		mov	r0, #2048
- 590 00d6 C4F20000 		movt	r0, 16384
- 591 00da 4FF00401 		mov	r1, #4
- 592 00de 4FF00002 		mov	r2, #0
- 593 00e2 FFF7FEFF 		bl	TIM_CCxCmd
+ 637              		.loc 1 336 0
+ 638 00d2 4FF40060 		mov	r0, #2048
+ 639 00d6 C4F20000 		movt	r0, 16384
+ 640 00da 4FF00401 		mov	r1, #4
+ 641 00de 4FF00002 		mov	r2, #0
+ 642 00e2 FFF7FEFF 		bl	TIM_CCxCmd
  337:src/hw_config.c **** 
  338:src/hw_config.c ****   TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
- 594              		.loc 1 338 0
- 595 00e6 4FF40060 		mov	r0, #2048
- 596 00ea C4F20000 		movt	r0, 16384
- 597 00ee 4FF00801 		mov	r1, #8
- 598 00f2 FFF7FEFF 		bl	TIM_OC2PreloadConfig
+ 643              		.loc 1 338 0
+ 644 00e6 4FF40060 		mov	r0, #2048
+ 645 00ea C4F20000 		movt	r0, 16384
+ 646 00ee 4FF00801 		mov	r1, #8
+ 647 00f2 FFF7FEFF 		bl	TIM_OC2PreloadConfig
  339:src/hw_config.c **** 
  340:src/hw_config.c ****   /* Output Compare PWM1 Mode configuration: Channel3 */
  341:src/hw_config.c ****   TIM_OC3Init(TIM4, &TIM_OCInitStructure);
- 599              		.loc 1 341 0
- 600 00f6 4FF40060 		mov	r0, #2048
- 601 00fa C4F20000 		movt	r0, 16384
- 602 00fe 07F11003 		add	r3, r7, #16
- 603 0102 1946     		mov	r1, r3
- 604 0104 FFF7FEFF 		bl	TIM_OC3Init
+ 648              		.loc 1 341 0
+ 649 00f6 4FF40060 		mov	r0, #2048
+ 650 00fa C4F20000 		movt	r0, 16384
+ 651 00fe 07F11003 		add	r3, r7, #16
+ 652 0102 1946     		mov	r1, r3
+ 653 0104 FFF7FEFF 		bl	TIM_OC3Init
  342:src/hw_config.c ****   TIM_CCxCmd(TIM4, TIM_Channel_3, DISABLE);
- 605              		.loc 1 342 0
- 606 0108 4FF40060 		mov	r0, #2048
- 607 010c C4F20000 		movt	r0, 16384
- 608 0110 4FF00801 		mov	r1, #8
- 609 0114 4FF00002 		mov	r2, #0
- 610 0118 FFF7FEFF 		bl	TIM_CCxCmd
+ 654              		.loc 1 342 0
+ 655 0108 4FF40060 		mov	r0, #2048
+ 656 010c C4F20000 		movt	r0, 16384
+ 657 0110 4FF00801 		mov	r1, #8
+ 658 0114 4FF00002 		mov	r2, #0
+ 659 0118 FFF7FEFF 		bl	TIM_CCxCmd
  343:src/hw_config.c **** 
  344:src/hw_config.c ****   TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
- 611              		.loc 1 344 0
- 612 011c 4FF40060 		mov	r0, #2048
- 613 0120 C4F20000 		movt	r0, 16384
- 614 0124 4FF00801 		mov	r1, #8
- 615 0128 FFF7FEFF 		bl	TIM_OC3PreloadConfig
+ 660              		.loc 1 344 0
+ 661 011c 4FF40060 		mov	r0, #2048
+ 662 0120 C4F20000 		movt	r0, 16384
+ 663 0124 4FF00801 		mov	r1, #8
+ 664 0128 FFF7FEFF 		bl	TIM_OC3PreloadConfig
  345:src/hw_config.c **** 
  346:src/hw_config.c ****   /* Output Compare PWM1 Mode configuration: Channel4 */
  347:src/hw_config.c ****   TIM_OC4Init(TIM4, &TIM_OCInitStructure);
- 616              		.loc 1 347 0
- 617 012c 4FF40060 		mov	r0, #2048
- 618 0130 C4F20000 		movt	r0, 16384
- 619 0134 07F11003 		add	r3, r7, #16
- 620 0138 1946     		mov	r1, r3
- 621 013a FFF7FEFF 		bl	TIM_OC4Init
+ 665              		.loc 1 347 0
+ 666 012c 4FF40060 		mov	r0, #2048
+ 667 0130 C4F20000 		movt	r0, 16384
+ 668 0134 07F11003 		add	r3, r7, #16
+ 669 0138 1946     		mov	r1, r3
+ 670 013a FFF7FEFF 		bl	TIM_OC4Init
  348:src/hw_config.c ****   TIM_CCxCmd(TIM4, TIM_Channel_4, DISABLE);
- 622              		.loc 1 348 0
- 623 013e 4FF40060 		mov	r0, #2048
- 624 0142 C4F20000 		movt	r0, 16384
- 625 0146 4FF00C01 		mov	r1, #12
- 626 014a 4FF00002 		mov	r2, #0
- 627 014e FFF7FEFF 		bl	TIM_CCxCmd
+ 671              		.loc 1 348 0
+ 672 013e 4FF40060 		mov	r0, #2048
+ 673 0142 C4F20000 		movt	r0, 16384
+ 674 0146 4FF00C01 		mov	r1, #12
+ 675 014a 4FF00002 		mov	r2, #0
+ 676 014e FFF7FEFF 		bl	TIM_CCxCmd
  349:src/hw_config.c **** 
  350:src/hw_config.c ****   TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
- 628              		.loc 1 350 0
- 629 0152 4FF40060 		mov	r0, #2048
- 630 0156 C4F20000 		movt	r0, 16384
- 631 015a 4FF00801 		mov	r1, #8
- 632 015e FFF7FEFF 		bl	TIM_OC4PreloadConfig
+ 677              		.loc 1 350 0
+ 678 0152 4FF40060 		mov	r0, #2048
+ 679 0156 C4F20000 		movt	r0, 16384
+ 680 015a 4FF00801 		mov	r1, #8
+ 681 015e FFF7FEFF 		bl	TIM_OC4PreloadConfig
  351:src/hw_config.c **** }
- 633              		.loc 1 351 0
- 634 0162 07F12807 		add	r7, r7, #40
- 635 0166 BD46     		mov	sp, r7
- 636 0168 80BD     		pop	{r7, pc}
- 637              		.cfi_endproc
- 638              	.LFE118:
- 640 016a 00BF     		.text
- 641              	.Letext0:
- 642              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
- 643              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
- 644              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
- 645              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
- 646              		.file 6 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h"
- 647              		.file 7 "src/include/stm32f4_discovery.h"
- 648              		.file 8 "src/include/stm32f4_discovery_lis3dsh.h"
- 649              		.file 9 "libs/CMSIS/Include/core_cm4.h"
- 650              		.file 10 "libs/Device/STM32F4xx/Include/system_stm32f4xx.h"
+ 682              		.loc 1 351 0
+ 683 0162 07F12807 		add	r7, r7, #40
+ 684 0166 BD46     		mov	sp, r7
+ 685 0168 80BD     		pop	{r7, pc}
+ 686              		.cfi_endproc
+ 687              	.LFE118:
+ 689 016a 00BF     		.text
+ 690              	.Letext0:
+ 691              		.file 2 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 692              		.file 3 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 693              		.file 4 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
+ 694              		.file 5 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h"
+ 695              		.file 6 "libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h"
+ 696              		.file 7 "src/include/stm32f4_discovery.h"
+ 697              		.file 8 "src/include/stm32f4_discovery_lis3dsh.h"
+ 698              		.file 9 "libs/CMSIS/Include/core_cm4.h"
+ 699              		.file 10 "libs/Device/STM32F4xx/Include/system_stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 hw_config.c
-     /tmp/ccPwWWpy.s:20     .text.prvSetupHardware:00000000 $t
-     /tmp/ccPwWWpy.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
-     /tmp/ccPwWWpy.s:75     .text.prvLED_Config:00000000 prvLED_Config
-     /tmp/ccPwWWpy.s:432    .text.prvMEMS_Config:00000000 prvMEMS_Config
-     /tmp/ccPwWWpy.s:175    .text.RCC_Configuration:00000000 RCC_Configuration
-     /tmp/ccPwWWpy.s:216    .text.GPIO_Configuration:00000000 GPIO_Configuration
-     /tmp/ccPwWWpy.s:279    .text.TIM_Configuration:00000000 TIM_Configuration
-     /tmp/ccPwWWpy.s:373    .text.USART_Configuration:00000000 USART_Configuration
-     /tmp/ccPwWWpy.s:70     .text.prvLED_Config:00000000 $t
-     /tmp/ccPwWWpy.s:170    .text.RCC_Configuration:00000000 $t
-     /tmp/ccPwWWpy.s:211    .text.GPIO_Configuration:00000000 $t
-     /tmp/ccPwWWpy.s:274    .text.TIM_Configuration:00000000 $t
-     /tmp/ccPwWWpy.s:368    .text.USART_Configuration:00000000 $t
-     /tmp/ccPwWWpy.s:427    .text.prvMEMS_Config:00000000 $t
-     /tmp/ccPwWWpy.s:464    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 $t
-     /tmp/ccPwWWpy.s:469    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 LIS3DSH_TIMEOUT_UserCallback
-     /tmp/ccPwWWpy.s:490    .text.prvTIM4_Config:00000000 $t
-     /tmp/ccPwWWpy.s:495    .text.prvTIM4_Config:00000000 prvTIM4_Config
+     /tmp/ccFkPkeI.s:20     .text.prvSetupHardware:00000000 $t
+     /tmp/ccFkPkeI.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
+     /tmp/ccFkPkeI.s:481    .text.prvMEMS_Config:00000000 prvMEMS_Config
+     /tmp/ccFkPkeI.s:172    .text.RCC_Configuration:00000000 RCC_Configuration
+     /tmp/ccFkPkeI.s:213    .text.GPIO_Configuration:00000000 GPIO_Configuration
+     /tmp/ccFkPkeI.s:328    .text.TIM_Configuration:00000000 TIM_Configuration
+     /tmp/ccFkPkeI.s:422    .text.USART_Configuration:00000000 USART_Configuration
+     /tmp/ccFkPkeI.s:67     .text.prvLED_Config:00000000 $t
+     /tmp/ccFkPkeI.s:72     .text.prvLED_Config:00000000 prvLED_Config
+     /tmp/ccFkPkeI.s:167    .text.RCC_Configuration:00000000 $t
+     /tmp/ccFkPkeI.s:208    .text.GPIO_Configuration:00000000 $t
+     /tmp/ccFkPkeI.s:323    .text.TIM_Configuration:00000000 $t
+     /tmp/ccFkPkeI.s:417    .text.USART_Configuration:00000000 $t
+     /tmp/ccFkPkeI.s:476    .text.prvMEMS_Config:00000000 $t
+     /tmp/ccFkPkeI.s:513    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 $t
+     /tmp/ccFkPkeI.s:518    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 LIS3DSH_TIMEOUT_UserCallback
+     /tmp/ccFkPkeI.s:539    .text.prvTIM4_Config:00000000 $t
+     /tmp/ccFkPkeI.s:544    .text.prvTIM4_Config:00000000 prvTIM4_Config
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
@@ -1011,6 +1060,7 @@ RCC_AHB1PeriphClockCmd
 GPIO_Init
 GPIO_PinAFConfig
 RCC_APB1PeriphClockCmd
+GPIO_StructInit
 TIM_TimeBaseStructInit
 TIM_TimeBaseInit
 TIM_OCStructInit

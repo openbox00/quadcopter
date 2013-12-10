@@ -28,9 +28,12 @@ int strcmp(const char *a, const char *b)
         );
 }
 
+#define PWM_MOTOR_MIN 100
+
 extern xQueueHandle xQueueUARTSend;
 extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
+extern void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4);
 
 char next_line[3] = {'\n','\r','\0'};
 char cmd[HISTORY_COUNT][CMDBUF_SIZE];
@@ -62,6 +65,7 @@ void pwm(int argc, char* argv[])
 	
 	qprintf(xQueueUARTSend, "%s\n", argv[1]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);
+	//qprintf(xQueueUARTSend, "finish\n");
 }
 
 /* ref tim37021 */
@@ -130,9 +134,7 @@ void check_keyword()
 	}
 
 	if (i == CMD_COUNT) {
-		qprintf(xQueueUARTSend, "%s",argv[0]);
-		qprintf(xQueueUARTSend, ": command not found");
-		qprintf(xQueueUARTSend, "%s",next_line);
+ 		 Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 
 }
@@ -150,7 +152,7 @@ void shell(void *pvParameters)
 		//printf("%s",str);
 		qprintf(xQueueUARTSend, "%s", str);
 
-		
+
 		while (1) {
 			put_ch = receive_byte();			
 

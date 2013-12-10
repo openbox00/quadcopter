@@ -32,7 +32,7 @@ void prvSetupHardware( void )
 
 	/* Configure LED IOs as output push-pull */
     /* Initialize LEDs on STM32F4_Discovery board */
-	prvLED_Config(GPIO);
+	//prvLED_Config(GPIO);
 	/* Configure User button pin (PA0) as external interrupt -> modes switching */
 	STM_EVAL_PBInit(BUTTON_USER,BUTTON_MODE_EXTI);
 
@@ -109,23 +109,23 @@ void GPIO_Configuration(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   //GPIO Configuration for TIM4
-  //   GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
+     GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
  
-  //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
-  //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
-  //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
-  //   GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
+     GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+     GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
+     GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
+     GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
       
 
   //   // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
-  //   GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; 
+     GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15; 
   // //PD12->LED3 PD13->LED4 PD14->LED5 PD15->LED6
-  // //GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
-  // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; 
-  //   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  //   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  //   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  //   GPIO_Init( GPIOD, &GPIO_InitStructure );  
+     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;            // Alt Function - Push Pull
+  	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; 
+     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+     GPIO_Init( GPIOD, &GPIO_InitStructure );  
 
     /*----------------------------------------------------------------------*/
 

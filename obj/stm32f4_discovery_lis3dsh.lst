@@ -805,18 +805,18 @@
  569              		.file 7 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4_discovery_lis3dsh.c
-     /tmp/cc226Jvw.s:24     .data.LIS3DSHTimeout:00000000 LIS3DSHTimeout
-     /tmp/cc226Jvw.s:21     .data.LIS3DSHTimeout:00000000 $d
-     /tmp/cc226Jvw.s:27     .text.LIS3DSH_Init:00000000 $t
-     /tmp/cc226Jvw.s:32     .text.LIS3DSH_Init:00000000 LIS3DSH_Init
-     /tmp/cc226Jvw.s:246    .text.LIS3DSH_LowLevel_Init:00000000 LIS3DSH_LowLevel_Init
-     /tmp/cc226Jvw.s:81     .text.LIS3DSH_Write:00000000 LIS3DSH_Write
-     /tmp/cc226Jvw.s:76     .text.LIS3DSH_Write:00000000 $t
-     /tmp/cc226Jvw.s:447    .text.LIS3DSH_SendByte:00000000 LIS3DSH_SendByte
-     /tmp/cc226Jvw.s:155    .text.LIS3DSH_Read:00000000 $t
-     /tmp/cc226Jvw.s:160    .text.LIS3DSH_Read:00000000 LIS3DSH_Read
-     /tmp/cc226Jvw.s:242    .text.LIS3DSH_LowLevel_Init:00000000 $t
-     /tmp/cc226Jvw.s:443    .text.LIS3DSH_SendByte:00000000 $t
+     /tmp/ccQ2lhgE.s:24     .data.LIS3DSHTimeout:00000000 LIS3DSHTimeout
+     /tmp/ccQ2lhgE.s:21     .data.LIS3DSHTimeout:00000000 $d
+     /tmp/ccQ2lhgE.s:27     .text.LIS3DSH_Init:00000000 $t
+     /tmp/ccQ2lhgE.s:32     .text.LIS3DSH_Init:00000000 LIS3DSH_Init
+     /tmp/ccQ2lhgE.s:246    .text.LIS3DSH_LowLevel_Init:00000000 LIS3DSH_LowLevel_Init
+     /tmp/ccQ2lhgE.s:81     .text.LIS3DSH_Write:00000000 LIS3DSH_Write
+     /tmp/ccQ2lhgE.s:76     .text.LIS3DSH_Write:00000000 $t
+     /tmp/ccQ2lhgE.s:447    .text.LIS3DSH_SendByte:00000000 LIS3DSH_SendByte
+     /tmp/ccQ2lhgE.s:155    .text.LIS3DSH_Read:00000000 $t
+     /tmp/ccQ2lhgE.s:160    .text.LIS3DSH_Read:00000000 LIS3DSH_Read
+     /tmp/ccQ2lhgE.s:242    .text.LIS3DSH_LowLevel_Init:00000000 $t
+     /tmp/ccQ2lhgE.s:443    .text.LIS3DSH_SendByte:00000000 $t
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

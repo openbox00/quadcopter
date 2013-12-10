@@ -529,16 +529,16 @@
  350              		.file 5 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 list.c
-     /tmp/ccmntegX.s:20     .text.vListInitialise:00000000 $t
-     /tmp/ccmntegX.s:25     .text.vListInitialise:00000000 vListInitialise
-     /tmp/ccmntegX.s:76     .text.vListInitialiseItem:00000000 $t
-     /tmp/ccmntegX.s:81     .text.vListInitialiseItem:00000000 vListInitialiseItem
-     /tmp/ccmntegX.s:112    .text.vListInsertEnd:00000000 $t
-     /tmp/ccmntegX.s:117    .text.vListInsertEnd:00000000 vListInsertEnd
-     /tmp/ccmntegX.s:182    .text.vListInsert:00000000 $t
-     /tmp/ccmntegX.s:187    .text.vListInsert:00000000 vListInsert
-     /tmp/ccmntegX.s:276    .text.vListRemove:00000000 $t
-     /tmp/ccmntegX.s:281    .text.vListRemove:00000000 vListRemove
+     /tmp/ccCHptn2.s:20     .text.vListInitialise:00000000 $t
+     /tmp/ccCHptn2.s:25     .text.vListInitialise:00000000 vListInitialise
+     /tmp/ccCHptn2.s:76     .text.vListInitialiseItem:00000000 $t
+     /tmp/ccCHptn2.s:81     .text.vListInitialiseItem:00000000 vListInitialiseItem
+     /tmp/ccCHptn2.s:112    .text.vListInsertEnd:00000000 $t
+     /tmp/ccCHptn2.s:117    .text.vListInsertEnd:00000000 vListInsertEnd
+     /tmp/ccCHptn2.s:182    .text.vListInsert:00000000 $t
+     /tmp/ccCHptn2.s:187    .text.vListInsert:00000000 vListInsert
+     /tmp/ccCHptn2.s:276    .text.vListRemove:00000000 $t
+     /tmp/ccCHptn2.s:281    .text.vListRemove:00000000 vListRemove
                      .debug_frame:00000010 $d
 
 NO UNDEFINED SYMBOLS
