@@ -1,6 +1,9 @@
-obj/src/main.o: src/main.c libs/Device/STM32F4xx/Include/stm32f4xx.h \
- libs/CMSIS/Include/core_cm4.h libs/CMSIS/Include/core_cmInstr.h \
- libs/CMSIS/Include/core_cmFunc.h libs/CMSIS/Include/core_cm4_simd.h \
+obj/src/shell.o: src/shell.c FreeRTOS/Source/include/FreeRTOS.h \
+ FreeRTOS/Source/include/projdefs.h \
+ FreeRTOS/Source/include/FreeRTOSConfig.h \
+ libs/Device/STM32F4xx/Include/stm32f4xx.h libs/CMSIS/Include/core_cm4.h \
+ libs/CMSIS/Include/core_cmInstr.h libs/CMSIS/Include/core_cmFunc.h \
+ libs/CMSIS/Include/core_cm4_simd.h \
  libs/Device/STM32F4xx/Include/system_stm32f4xx.h \
  src/include/stm32f4xx_conf.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_adc.h \
@@ -28,17 +31,18 @@ obj/src/main.o: src/main.c libs/Device/STM32F4xx/Include/stm32f4xx.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h \
  libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h \
- libs/STM32F4xx_StdPeriph_Driver/inc/misc.h \
- FreeRTOS/Source/include/FreeRTOS.h FreeRTOS/Source/include/projdefs.h \
- FreeRTOS/Source/include/FreeRTOSConfig.h src/include/ustime.h \
+ libs/STM32F4xx_StdPeriph_Driver/inc/misc.h src/include/ustime.h \
  FreeRTOS/Source/include/portable.h \
  FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h \
  FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
- FreeRTOS/Source/include/list.h FreeRTOS/Source/include/semphr.h \
- FreeRTOS/Source/include/queue.h src/include/hw_config.h \
- src/include/stm32f4_discovery.h src/include/stm32f4_discovery_lis3dsh.h \
- src/include/main.h src/include/shell.h src/string-util.c \
- FreeRTOS/Source/include/queue.h
+ FreeRTOS/Source/include/list.h FreeRTOS/Source/include/queue.h \
+ FreeRTOS/Source/include/semphr.h FreeRTOS/Source/include/queue.h
+
+FreeRTOS/Source/include/FreeRTOS.h:
+
+FreeRTOS/Source/include/projdefs.h:
+
+FreeRTOS/Source/include/FreeRTOSConfig.h:
 
 libs/Device/STM32F4xx/Include/stm32f4xx.h:
 
@@ -106,12 +110,6 @@ libs/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h:
 
 libs/STM32F4xx_StdPeriph_Driver/inc/misc.h:
 
-FreeRTOS/Source/include/FreeRTOS.h:
-
-FreeRTOS/Source/include/projdefs.h:
-
-FreeRTOS/Source/include/FreeRTOSConfig.h:
-
 src/include/ustime.h:
 
 FreeRTOS/Source/include/portable.h:
@@ -124,20 +122,8 @@ FreeRTOS/Source/include/task.h:
 
 FreeRTOS/Source/include/list.h:
 
-FreeRTOS/Source/include/semphr.h:
-
 FreeRTOS/Source/include/queue.h:
 
-src/include/hw_config.h:
-
-src/include/stm32f4_discovery.h:
-
-src/include/stm32f4_discovery_lis3dsh.h:
-
-src/include/main.h:
-
-src/include/shell.h:
-
-src/string-util.c:
+FreeRTOS/Source/include/semphr.h:
 
 FreeRTOS/Source/include/queue.h:

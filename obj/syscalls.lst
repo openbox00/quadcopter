@@ -1097,33 +1097,33 @@
  575              		.file 12 "libs/CMSIS/Include/core_cm4.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 syscalls.c
-     /tmp/cciRSsak.s:24     .data.__malloc_margin:00000000 __malloc_margin
-     /tmp/cciRSsak.s:21     .data.__malloc_margin:00000000 $d
+     /tmp/ccaRmnEf.s:24     .data.__malloc_margin:00000000 __malloc_margin
+     /tmp/ccaRmnEf.s:21     .data.__malloc_margin:00000000 $d
                             *COM*:00000004 __brkval
-     /tmp/cciRSsak.s:28     .text._exit:00000000 $t
-     /tmp/cciRSsak.s:33     .text._exit:00000000 _exit
-     /tmp/cciRSsak.s:59     .text._read_r:00000000 $t
-     /tmp/cciRSsak.s:64     .text._read_r:00000000 _read_r
-     /tmp/cciRSsak.s:101    .text._write_r:00000000 $t
-     /tmp/cciRSsak.s:106    .text._write_r:00000000 _write_r
-     /tmp/cciRSsak.s:143    .text._lseek_r:00000000 $t
-     /tmp/cciRSsak.s:148    .text._lseek_r:00000000 _lseek_r
-     /tmp/cciRSsak.s:185    .text._close_r:00000000 $t
-     /tmp/cciRSsak.s:190    .text._close_r:00000000 _close_r
-     /tmp/cciRSsak.s:225    .text._fstat_r:00000000 $t
-     /tmp/cciRSsak.s:230    .text._fstat_r:00000000 _fstat_r
-     /tmp/cciRSsak.s:283    .text._isatty_r:00000000 $t
-     /tmp/cciRSsak.s:288    .text._isatty_r:00000000 _isatty_r
-     /tmp/cciRSsak.s:319    .text._sbrk_r:00000000 $t
-     /tmp/cciRSsak.s:324    .text._sbrk_r:00000000 _sbrk_r
-     /tmp/cciRSsak.s:419    .text._kill_r:00000000 $t
-     /tmp/cciRSsak.s:424    .text._kill_r:00000000 _kill_r
-     /tmp/cciRSsak.s:460    .text._getpid_r:00000000 $t
-     /tmp/cciRSsak.s:465    .text._getpid_r:00000000 _getpid_r
-     /tmp/cciRSsak.s:499    .text.__malloc_lock:00000000 $t
-     /tmp/cciRSsak.s:504    .text.__malloc_lock:00000000 __malloc_lock
-     /tmp/cciRSsak.s:532    .text.__malloc_unlock:00000000 $t
-     /tmp/cciRSsak.s:537    .text.__malloc_unlock:00000000 __malloc_unlock
+     /tmp/ccaRmnEf.s:28     .text._exit:00000000 $t
+     /tmp/ccaRmnEf.s:33     .text._exit:00000000 _exit
+     /tmp/ccaRmnEf.s:59     .text._read_r:00000000 $t
+     /tmp/ccaRmnEf.s:64     .text._read_r:00000000 _read_r
+     /tmp/ccaRmnEf.s:101    .text._write_r:00000000 $t
+     /tmp/ccaRmnEf.s:106    .text._write_r:00000000 _write_r
+     /tmp/ccaRmnEf.s:143    .text._lseek_r:00000000 $t
+     /tmp/ccaRmnEf.s:148    .text._lseek_r:00000000 _lseek_r
+     /tmp/ccaRmnEf.s:185    .text._close_r:00000000 $t
+     /tmp/ccaRmnEf.s:190    .text._close_r:00000000 _close_r
+     /tmp/ccaRmnEf.s:225    .text._fstat_r:00000000 $t
+     /tmp/ccaRmnEf.s:230    .text._fstat_r:00000000 _fstat_r
+     /tmp/ccaRmnEf.s:283    .text._isatty_r:00000000 $t
+     /tmp/ccaRmnEf.s:288    .text._isatty_r:00000000 _isatty_r
+     /tmp/ccaRmnEf.s:319    .text._sbrk_r:00000000 $t
+     /tmp/ccaRmnEf.s:324    .text._sbrk_r:00000000 _sbrk_r
+     /tmp/ccaRmnEf.s:419    .text._kill_r:00000000 $t
+     /tmp/ccaRmnEf.s:424    .text._kill_r:00000000 _kill_r
+     /tmp/ccaRmnEf.s:460    .text._getpid_r:00000000 $t
+     /tmp/ccaRmnEf.s:465    .text._getpid_r:00000000 _getpid_r
+     /tmp/ccaRmnEf.s:499    .text.__malloc_lock:00000000 $t
+     /tmp/ccaRmnEf.s:504    .text.__malloc_lock:00000000 __malloc_lock
+     /tmp/ccaRmnEf.s:532    .text.__malloc_unlock:00000000 $t
+     /tmp/ccaRmnEf.s:537    .text.__malloc_unlock:00000000 __malloc_unlock
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

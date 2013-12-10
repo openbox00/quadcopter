@@ -33,6 +33,7 @@
 
 #include "hw_config.h"  //all hardware configuration was setted here
 #include "main.h"
+#include "shell.h"
 
 #include "string-util.c"
 
@@ -63,29 +64,65 @@
 #define PWM_Motor3 TIM4->CCR3   
 #define PWM_Motor4 TIM4->CCR4   
 
+/* Task functions declarations */
+static void pwmctrl(void *pvParameters);
+static void vMEMSTask(void *pvParameters);
+
+static void UsartTask(void *pvParameters);
+static void Usartrecive(void *pvParameters);
+
+/* semaphores, queues declarations */
+xQueueHandle xQueueUARTSend;
+xQueueHandle xQueueUARTRecvie;
+xQueueHandle xQueueShell2PWM;
+
+
 /* Private variables ---------------------------------------------------------*/
 /* Queue structure used for passing messages. */
 typedef struct {
 	char str[100];
 } serial_str_msg;
 
+typedef struct {
+        char ch;
+} serial_ch_msg;
+
+
+char receive_byte()
+{
+        serial_ch_msg msg;
+
+        /* Wait for a byte to be queued by the receive interrupts handler. */
+        while (!xQueueReceive(xQueueUARTRecvie, &msg, portMAX_DELAY));
+
+        return msg.ch;
+}
+
+/* for fg ref zzz0072*/
+int receive_byte_noblock(char *ch)
+{
+    serial_ch_msg msg;
+    int rval = xQueueReceive(xQueueUARTRecvie, &msg, 10);
+    if ( rval == 1) {
+        *ch = msg.ch;
+    }
+    return rval;
+}
+
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
 
-void pwm(void)
+static void pwmctrl(void *pvParameters)
 {
   const portTickType xDelay = 1000; // portTICK_RATE_MS;
 
- //Delay_1ms(50);
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
 
-  Delay_1ms(100);
-
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
   
-  Delay_1ms(100);
+
 
   while(1)  // Do not exit
   {
@@ -126,12 +163,6 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 /*********************************************************************************************************/
 /* Private functions ---------------------------------------------------------*/
 
-/* Task functions declarations */
-static void vMEMSTask(void *pvParameters);
-static void UsartTask(void *pvParameters);
-
-/* semaphores, queues declarations */
-xQueueHandle xQueueUARTSend;
 
 /**
   * @brief  Main program.
@@ -143,13 +174,20 @@ int main(void)
 	
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
+    xQueueUARTRecvie = xQueueCreate(1, sizeof(serial_ch_msg));
+    xQueueShell2PWM = xQueueCreate(1, sizeof(serial_ch_msg));
+
 
 	/* initialize hardware... */
 	prvSetupHardware();
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "MEMS", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+
+	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "vMEMSTask", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -173,14 +211,6 @@ static void UsartTask(void *pvParameters)
 
 	
 		serial_str_msg msg;
-		//Wait for character
-		// while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
-  //           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
-		// 		USART_ReceiveData(USART2); // Clear Error
-		// }
-
-		//Collect the caracter
-		//Data = USART_ReceiveData(USART2);
 
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
 
@@ -198,6 +228,31 @@ static void UsartTask(void *pvParameters)
 	while(1);
 }
 
+//Task For Sending Data Via USART
+static void Usartrecive(void *pvParameters)
+{
+	//Variable to store received data	
+	uint32_t Data;
+	uint8_t curr_char;	
+
+	while(1) {
+
+	
+		serial_str_msg msg;
+		//Wait for character
+		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+  		           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
+		 		USART_ReceiveData(USART2); // Clear Error
+		 }
+
+		//Collect the caracter
+		Data = USART_ReceiveData(USART2);
+		qprintf(xQueueUARTRecvie, "%c", Data); 
+		
+			}
+
+	while(1);
+}
 
 
 void vMEMSTask(void *pvParameters)
@@ -214,21 +269,18 @@ void vMEMSTask(void *pvParameters)
 	uint8_t Buffer_Lz[1];
 
 	uint8_t counter  = 0;
-	__IO uint32_t TimingDelay = 0;
-	__IO int8_t XOffset;
-	__IO int8_t YOffset;
-	__IO int8_t ZOffset;
 
-
-	int16_t temp1 = 0;
-	int16_t temp2 = 0;
-	int16_t temp3 = 0;
+	__IO float XOffset;
+	__IO float YOffset;
+	__IO float ZOffset;
 
 	int16_t temp4 = 0;
 	int16_t temp5 = 0;
 	int16_t temp6 = 0;
 
-  	uint16_t TempAcceleration = 0;   
+	float x;
+	float y;
+	float z;
 
 	/* reset offset */
   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
@@ -237,11 +289,21 @@ void vMEMSTask(void *pvParameters)
   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
-            
-  	XOffset = (int8_t)Buffer_Hx[0];
-  	YOffset = (int8_t)Buffer_Hy[0];
-  	ZOffset = (int8_t)Buffer_Hz[0];
- 
+
+	    /* Update autoreload and capture compare registers value*/
+
+	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+
+		x = ((float)temp4)*9.8 / 16000;
+		y = ((float)temp5)*9.8 / 16000;
+		z = ((float)temp6)*9.8 / 16000;
+
+  	XOffset = x;
+ 	YOffset = y;
+  	ZOffset = z;
+
 	/* reset */
 
 	for( ;; )
@@ -257,119 +319,57 @@ void vMEMSTask(void *pvParameters)
 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
 
-
-	    /* Remove the offsets values from data */
-	    //Buffer_x[0] -= XOffset;
-	    //Buffer_y[0] -= YOffset;
-	    //Buffer_z[0] -= ZOffset;
-
 	    /* Update autoreload and capture compare registers value*/
-	    temp1 = ABS((int8_t)(Buffer_Hx[0])<<8|(int8_t)(Buffer_Lx[0]));
-	    temp2 = ABS((int8_t)(Buffer_Hy[0])<<8|(int8_t)(Buffer_Ly[0]));
-	    temp3 = ABS((int8_t)(Buffer_Hz[0])<<8|(int8_t)(Buffer_Lz[0]));
 
-	    temp4 = (int16_t)((Buffer_Hx[0])<<8);
-		temp4 = temp4 | (Buffer_Lx[0]);
+	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
 
-	    temp5 = (int16_t)((Buffer_Hy[0])<<8);
-		temp5 = temp5 | (Buffer_Ly[0]);
+		x = ((float)temp4)*9.8 / 16000;
+		y = ((float)temp5)*9.8 / 16000;
+		z = ((float)temp6)*9.8 / 16000;
 
-	    temp6 = (int16_t)((Buffer_Hy[0])<<8);
-		temp6 = temp6 | (Buffer_Ly[0]);
-
-    	TempAcceleration = MAX(temp1, temp2);
+            
+	    x -= XOffset;
+	    y -= YOffset;
+	    z -= ZOffset;
 		  
 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
-		qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", temp4, temp5, temp6);
+		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", x, y, z);
+		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int)x, (int)y, (int)z);
 		
-		if(TempAcceleration != 0)
-	      {
-		
-	        if ((int8_t)Buffer_Hx[0] < -G)
-	        {
-				STM_EVAL_LEDOn(LED4);
-
-
-	            if ((int8_t)Buffer_Hx[0] <= G)
-	            {
-	                STM_EVAL_LEDOff(LED3);
-
-	            }
-
-	            if ((int8_t)Buffer_Hy[0] <= G)
-	            {
-	               STM_EVAL_LEDOff(LED6);
-	            }
-
-	            if ((int8_t)Buffer_Hy[0] >= -G)
-	            {
-	                STM_EVAL_LEDOff(LED5);
-	            }
-
-	        }
-	        if ((int8_t)Buffer_Hx[0] > G)
-	        {
-				STM_EVAL_LEDOn(LED5);
-
-	            if ((int8_t)Buffer_Hy[0] <= G)
-	            {
-		            STM_EVAL_LEDOff(LED4);
-	            }
-
-	            if ((int8_t)Buffer_Hy[0] >= -G)
-	            {
-	    			STM_EVAL_LEDOff(LED3);
-	            }
-
-	            if ((int8_t)Buffer_Hx[0] >= -G)
-	            {
-	        	    STM_EVAL_LEDOff(LED6);
-	            }
-
-	        }
-	        if ((int8_t)Buffer_Hy[0] > G)
-	        {
-
-				STM_EVAL_LEDOn(LED3);
-
-	            if ((int8_t)Buffer_Hx[0] <= G)
-	            {
-	                STM_EVAL_LEDOff(LED4);
-	            }
-
-	            if ((int8_t)Buffer_Hy[0] >= -G)
-	            {
-	                STM_EVAL_LEDOff(LED5);
-	            }
-
-	            if ((int8_t)Buffer_Hx[0] >= -G)
-	            {
-	                STM_EVAL_LEDOff(LED6);
-	            }
-
-	        }
-	        if ((int8_t)Buffer_Hy[0] < -G)
-	        {
-
-				STM_EVAL_LEDOn(LED6);
-
-	            if ((int8_t)Buffer_Hx[0] <= G)
-	            {
-	                STM_EVAL_LEDOff(LED3);
-	            }
-
-	            if ((int8_t)Buffer_Hy[0] <= G)
-	            {
-		           STM_EVAL_LEDOff(LED4);
-	            }
-
-	            if ((int8_t)Buffer_Hx[0] >= -G)
-	            {
-	    	        STM_EVAL_LEDOff(LED5);
-	            }
-	        }
-			counter = 0x00;
+		if(((int)x != 0) || ((int)y != 0))
+		{
+                if ((int)x < -G)
+                {
+                    STM_EVAL_LEDOn(LED4);
+                    if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
+                    if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
+                    if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+                }
+                if ((int)x > G)
+                {
+                    STM_EVAL_LEDOn(LED5);
+                    if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+                    if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
+                    if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+                }
+                if ((int)y > G)
+                {
+                    STM_EVAL_LEDOn(LED3);
+                    if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
+                    if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+                    if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+                }
+                if ((int)y < -G)
+                {
+                    STM_EVAL_LEDOn(LED6);
+				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
+                    if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+                    if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
+                }
+                counter = 0x00;
 
 	    }
 	  }
