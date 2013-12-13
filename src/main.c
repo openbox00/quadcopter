@@ -50,9 +50,9 @@
 #define queueSIZE	6
 
 /*brushless motor PWM max and min duty cycle*/
-#define PWM_MOTOR_MIN 100
-#define PWM_MOTOR_MAX 1000
-#define TEST 200
+#define PWM_MOTOR_MIN 1000
+#define PWM_MOTOR_MAX 10000
+
 
 /* angle */
 #define G 2
@@ -116,7 +116,7 @@ int receive_byte_noblock(char *ch)
 
 static void pwmctrl(void *pvParameters)
 {
-  const portTickType xDelay = 3000; // portTICK_RATE_MS;
+  const portTickType xDelay = 6000; // portTICK_RATE_MS;
 
   char pwm_speed_char[4];
 
@@ -124,10 +124,14 @@ static void pwmctrl(void *pvParameters)
 
   int pwm_speed;
 
+ // vTaskDelay( xDelay );	
+
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( xDelay );
+  vTaskDelay( 10000 );
+
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-  vTaskDelay( xDelay );
+
+ // vTaskDelay( xDelay );
 
 
   while(1)  // Do not exit
@@ -140,10 +144,10 @@ static void pwmctrl(void *pvParameters)
 	
    pwm_speed = (pwm_speed_int *1000) / 100;
 
-   if (pwm_speed >1000) {
+   if (pwm_speed >10000) {
+	pwm_speed = 10000;
+	}else if (pwm_speed <1000){
 	pwm_speed = 1000;
-	}else if (pwm_speed <100){
-	pwm_speed = 100;
 	}else{
 	pwm_speed = pwm_speed;
 	}

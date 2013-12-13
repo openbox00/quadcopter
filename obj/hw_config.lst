@@ -500,13 +500,13 @@
  349              		.loc 1 160 0
  350 0010 4FF40073 		mov	r3, #512
  351 0014 BB83     		strh	r3, [r7, #28]	@ movhi
- 161:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
+ 161:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Period = 33600 - 1;   
  352              		.loc 1 161 0
- 353 0016 40F61F53 		movw	r3, #3359
+ 353 0016 48F23F33 		movw	r3, #33599
  354 001a BB61     		str	r3, [r7, #24]
- 162:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
+ 162:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_Prescaler = 50 - 1; 
  355              		.loc 1 162 0
- 356 001c 40F2F313 		movw	r3, #499
+ 356 001c 4FF03103 		mov	r3, #49
  357 0020 BB82     		strh	r3, [r7, #20]	@ movhi
  163:src/hw_config.c ****     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
  358              		.loc 1 163 0
@@ -1032,24 +1032,24 @@
  699              		.file 10 "libs/Device/STM32F4xx/Include/system_stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 hw_config.c
-     /tmp/ccFkPkeI.s:20     .text.prvSetupHardware:00000000 $t
-     /tmp/ccFkPkeI.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
-     /tmp/ccFkPkeI.s:481    .text.prvMEMS_Config:00000000 prvMEMS_Config
-     /tmp/ccFkPkeI.s:172    .text.RCC_Configuration:00000000 RCC_Configuration
-     /tmp/ccFkPkeI.s:213    .text.GPIO_Configuration:00000000 GPIO_Configuration
-     /tmp/ccFkPkeI.s:328    .text.TIM_Configuration:00000000 TIM_Configuration
-     /tmp/ccFkPkeI.s:422    .text.USART_Configuration:00000000 USART_Configuration
-     /tmp/ccFkPkeI.s:67     .text.prvLED_Config:00000000 $t
-     /tmp/ccFkPkeI.s:72     .text.prvLED_Config:00000000 prvLED_Config
-     /tmp/ccFkPkeI.s:167    .text.RCC_Configuration:00000000 $t
-     /tmp/ccFkPkeI.s:208    .text.GPIO_Configuration:00000000 $t
-     /tmp/ccFkPkeI.s:323    .text.TIM_Configuration:00000000 $t
-     /tmp/ccFkPkeI.s:417    .text.USART_Configuration:00000000 $t
-     /tmp/ccFkPkeI.s:476    .text.prvMEMS_Config:00000000 $t
-     /tmp/ccFkPkeI.s:513    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 $t
-     /tmp/ccFkPkeI.s:518    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 LIS3DSH_TIMEOUT_UserCallback
-     /tmp/ccFkPkeI.s:539    .text.prvTIM4_Config:00000000 $t
-     /tmp/ccFkPkeI.s:544    .text.prvTIM4_Config:00000000 prvTIM4_Config
+     /tmp/ccAvr9ez.s:20     .text.prvSetupHardware:00000000 $t
+     /tmp/ccAvr9ez.s:25     .text.prvSetupHardware:00000000 prvSetupHardware
+     /tmp/ccAvr9ez.s:481    .text.prvMEMS_Config:00000000 prvMEMS_Config
+     /tmp/ccAvr9ez.s:172    .text.RCC_Configuration:00000000 RCC_Configuration
+     /tmp/ccAvr9ez.s:213    .text.GPIO_Configuration:00000000 GPIO_Configuration
+     /tmp/ccAvr9ez.s:328    .text.TIM_Configuration:00000000 TIM_Configuration
+     /tmp/ccAvr9ez.s:422    .text.USART_Configuration:00000000 USART_Configuration
+     /tmp/ccAvr9ez.s:67     .text.prvLED_Config:00000000 $t
+     /tmp/ccAvr9ez.s:72     .text.prvLED_Config:00000000 prvLED_Config
+     /tmp/ccAvr9ez.s:167    .text.RCC_Configuration:00000000 $t
+     /tmp/ccAvr9ez.s:208    .text.GPIO_Configuration:00000000 $t
+     /tmp/ccAvr9ez.s:323    .text.TIM_Configuration:00000000 $t
+     /tmp/ccAvr9ez.s:417    .text.USART_Configuration:00000000 $t
+     /tmp/ccAvr9ez.s:476    .text.prvMEMS_Config:00000000 $t
+     /tmp/ccAvr9ez.s:513    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 $t
+     /tmp/ccAvr9ez.s:518    .text.LIS3DSH_TIMEOUT_UserCallback:00000000 LIS3DSH_TIMEOUT_UserCallback
+     /tmp/ccAvr9ez.s:539    .text.prvTIM4_Config:00000000 $t
+     /tmp/ccAvr9ez.s:544    .text.prvTIM4_Config:00000000 prvTIM4_Config
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

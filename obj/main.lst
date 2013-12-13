@@ -2165,9 +2165,9 @@
   50:src/main.c    **** #define queueSIZE	6
   51:src/main.c    **** 
   52:src/main.c    **** /*brushless motor PWM max and min duty cycle*/
-  53:src/main.c    **** #define PWM_MOTOR_MIN 100
-  54:src/main.c    **** #define PWM_MOTOR_MAX 1000
-  55:src/main.c    **** #define TEST 200
+  53:src/main.c    **** #define PWM_MOTOR_MIN 1000
+  54:src/main.c    **** #define PWM_MOTOR_MAX 10000
+  55:src/main.c    **** 
   56:src/main.c    **** 
   57:src/main.c    **** /* angle */
   58:src/main.c    **** #define G 2
@@ -2350,9 +2350,9 @@
  1918              	.LCFI64:
  1919              		.cfi_def_cfa_register 7
  1920 0006 7860     		str	r0, [r7, #4]
- 119:src/main.c    ****   const portTickType xDelay = 3000; // portTICK_RATE_MS;
+ 119:src/main.c    ****   const portTickType xDelay = 6000; // portTICK_RATE_MS;
  1921              		.loc 2 119 0
- 1922 0008 40F6B833 		movw	r3, #3000
+ 1922 0008 41F27073 		movw	r3, #6000
  1923 000c 3B61     		str	r3, [r7, #16]
  120:src/main.c    **** 
  121:src/main.c    ****   char pwm_speed_char[4];
@@ -2364,1550 +2364,1561 @@
  124:src/main.c    **** 
  125:src/main.c    ****   int pwm_speed;
  126:src/main.c    **** 
- 127:src/main.c    ****   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
- 1927              		.loc 2 127 0
+ 127:src/main.c    ****  // vTaskDelay( xDelay );	
+ 128:src/main.c    **** 
+ 129:src/main.c    ****   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+ 1927              		.loc 2 129 0
  1928 0014 40F20004 		movw	r4, #:lower16:Motor_Control
  1929 0018 C0F20004 		movt	r4, #:upper16:Motor_Control
- 1930 001c 4FF47A70 		mov	r0, #1000
- 1931 0020 4FF47A71 		mov	r1, #1000
- 1932 0024 4FF47A72 		mov	r2, #1000
- 1933 0028 4FF47A73 		mov	r3, #1000
+ 1930 001c 42F21070 		movw	r0, #10000
+ 1931 0020 42F21071 		movw	r1, #10000
+ 1932 0024 42F21072 		movw	r2, #10000
+ 1933 0028 42F21073 		movw	r3, #10000
  1934 002c A047     		blx	r4
- 128:src/main.c    ****   vTaskDelay( xDelay );
- 1935              		.loc 2 128 0
- 1936 002e 3869     		ldr	r0, [r7, #16]
- 1937 0030 FFF7FEFF 		bl	vTaskDelay
- 129:src/main.c    ****   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
- 1938              		.loc 2 129 0
- 1939 0034 40F20004 		movw	r4, #:lower16:Motor_Control
- 1940 0038 C0F20004 		movt	r4, #:upper16:Motor_Control
- 1941 003c 4FF06400 		mov	r0, #100
- 1942 0040 4FF06401 		mov	r1, #100
- 1943 0044 4FF06402 		mov	r2, #100
- 1944 0048 4FF06403 		mov	r3, #100
- 1945 004c A047     		blx	r4
- 130:src/main.c    ****   vTaskDelay( xDelay );
- 1946              		.loc 2 130 0
- 1947 004e 3869     		ldr	r0, [r7, #16]
- 1948 0050 FFF7FEFF 		bl	vTaskDelay
- 1949              	.L106:
+ 130:src/main.c    ****   vTaskDelay( 10000 );
+ 1935              		.loc 2 130 0
+ 1936 002e 42F21070 		movw	r0, #10000
+ 1937 0032 FFF7FEFF 		bl	vTaskDelay
  131:src/main.c    **** 
- 132:src/main.c    **** 
- 133:src/main.c    ****   while(1)  // Do not exit
- 134:src/main.c    ****   {
- 135:src/main.c    ****   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
- 1950              		.loc 2 135 0
- 1951 0054 00BF     		nop
- 1952              	.L101:
- 1953              		.loc 2 135 0 is_stmt 0 discriminator 1
- 1954 0056 40F20003 		movw	r3, #:lower16:xQueueShell2PWM
- 1955 005a C0F20003 		movt	r3, #:upper16:xQueueShell2PWM
- 1956 005e 1B68     		ldr	r3, [r3, #0]
- 1957 0060 1846     		mov	r0, r3
- 1958 0062 07F10803 		add	r3, r7, #8
- 1959 0066 1946     		mov	r1, r3
- 1960 0068 4FF0FF32 		mov	r2, #-1
- 1961 006c 4FF00003 		mov	r3, #0
- 1962 0070 FFF7FEFF 		bl	xQueueGenericReceive
- 1963 0074 0346     		mov	r3, r0
- 1964 0076 002B     		cmp	r3, #0
- 1965 0078 EDD0     		beq	.L101
+ 132:src/main.c    ****   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+ 1938              		.loc 2 132 0
+ 1939 0036 40F20004 		movw	r4, #:lower16:Motor_Control
+ 1940 003a C0F20004 		movt	r4, #:upper16:Motor_Control
+ 1941 003e 4FF47A70 		mov	r0, #1000
+ 1942 0042 4FF47A71 		mov	r1, #1000
+ 1943 0046 4FF47A72 		mov	r2, #1000
+ 1944 004a 4FF47A73 		mov	r3, #1000
+ 1945 004e A047     		blx	r4
+ 1946              	.L106:
+ 133:src/main.c    **** 
+ 134:src/main.c    ****  // vTaskDelay( xDelay );
+ 135:src/main.c    **** 
  136:src/main.c    **** 
- 137:src/main.c    ****   pwm_speed_int = atoi(pwm_speed_char);
- 1966              		.loc 2 137 0 is_stmt 1
- 1967 007a 07F10803 		add	r3, r7, #8
- 1968 007e 1846     		mov	r0, r3
- 1969 0080 FFF7FEFF 		bl	atoi
- 1970 0084 F860     		str	r0, [r7, #12]
- 138:src/main.c    **** 	
- 139:src/main.c    ****   qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
- 1971              		.loc 2 139 0
- 1972 0086 40F20003 		movw	r3, #:lower16:xQueueUARTSend
- 1973 008a C0F20003 		movt	r3, #:upper16:xQueueUARTSend
- 1974 008e 1B68     		ldr	r3, [r3, #0]
- 1975 0090 1846     		mov	r0, r3
- 1976 0092 40F20001 		movw	r1, #:lower16:.LC1
- 1977 0096 C0F20001 		movt	r1, #:upper16:.LC1
- 1978 009a FA68     		ldr	r2, [r7, #12]
- 1979 009c FFF7FEFF 		bl	qprintf
- 140:src/main.c    **** 	
- 141:src/main.c    ****    pwm_speed = (pwm_speed_int *1000) / 100;
- 1980              		.loc 2 141 0
- 1981 00a0 FB68     		ldr	r3, [r7, #12]
- 1982 00a2 4FF47A72 		mov	r2, #1000
- 1983 00a6 02FB03F2 		mul	r2, r2, r3
- 1984 00aa 48F21F53 		movw	r3, #34079
- 1985 00ae C5F2EB13 		movt	r3, 20971
- 1986 00b2 83FB0213 		smull	r1, r3, r3, r2
- 1987 00b6 4FEA6311 		asr	r1, r3, #5
- 1988 00ba 4FEAE273 		asr	r3, r2, #31
- 1989 00be CB1A     		subs	r3, r1, r3
- 1990 00c0 7B61     		str	r3, [r7, #20]
- 142:src/main.c    **** 
- 143:src/main.c    ****    if (pwm_speed >1000) {
- 1991              		.loc 2 143 0
- 1992 00c2 7B69     		ldr	r3, [r7, #20]
- 1993 00c4 B3F57A7F 		cmp	r3, #1000
- 1994 00c8 03DD     		ble	.L102
- 144:src/main.c    **** 	pwm_speed = 1000;
- 1995              		.loc 2 144 0
- 1996 00ca 4FF47A73 		mov	r3, #1000
- 1997 00ce 7B61     		str	r3, [r7, #20]
- 1998 00d0 05E0     		b	.L103
- 1999              	.L102:
- 145:src/main.c    **** 	}else if (pwm_speed <100){
- 2000              		.loc 2 145 0
- 2001 00d2 7B69     		ldr	r3, [r7, #20]
- 2002 00d4 632B     		cmp	r3, #99
- 2003 00d6 02DC     		bgt	.L103
- 146:src/main.c    **** 	pwm_speed = 100;
- 2004              		.loc 2 146 0
- 2005 00d8 4FF06403 		mov	r3, #100
- 2006 00dc 7B61     		str	r3, [r7, #20]
- 2007              	.L103:
- 147:src/main.c    **** 	}else{
- 148:src/main.c    **** 	pwm_speed = pwm_speed;
- 149:src/main.c    **** 	}
- 150:src/main.c    **** 	
- 151:src/main.c    **** 		
- 152:src/main.c    ****    Motor_Control(pwm_speed, pwm_speed, pwm_speed, pwm_speed);
- 2008              		.loc 2 152 0
- 2009 00de 40F20004 		movw	r4, #:lower16:Motor_Control
- 2010 00e2 C0F20004 		movt	r4, #:upper16:Motor_Control
- 2011 00e6 7869     		ldr	r0, [r7, #20]
- 2012 00e8 7969     		ldr	r1, [r7, #20]
- 2013 00ea 7A69     		ldr	r2, [r7, #20]
- 2014 00ec 7B69     		ldr	r3, [r7, #20]
- 2015 00ee A047     		blx	r4
- 153:src/main.c    **** 
- 154:src/main.c    **** 
- 155:src/main.c    ****   }
- 2016              		.loc 2 155 0
- 2017 00f0 00BF     		nop
- 135:src/main.c    ****   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
- 2018              		.loc 2 135 0
- 2019 00f2 AFE7     		b	.L106
- 2020              		.cfi_endproc
- 2021              	.LFE130:
- 2023              		.section	.text.Motor_Control,"ax",%progbits
- 2024              		.align	2
- 2025              		.global	Motor_Control
- 2026              		.thumb
- 2027              		.thumb_func
- 2029              	Motor_Control:
- 2030              	.LFB131:
- 156:src/main.c    ****  
- 157:src/main.c    ****   return(0); // System will implode
- 158:src/main.c    **** } 
- 159:src/main.c    **** 
- 160:src/main.c    **** void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
- 161:src/main.c    **** {
- 2031              		.loc 2 161 0
- 2032              		.cfi_startproc
- 2033              		@ args = 0, pretend = 0, frame = 8
- 2034              		@ frame_needed = 1, uses_anonymous_args = 0
- 2035              		@ link register save eliminated.
- 2036 0000 80B4     		push	{r7}
- 2037              	.LCFI65:
- 2038              		.cfi_def_cfa_offset 4
- 2039              		.cfi_offset 7, -4
- 2040 0002 83B0     		sub	sp, sp, #12
- 2041              	.LCFI66:
- 2042              		.cfi_def_cfa_offset 16
- 2043 0004 00AF     		add	r7, sp, #0
- 2044              	.LCFI67:
- 2045              		.cfi_def_cfa_register 7
- 2046 0006 F880     		strh	r0, [r7, #6]	@ movhi
- 2047 0008 B980     		strh	r1, [r7, #4]	@ movhi
- 2048 000a 7A80     		strh	r2, [r7, #2]	@ movhi
- 2049 000c 3B80     		strh	r3, [r7, #0]	@ movhi
- 162:src/main.c    **** 	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
- 2050              		.loc 2 162 0
- 2051 000e FB88     		ldrh	r3, [r7, #6]
- 2052 0010 B3F57A7F 		cmp	r3, #1000
- 2053 0014 03D9     		bls	.L108
- 2054              		.loc 2 162 0 is_stmt 0 discriminator 1
- 2055 0016 4FF47A73 		mov	r3, #1000
- 2056 001a FB80     		strh	r3, [r7, #6]	@ movhi
- 2057 001c 05E0     		b	.L109
+ 137:src/main.c    ****   while(1)  // Do not exit
+ 138:src/main.c    ****   {
+ 139:src/main.c    ****   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
+ 1947              		.loc 2 139 0
+ 1948 0050 00BF     		nop
+ 1949              	.L101:
+ 1950              		.loc 2 139 0 is_stmt 0 discriminator 1
+ 1951 0052 40F20003 		movw	r3, #:lower16:xQueueShell2PWM
+ 1952 0056 C0F20003 		movt	r3, #:upper16:xQueueShell2PWM
+ 1953 005a 1B68     		ldr	r3, [r3, #0]
+ 1954 005c 1846     		mov	r0, r3
+ 1955 005e 07F10803 		add	r3, r7, #8
+ 1956 0062 1946     		mov	r1, r3
+ 1957 0064 4FF0FF32 		mov	r2, #-1
+ 1958 0068 4FF00003 		mov	r3, #0
+ 1959 006c FFF7FEFF 		bl	xQueueGenericReceive
+ 1960 0070 0346     		mov	r3, r0
+ 1961 0072 002B     		cmp	r3, #0
+ 1962 0074 EDD0     		beq	.L101
+ 140:src/main.c    **** 
+ 141:src/main.c    ****   pwm_speed_int = atoi(pwm_speed_char);
+ 1963              		.loc 2 141 0 is_stmt 1
+ 1964 0076 07F10803 		add	r3, r7, #8
+ 1965 007a 1846     		mov	r0, r3
+ 1966 007c FFF7FEFF 		bl	atoi
+ 1967 0080 F860     		str	r0, [r7, #12]
+ 142:src/main.c    **** 	
+ 143:src/main.c    ****   qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
+ 1968              		.loc 2 143 0
+ 1969 0082 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 1970 0086 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 1971 008a 1B68     		ldr	r3, [r3, #0]
+ 1972 008c 1846     		mov	r0, r3
+ 1973 008e 40F20001 		movw	r1, #:lower16:.LC1
+ 1974 0092 C0F20001 		movt	r1, #:upper16:.LC1
+ 1975 0096 FA68     		ldr	r2, [r7, #12]
+ 1976 0098 FFF7FEFF 		bl	qprintf
+ 144:src/main.c    **** 	
+ 145:src/main.c    ****    pwm_speed = (pwm_speed_int *1000) / 100;
+ 1977              		.loc 2 145 0
+ 1978 009c FB68     		ldr	r3, [r7, #12]
+ 1979 009e 4FF47A72 		mov	r2, #1000
+ 1980 00a2 02FB03F2 		mul	r2, r2, r3
+ 1981 00a6 48F21F53 		movw	r3, #34079
+ 1982 00aa C5F2EB13 		movt	r3, 20971
+ 1983 00ae 83FB0213 		smull	r1, r3, r3, r2
+ 1984 00b2 4FEA6311 		asr	r1, r3, #5
+ 1985 00b6 4FEAE273 		asr	r3, r2, #31
+ 1986 00ba CB1A     		subs	r3, r1, r3
+ 1987 00bc 7B61     		str	r3, [r7, #20]
+ 146:src/main.c    **** 
+ 147:src/main.c    ****    if (pwm_speed >10000) {
+ 1988              		.loc 2 147 0
+ 1989 00be 7A69     		ldr	r2, [r7, #20]
+ 1990 00c0 42F21073 		movw	r3, #10000
+ 1991 00c4 9A42     		cmp	r2, r3
+ 1992 00c6 03DD     		ble	.L102
+ 148:src/main.c    **** 	pwm_speed = 10000;
+ 1993              		.loc 2 148 0
+ 1994 00c8 42F21073 		movw	r3, #10000
+ 1995 00cc 7B61     		str	r3, [r7, #20]
+ 1996 00ce 07E0     		b	.L103
+ 1997              	.L102:
+ 149:src/main.c    **** 	}else if (pwm_speed <1000){
+ 1998              		.loc 2 149 0
+ 1999 00d0 7A69     		ldr	r2, [r7, #20]
+ 2000 00d2 40F2E733 		movw	r3, #999
+ 2001 00d6 9A42     		cmp	r2, r3
+ 2002 00d8 02DC     		bgt	.L103
+ 150:src/main.c    **** 	pwm_speed = 1000;
+ 2003              		.loc 2 150 0
+ 2004 00da 4FF47A73 		mov	r3, #1000
+ 2005 00de 7B61     		str	r3, [r7, #20]
+ 2006              	.L103:
+ 151:src/main.c    **** 	}else{
+ 152:src/main.c    **** 	pwm_speed = pwm_speed;
+ 153:src/main.c    **** 	}
+ 154:src/main.c    **** 	
+ 155:src/main.c    **** 		
+ 156:src/main.c    ****    Motor_Control(pwm_speed, pwm_speed, pwm_speed, pwm_speed);
+ 2007              		.loc 2 156 0
+ 2008 00e0 40F20004 		movw	r4, #:lower16:Motor_Control
+ 2009 00e4 C0F20004 		movt	r4, #:upper16:Motor_Control
+ 2010 00e8 7869     		ldr	r0, [r7, #20]
+ 2011 00ea 7969     		ldr	r1, [r7, #20]
+ 2012 00ec 7A69     		ldr	r2, [r7, #20]
+ 2013 00ee 7B69     		ldr	r3, [r7, #20]
+ 2014 00f0 A047     		blx	r4
+ 157:src/main.c    **** 
+ 158:src/main.c    **** 
+ 159:src/main.c    ****   }
+ 2015              		.loc 2 159 0
+ 2016 00f2 00BF     		nop
+ 139:src/main.c    ****   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
+ 2017              		.loc 2 139 0
+ 2018 00f4 ACE7     		b	.L106
+ 2019              		.cfi_endproc
+ 2020              	.LFE130:
+ 2022 00f6 00BF     		.section	.text.Motor_Control,"ax",%progbits
+ 2023              		.align	2
+ 2024              		.global	Motor_Control
+ 2025              		.thumb
+ 2026              		.thumb_func
+ 2028              	Motor_Control:
+ 2029              	.LFB131:
+ 160:src/main.c    ****  
+ 161:src/main.c    ****   return(0); // System will implode
+ 162:src/main.c    **** } 
+ 163:src/main.c    **** 
+ 164:src/main.c    **** void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
+ 165:src/main.c    **** {
+ 2030              		.loc 2 165 0
+ 2031              		.cfi_startproc
+ 2032              		@ args = 0, pretend = 0, frame = 8
+ 2033              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2034              		@ link register save eliminated.
+ 2035 0000 80B4     		push	{r7}
+ 2036              	.LCFI65:
+ 2037              		.cfi_def_cfa_offset 4
+ 2038              		.cfi_offset 7, -4
+ 2039 0002 83B0     		sub	sp, sp, #12
+ 2040              	.LCFI66:
+ 2041              		.cfi_def_cfa_offset 16
+ 2042 0004 00AF     		add	r7, sp, #0
+ 2043              	.LCFI67:
+ 2044              		.cfi_def_cfa_register 7
+ 2045 0006 F880     		strh	r0, [r7, #6]	@ movhi
+ 2046 0008 B980     		strh	r1, [r7, #4]	@ movhi
+ 2047 000a 7A80     		strh	r2, [r7, #2]	@ movhi
+ 2048 000c 3B80     		strh	r3, [r7, #0]	@ movhi
+ 166:src/main.c    **** 	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
+ 2049              		.loc 2 166 0
+ 2050 000e FA88     		ldrh	r2, [r7, #6]
+ 2051 0010 42F21073 		movw	r3, #10000
+ 2052 0014 9A42     		cmp	r2, r3
+ 2053 0016 03D9     		bls	.L108
+ 2054              		.loc 2 166 0 is_stmt 0 discriminator 1
+ 2055 0018 42F21073 		movw	r3, #10000
+ 2056 001c FB80     		strh	r3, [r7, #6]	@ movhi
+ 2057 001e 07E0     		b	.L109
  2058              	.L108:
- 163:src/main.c    **** 	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
- 2059              		.loc 2 163 0 is_stmt 1
- 2060 001e FB88     		ldrh	r3, [r7, #6]
- 2061 0020 632B     		cmp	r3, #99
- 2062 0022 02D8     		bhi	.L109
- 2063              		.loc 2 163 0 is_stmt 0 discriminator 1
- 2064 0024 4FF06403 		mov	r3, #100
- 2065 0028 FB80     		strh	r3, [r7, #6]	@ movhi
- 2066              	.L109:
- 164:src/main.c    **** 		
- 165:src/main.c    **** 	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
- 2067              		.loc 2 165 0 is_stmt 1
- 2068 002a BB88     		ldrh	r3, [r7, #4]
- 2069 002c B3F57A7F 		cmp	r3, #1000
- 2070 0030 03D9     		bls	.L110
- 2071              		.loc 2 165 0 is_stmt 0 discriminator 1
- 2072 0032 4FF47A73 		mov	r3, #1000
- 2073 0036 BB80     		strh	r3, [r7, #4]	@ movhi
- 2074 0038 05E0     		b	.L111
- 2075              	.L110:
- 166:src/main.c    **** 	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
- 2076              		.loc 2 166 0 is_stmt 1
- 2077 003a BB88     		ldrh	r3, [r7, #4]
- 2078 003c 632B     		cmp	r3, #99
- 2079 003e 02D8     		bhi	.L111
- 2080              		.loc 2 166 0 is_stmt 0 discriminator 1
- 2081 0040 4FF06403 		mov	r3, #100
- 2082 0044 BB80     		strh	r3, [r7, #4]	@ movhi
- 2083              	.L111:
- 167:src/main.c    **** 				
- 168:src/main.c    **** 	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
- 2084              		.loc 2 168 0 is_stmt 1
- 2085 0046 7B88     		ldrh	r3, [r7, #2]
- 2086 0048 B3F57A7F 		cmp	r3, #1000
- 2087 004c 03D9     		bls	.L112
- 2088              		.loc 2 168 0 is_stmt 0 discriminator 1
- 2089 004e 4FF47A73 		mov	r3, #1000
- 2090 0052 7B80     		strh	r3, [r7, #2]	@ movhi
- 2091 0054 05E0     		b	.L113
- 2092              	.L112:
- 169:src/main.c    **** 	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
- 2093              		.loc 2 169 0 is_stmt 1
- 2094 0056 7B88     		ldrh	r3, [r7, #2]
- 2095 0058 632B     		cmp	r3, #99
- 2096 005a 02D8     		bhi	.L113
- 2097              		.loc 2 169 0 is_stmt 0 discriminator 1
- 2098 005c 4FF06403 		mov	r3, #100
- 2099 0060 7B80     		strh	r3, [r7, #2]	@ movhi
- 2100              	.L113:
- 170:src/main.c    **** 						
- 171:src/main.c    **** 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
- 2101              		.loc 2 171 0 is_stmt 1
- 2102 0062 3B88     		ldrh	r3, [r7, #0]
- 2103 0064 B3F57A7F 		cmp	r3, #1000
- 2104 0068 03D9     		bls	.L114
- 2105              		.loc 2 171 0 is_stmt 0 discriminator 1
- 2106 006a 4FF47A73 		mov	r3, #1000
- 2107 006e 3B80     		strh	r3, [r7, #0]	@ movhi
- 2108 0070 05E0     		b	.L115
- 2109              	.L114:
- 172:src/main.c    **** 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
- 2110              		.loc 2 172 0 is_stmt 1
- 2111 0072 3B88     		ldrh	r3, [r7, #0]
- 2112 0074 632B     		cmp	r3, #99
- 2113 0076 02D8     		bhi	.L115
- 2114              		.loc 2 172 0 is_stmt 0 discriminator 1
- 2115 0078 4FF06403 		mov	r3, #100
- 2116 007c 3B80     		strh	r3, [r7, #0]	@ movhi
- 2117              	.L115:
- 173:src/main.c    **** 								
- 174:src/main.c    **** 	PWM_Motor1 = Motor1;
- 2118              		.loc 2 174 0 is_stmt 1
- 2119 007e 4FF40063 		mov	r3, #2048
- 2120 0082 C4F20003 		movt	r3, 16384
- 2121 0086 FA88     		ldrh	r2, [r7, #6]
- 2122 0088 5A63     		str	r2, [r3, #52]
- 175:src/main.c    **** 	PWM_Motor2 = Motor2;
- 2123              		.loc 2 175 0
- 2124 008a 4FF40063 		mov	r3, #2048
- 2125 008e C4F20003 		movt	r3, 16384
- 2126 0092 BA88     		ldrh	r2, [r7, #4]
- 2127 0094 9A63     		str	r2, [r3, #56]
- 176:src/main.c    **** 	PWM_Motor3 = Motor3;
- 2128              		.loc 2 176 0
- 2129 0096 4FF40063 		mov	r3, #2048
- 2130 009a C4F20003 		movt	r3, 16384
- 2131 009e 7A88     		ldrh	r2, [r7, #2]
- 2132 00a0 DA63     		str	r2, [r3, #60]
- 177:src/main.c    **** 	PWM_Motor4 = Motor4;
- 2133              		.loc 2 177 0
- 2134 00a2 4FF40063 		mov	r3, #2048
- 2135 00a6 C4F20003 		movt	r3, 16384
- 2136 00aa 3A88     		ldrh	r2, [r7, #0]
- 2137 00ac 1A64     		str	r2, [r3, #64]
- 178:src/main.c    **** }
- 2138              		.loc 2 178 0
- 2139 00ae 07F10C07 		add	r7, r7, #12
- 2140 00b2 BD46     		mov	sp, r7
- 2141 00b4 80BC     		pop	{r7}
- 2142 00b6 7047     		bx	lr
- 2143              		.cfi_endproc
- 2144              	.LFE131:
- 2146              		.section	.rodata
- 2147              		.align	2
- 2148              	.LC2:
- 2149 0008 70776D63 		.ascii	"pwmctrl\000"
- 2149      74726C00 
- 2150              		.align	2
- 2151              	.LC3:
- 2152 0010 55534152 		.ascii	"USART\000"
- 2152      5400
- 2153 0016 0000     		.align	2
- 2154              	.LC4:
- 2155 0018 55736172 		.ascii	"Usartrecive\000"
- 2155      74726563 
- 2155      69766500 
- 2156              		.align	2
- 2157              	.LC5:
- 2158 0024 7368656C 		.ascii	"shell\000"
- 2158      6C00
- 2159 002a 0000     		.align	2
- 2160              	.LC6:
- 2161 002c 764D454D 		.ascii	"vMEMSTask\000"
- 2161      53546173 
- 2161      6B00
- 2162              		.section	.text.main,"ax",%progbits
+ 167:src/main.c    **** 	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
+ 2059              		.loc 2 167 0 is_stmt 1
+ 2060 0020 FA88     		ldrh	r2, [r7, #6]
+ 2061 0022 40F2E733 		movw	r3, #999
+ 2062 0026 9A42     		cmp	r2, r3
+ 2063 0028 02D8     		bhi	.L109
+ 2064              		.loc 2 167 0 is_stmt 0 discriminator 1
+ 2065 002a 4FF47A73 		mov	r3, #1000
+ 2066 002e FB80     		strh	r3, [r7, #6]	@ movhi
+ 2067              	.L109:
+ 168:src/main.c    **** 		
+ 169:src/main.c    **** 	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
+ 2068              		.loc 2 169 0 is_stmt 1
+ 2069 0030 BA88     		ldrh	r2, [r7, #4]
+ 2070 0032 42F21073 		movw	r3, #10000
+ 2071 0036 9A42     		cmp	r2, r3
+ 2072 0038 03D9     		bls	.L110
+ 2073              		.loc 2 169 0 is_stmt 0 discriminator 1
+ 2074 003a 42F21073 		movw	r3, #10000
+ 2075 003e BB80     		strh	r3, [r7, #4]	@ movhi
+ 2076 0040 07E0     		b	.L111
+ 2077              	.L110:
+ 170:src/main.c    **** 	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
+ 2078              		.loc 2 170 0 is_stmt 1
+ 2079 0042 BA88     		ldrh	r2, [r7, #4]
+ 2080 0044 40F2E733 		movw	r3, #999
+ 2081 0048 9A42     		cmp	r2, r3
+ 2082 004a 02D8     		bhi	.L111
+ 2083              		.loc 2 170 0 is_stmt 0 discriminator 1
+ 2084 004c 4FF47A73 		mov	r3, #1000
+ 2085 0050 BB80     		strh	r3, [r7, #4]	@ movhi
+ 2086              	.L111:
+ 171:src/main.c    **** 				
+ 172:src/main.c    **** 	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
+ 2087              		.loc 2 172 0 is_stmt 1
+ 2088 0052 7A88     		ldrh	r2, [r7, #2]
+ 2089 0054 42F21073 		movw	r3, #10000
+ 2090 0058 9A42     		cmp	r2, r3
+ 2091 005a 03D9     		bls	.L112
+ 2092              		.loc 2 172 0 is_stmt 0 discriminator 1
+ 2093 005c 42F21073 		movw	r3, #10000
+ 2094 0060 7B80     		strh	r3, [r7, #2]	@ movhi
+ 2095 0062 07E0     		b	.L113
+ 2096              	.L112:
+ 173:src/main.c    **** 	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
+ 2097              		.loc 2 173 0 is_stmt 1
+ 2098 0064 7A88     		ldrh	r2, [r7, #2]
+ 2099 0066 40F2E733 		movw	r3, #999
+ 2100 006a 9A42     		cmp	r2, r3
+ 2101 006c 02D8     		bhi	.L113
+ 2102              		.loc 2 173 0 is_stmt 0 discriminator 1
+ 2103 006e 4FF47A73 		mov	r3, #1000
+ 2104 0072 7B80     		strh	r3, [r7, #2]	@ movhi
+ 2105              	.L113:
+ 174:src/main.c    **** 						
+ 175:src/main.c    **** 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
+ 2106              		.loc 2 175 0 is_stmt 1
+ 2107 0074 3A88     		ldrh	r2, [r7, #0]
+ 2108 0076 42F21073 		movw	r3, #10000
+ 2109 007a 9A42     		cmp	r2, r3
+ 2110 007c 03D9     		bls	.L114
+ 2111              		.loc 2 175 0 is_stmt 0 discriminator 1
+ 2112 007e 42F21073 		movw	r3, #10000
+ 2113 0082 3B80     		strh	r3, [r7, #0]	@ movhi
+ 2114 0084 07E0     		b	.L115
+ 2115              	.L114:
+ 176:src/main.c    **** 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
+ 2116              		.loc 2 176 0 is_stmt 1
+ 2117 0086 3A88     		ldrh	r2, [r7, #0]
+ 2118 0088 40F2E733 		movw	r3, #999
+ 2119 008c 9A42     		cmp	r2, r3
+ 2120 008e 02D8     		bhi	.L115
+ 2121              		.loc 2 176 0 is_stmt 0 discriminator 1
+ 2122 0090 4FF47A73 		mov	r3, #1000
+ 2123 0094 3B80     		strh	r3, [r7, #0]	@ movhi
+ 2124              	.L115:
+ 177:src/main.c    **** 								
+ 178:src/main.c    **** 	PWM_Motor1 = Motor1;
+ 2125              		.loc 2 178 0 is_stmt 1
+ 2126 0096 4FF40063 		mov	r3, #2048
+ 2127 009a C4F20003 		movt	r3, 16384
+ 2128 009e FA88     		ldrh	r2, [r7, #6]
+ 2129 00a0 5A63     		str	r2, [r3, #52]
+ 179:src/main.c    **** 	PWM_Motor2 = Motor2;
+ 2130              		.loc 2 179 0
+ 2131 00a2 4FF40063 		mov	r3, #2048
+ 2132 00a6 C4F20003 		movt	r3, 16384
+ 2133 00aa BA88     		ldrh	r2, [r7, #4]
+ 2134 00ac 9A63     		str	r2, [r3, #56]
+ 180:src/main.c    **** 	PWM_Motor3 = Motor3;
+ 2135              		.loc 2 180 0
+ 2136 00ae 4FF40063 		mov	r3, #2048
+ 2137 00b2 C4F20003 		movt	r3, 16384
+ 2138 00b6 7A88     		ldrh	r2, [r7, #2]
+ 2139 00b8 DA63     		str	r2, [r3, #60]
+ 181:src/main.c    **** 	PWM_Motor4 = Motor4;
+ 2140              		.loc 2 181 0
+ 2141 00ba 4FF40063 		mov	r3, #2048
+ 2142 00be C4F20003 		movt	r3, 16384
+ 2143 00c2 3A88     		ldrh	r2, [r7, #0]
+ 2144 00c4 1A64     		str	r2, [r3, #64]
+ 182:src/main.c    **** }
+ 2145              		.loc 2 182 0
+ 2146 00c6 07F10C07 		add	r7, r7, #12
+ 2147 00ca BD46     		mov	sp, r7
+ 2148 00cc 80BC     		pop	{r7}
+ 2149 00ce 7047     		bx	lr
+ 2150              		.cfi_endproc
+ 2151              	.LFE131:
+ 2153              		.section	.rodata
+ 2154              		.align	2
+ 2155              	.LC2:
+ 2156 0008 70776D63 		.ascii	"pwmctrl\000"
+ 2156      74726C00 
+ 2157              		.align	2
+ 2158              	.LC3:
+ 2159 0010 55534152 		.ascii	"USART\000"
+ 2159      5400
+ 2160 0016 0000     		.align	2
+ 2161              	.LC4:
+ 2162 0018 55736172 		.ascii	"Usartrecive\000"
+ 2162      74726563 
+ 2162      69766500 
  2163              		.align	2
- 2164              		.global	main
- 2165              		.thumb
- 2166              		.thumb_func
- 2168              	main:
- 2169              	.LFB132:
- 179:src/main.c    **** 
- 180:src/main.c    **** 
- 181:src/main.c    **** /**************************************************************************************************
- 182:src/main.c    **** /* Private functions ---------------------------------------------------------*/
+ 2164              	.LC5:
+ 2165 0024 7368656C 		.ascii	"shell\000"
+ 2165      6C00
+ 2166 002a 0000     		.align	2
+ 2167              	.LC6:
+ 2168 002c 764D454D 		.ascii	"vMEMSTask\000"
+ 2168      53546173 
+ 2168      6B00
+ 2169              		.section	.text.main,"ax",%progbits
+ 2170              		.align	2
+ 2171              		.global	main
+ 2172              		.thumb
+ 2173              		.thumb_func
+ 2175              	main:
+ 2176              	.LFB132:
  183:src/main.c    **** 
  184:src/main.c    **** 
- 185:src/main.c    **** /**
- 186:src/main.c    ****   * @brief  Main program.
- 187:src/main.c    ****   * @param  None
- 188:src/main.c    ****   * @retval None
- 189:src/main.c    ****   */
- 190:src/main.c    **** int main(void)
- 191:src/main.c    **** { 
- 2170              		.loc 2 191 0
- 2171              		.cfi_startproc
- 2172              		@ args = 0, pretend = 0, frame = 0
- 2173              		@ frame_needed = 1, uses_anonymous_args = 0
- 2174 0000 80B5     		push	{r7, lr}
- 2175              	.LCFI68:
- 2176              		.cfi_def_cfa_offset 8
- 2177              		.cfi_offset 14, -4
- 2178              		.cfi_offset 7, -8
- 2179 0002 84B0     		sub	sp, sp, #16
- 2180              	.LCFI69:
- 2181              		.cfi_def_cfa_offset 24
- 2182 0004 04AF     		add	r7, sp, #16
- 2183              	.LCFI70:
- 2184              		.cfi_def_cfa 7, 8
- 192:src/main.c    **** 	
- 193:src/main.c    **** 	/*a queue for tansfer the senddate to USART task*/
- 194:src/main.c    **** 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
- 2185              		.loc 2 194 0
- 2186 0006 4FF00F00 		mov	r0, #15
- 2187 000a 4FF03201 		mov	r1, #50
- 2188 000e FFF7FEFF 		bl	xQueueCreate
- 2189 0012 0246     		mov	r2, r0
- 2190 0014 40F20003 		movw	r3, #:lower16:xQueueUARTSend
- 2191 0018 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
- 2192 001c 1A60     		str	r2, [r3, #0]
- 195:src/main.c    ****     xQueueUARTRecvie = xQueueCreate(1, sizeof(serial_ch_msg));
- 2193              		.loc 2 195 0
- 2194 001e 4FF00100 		mov	r0, #1
- 2195 0022 4FF00101 		mov	r1, #1
- 2196 0026 FFF7FEFF 		bl	xQueueCreate
- 2197 002a 0246     		mov	r2, r0
- 2198 002c 40F20003 		movw	r3, #:lower16:xQueueUARTRecvie
- 2199 0030 C0F20003 		movt	r3, #:upper16:xQueueUARTRecvie
- 2200 0034 1A60     		str	r2, [r3, #0]
- 196:src/main.c    ****     xQueueShell2PWM = xQueueCreate(1, 24);
- 2201              		.loc 2 196 0
- 2202 0036 4FF00100 		mov	r0, #1
- 2203 003a 4FF01801 		mov	r1, #24
- 2204 003e FFF7FEFF 		bl	xQueueCreate
- 2205 0042 0246     		mov	r2, r0
- 2206 0044 40F20003 		movw	r3, #:lower16:xQueueShell2PWM
- 2207 0048 C0F20003 		movt	r3, #:upper16:xQueueShell2PWM
- 2208 004c 1A60     		str	r2, [r3, #0]
- 197:src/main.c    **** 
- 198:src/main.c    **** 	/* initialize hardware... */
- 199:src/main.c    **** 	prvSetupHardware();
- 2209              		.loc 2 199 0
- 2210 004e FFF7FEFF 		bl	prvSetupHardware
- 200:src/main.c    **** 
- 201:src/main.c    **** 	/* Start the tasks defined within this file/specific to this demo. */
- 202:src/main.c    **** 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIOR
- 2211              		.loc 2 202 0
- 2212 0052 4FF00503 		mov	r3, #5
- 2213 0056 0093     		str	r3, [sp, #0]
- 2214 0058 4FF00003 		mov	r3, #0
- 2215 005c 0193     		str	r3, [sp, #4]
- 2216 005e 4FF00003 		mov	r3, #0
- 2217 0062 0293     		str	r3, [sp, #8]
- 2218 0064 4FF00003 		mov	r3, #0
- 2219 0068 0393     		str	r3, [sp, #12]
- 2220 006a 40F20000 		movw	r0, #:lower16:pwmctrl
- 2221 006e C0F20000 		movt	r0, #:upper16:pwmctrl
- 2222 0072 40F20001 		movw	r1, #:lower16:.LC2
- 2223 0076 C0F20001 		movt	r1, #:upper16:.LC2
- 2224 007a 4FF48072 		mov	r2, #256
- 2225 007e 4FF00003 		mov	r3, #0
- 2226 0082 FFF7FEFF 		bl	xTaskGenericCreate
- 203:src/main.c    **** 	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIOR
- 2227              		.loc 2 203 0
- 2228 0086 4FF00003 		mov	r3, #0
- 2229 008a 0093     		str	r3, [sp, #0]
- 2230 008c 4FF00003 		mov	r3, #0
- 2231 0090 0193     		str	r3, [sp, #4]
- 2232 0092 4FF00003 		mov	r3, #0
- 2233 0096 0293     		str	r3, [sp, #8]
- 2234 0098 4FF00003 		mov	r3, #0
- 2235 009c 0393     		str	r3, [sp, #12]
- 2236 009e 40F20000 		movw	r0, #:lower16:UsartTask
- 2237 00a2 C0F20000 		movt	r0, #:upper16:UsartTask
- 2238 00a6 40F20001 		movw	r1, #:lower16:.LC3
- 2239 00aa C0F20001 		movt	r1, #:upper16:.LC3
- 2240 00ae 4FF48072 		mov	r2, #256
- 2241 00b2 4FF00003 		mov	r3, #0
- 2242 00b6 FFF7FEFF 		bl	xTaskGenericCreate
- 204:src/main.c    **** 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskID
- 2243              		.loc 2 204 0
- 2244 00ba 4FF00003 		mov	r3, #0
- 2245 00be 0093     		str	r3, [sp, #0]
- 2246 00c0 4FF00003 		mov	r3, #0
- 2247 00c4 0193     		str	r3, [sp, #4]
- 2248 00c6 4FF00003 		mov	r3, #0
- 2249 00ca 0293     		str	r3, [sp, #8]
- 2250 00cc 4FF00003 		mov	r3, #0
- 2251 00d0 0393     		str	r3, [sp, #12]
- 2252 00d2 40F20000 		movw	r0, #:lower16:Usartrecive
- 2253 00d6 C0F20000 		movt	r0, #:upper16:Usartrecive
- 2254 00da 40F20001 		movw	r1, #:lower16:.LC4
- 2255 00de C0F20001 		movt	r1, #:upper16:.LC4
- 2256 00e2 4FF48072 		mov	r2, #256
- 2257 00e6 4FF00003 		mov	r3, #0
- 2258 00ea FFF7FEFF 		bl	xTaskGenericCreate
- 205:src/main.c    **** 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY,
- 2259              		.loc 2 205 0
- 2260 00ee 4FF00003 		mov	r3, #0
- 2261 00f2 0093     		str	r3, [sp, #0]
- 2262 00f4 4FF00003 		mov	r3, #0
- 2263 00f8 0193     		str	r3, [sp, #4]
- 2264 00fa 4FF00003 		mov	r3, #0
- 2265 00fe 0293     		str	r3, [sp, #8]
- 2266 0100 4FF00003 		mov	r3, #0
- 2267 0104 0393     		str	r3, [sp, #12]
- 2268 0106 40F20000 		movw	r0, #:lower16:shell
- 2269 010a C0F20000 		movt	r0, #:upper16:shell
- 2270 010e 40F20001 		movw	r1, #:lower16:.LC5
- 2271 0112 C0F20001 		movt	r1, #:upper16:.LC5
- 2272 0116 4FF48072 		mov	r2, #256
- 2273 011a 4FF00003 		mov	r3, #0
- 2274 011e FFF7FEFF 		bl	xTaskGenericCreate
- 206:src/main.c    **** 
- 207:src/main.c    **** 	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "vMEMSTask", configMINIMAL_STACK_SIZE, NULL,tskIDLE_P
- 2275              		.loc 2 207 0
- 2276 0122 4FF00003 		mov	r3, #0
- 2277 0126 0093     		str	r3, [sp, #0]
- 2278 0128 4FF00003 		mov	r3, #0
- 2279 012c 0193     		str	r3, [sp, #4]
- 2280 012e 4FF00003 		mov	r3, #0
- 2281 0132 0293     		str	r3, [sp, #8]
- 2282 0134 4FF00003 		mov	r3, #0
- 2283 0138 0393     		str	r3, [sp, #12]
- 2284 013a 40F20000 		movw	r0, #:lower16:vMEMSTask
- 2285 013e C0F20000 		movt	r0, #:upper16:vMEMSTask
- 2286 0142 40F20001 		movw	r1, #:lower16:.LC6
- 2287 0146 C0F20001 		movt	r1, #:upper16:.LC6
- 2288 014a 4FF48072 		mov	r2, #256
- 2289 014e 4FF00003 		mov	r3, #0
- 2290 0152 FFF7FEFF 		bl	xTaskGenericCreate
- 208:src/main.c    **** 
- 209:src/main.c    **** 	/* Start the scheduler. */
- 210:src/main.c    **** 	vTaskStartScheduler();
- 2291              		.loc 2 210 0
- 2292 0156 FFF7FEFF 		bl	vTaskStartScheduler
- 211:src/main.c    **** 
- 212:src/main.c    **** 	/* Will only get here if there was not enough heap space to create the idle task. */
- 213:src/main.c    **** 	return 0;  
- 2293              		.loc 2 213 0
- 2294 015a 4FF00003 		mov	r3, #0
- 214:src/main.c    **** }
- 2295              		.loc 2 214 0
- 2296 015e 1846     		mov	r0, r3
- 2297 0160 BD46     		mov	sp, r7
- 2298 0162 80BD     		pop	{r7, pc}
- 2299              		.cfi_endproc
- 2300              	.LFE132:
- 2302              		.section	.text.UsartTask,"ax",%progbits
- 2303              		.align	2
- 2304              		.thumb
- 2305              		.thumb_func
- 2307              	UsartTask:
- 2308              	.LFB133:
+ 185:src/main.c    **** /**************************************************************************************************
+ 186:src/main.c    **** /* Private functions ---------------------------------------------------------*/
+ 187:src/main.c    **** 
+ 188:src/main.c    **** 
+ 189:src/main.c    **** /**
+ 190:src/main.c    ****   * @brief  Main program.
+ 191:src/main.c    ****   * @param  None
+ 192:src/main.c    ****   * @retval None
+ 193:src/main.c    ****   */
+ 194:src/main.c    **** int main(void)
+ 195:src/main.c    **** { 
+ 2177              		.loc 2 195 0
+ 2178              		.cfi_startproc
+ 2179              		@ args = 0, pretend = 0, frame = 0
+ 2180              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2181 0000 80B5     		push	{r7, lr}
+ 2182              	.LCFI68:
+ 2183              		.cfi_def_cfa_offset 8
+ 2184              		.cfi_offset 14, -4
+ 2185              		.cfi_offset 7, -8
+ 2186 0002 84B0     		sub	sp, sp, #16
+ 2187              	.LCFI69:
+ 2188              		.cfi_def_cfa_offset 24
+ 2189 0004 04AF     		add	r7, sp, #16
+ 2190              	.LCFI70:
+ 2191              		.cfi_def_cfa 7, 8
+ 196:src/main.c    **** 	
+ 197:src/main.c    **** 	/*a queue for tansfer the senddate to USART task*/
+ 198:src/main.c    **** 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
+ 2192              		.loc 2 198 0
+ 2193 0006 4FF00F00 		mov	r0, #15
+ 2194 000a 4FF03201 		mov	r1, #50
+ 2195 000e FFF7FEFF 		bl	xQueueCreate
+ 2196 0012 0246     		mov	r2, r0
+ 2197 0014 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 2198 0018 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 2199 001c 1A60     		str	r2, [r3, #0]
+ 199:src/main.c    ****     xQueueUARTRecvie = xQueueCreate(1, sizeof(serial_ch_msg));
+ 2200              		.loc 2 199 0
+ 2201 001e 4FF00100 		mov	r0, #1
+ 2202 0022 4FF00101 		mov	r1, #1
+ 2203 0026 FFF7FEFF 		bl	xQueueCreate
+ 2204 002a 0246     		mov	r2, r0
+ 2205 002c 40F20003 		movw	r3, #:lower16:xQueueUARTRecvie
+ 2206 0030 C0F20003 		movt	r3, #:upper16:xQueueUARTRecvie
+ 2207 0034 1A60     		str	r2, [r3, #0]
+ 200:src/main.c    ****     xQueueShell2PWM = xQueueCreate(1, 24);
+ 2208              		.loc 2 200 0
+ 2209 0036 4FF00100 		mov	r0, #1
+ 2210 003a 4FF01801 		mov	r1, #24
+ 2211 003e FFF7FEFF 		bl	xQueueCreate
+ 2212 0042 0246     		mov	r2, r0
+ 2213 0044 40F20003 		movw	r3, #:lower16:xQueueShell2PWM
+ 2214 0048 C0F20003 		movt	r3, #:upper16:xQueueShell2PWM
+ 2215 004c 1A60     		str	r2, [r3, #0]
+ 201:src/main.c    **** 
+ 202:src/main.c    **** 	/* initialize hardware... */
+ 203:src/main.c    **** 	prvSetupHardware();
+ 2216              		.loc 2 203 0
+ 2217 004e FFF7FEFF 		bl	prvSetupHardware
+ 204:src/main.c    **** 
+ 205:src/main.c    **** 	/* Start the tasks defined within this file/specific to this demo. */
+ 206:src/main.c    **** 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIOR
+ 2218              		.loc 2 206 0
+ 2219 0052 4FF00503 		mov	r3, #5
+ 2220 0056 0093     		str	r3, [sp, #0]
+ 2221 0058 4FF00003 		mov	r3, #0
+ 2222 005c 0193     		str	r3, [sp, #4]
+ 2223 005e 4FF00003 		mov	r3, #0
+ 2224 0062 0293     		str	r3, [sp, #8]
+ 2225 0064 4FF00003 		mov	r3, #0
+ 2226 0068 0393     		str	r3, [sp, #12]
+ 2227 006a 40F20000 		movw	r0, #:lower16:pwmctrl
+ 2228 006e C0F20000 		movt	r0, #:upper16:pwmctrl
+ 2229 0072 40F20001 		movw	r1, #:lower16:.LC2
+ 2230 0076 C0F20001 		movt	r1, #:upper16:.LC2
+ 2231 007a 4FF48072 		mov	r2, #256
+ 2232 007e 4FF00003 		mov	r3, #0
+ 2233 0082 FFF7FEFF 		bl	xTaskGenericCreate
+ 207:src/main.c    **** 	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIOR
+ 2234              		.loc 2 207 0
+ 2235 0086 4FF00003 		mov	r3, #0
+ 2236 008a 0093     		str	r3, [sp, #0]
+ 2237 008c 4FF00003 		mov	r3, #0
+ 2238 0090 0193     		str	r3, [sp, #4]
+ 2239 0092 4FF00003 		mov	r3, #0
+ 2240 0096 0293     		str	r3, [sp, #8]
+ 2241 0098 4FF00003 		mov	r3, #0
+ 2242 009c 0393     		str	r3, [sp, #12]
+ 2243 009e 40F20000 		movw	r0, #:lower16:UsartTask
+ 2244 00a2 C0F20000 		movt	r0, #:upper16:UsartTask
+ 2245 00a6 40F20001 		movw	r1, #:lower16:.LC3
+ 2246 00aa C0F20001 		movt	r1, #:upper16:.LC3
+ 2247 00ae 4FF48072 		mov	r2, #256
+ 2248 00b2 4FF00003 		mov	r3, #0
+ 2249 00b6 FFF7FEFF 		bl	xTaskGenericCreate
+ 208:src/main.c    **** 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskID
+ 2250              		.loc 2 208 0
+ 2251 00ba 4FF00003 		mov	r3, #0
+ 2252 00be 0093     		str	r3, [sp, #0]
+ 2253 00c0 4FF00003 		mov	r3, #0
+ 2254 00c4 0193     		str	r3, [sp, #4]
+ 2255 00c6 4FF00003 		mov	r3, #0
+ 2256 00ca 0293     		str	r3, [sp, #8]
+ 2257 00cc 4FF00003 		mov	r3, #0
+ 2258 00d0 0393     		str	r3, [sp, #12]
+ 2259 00d2 40F20000 		movw	r0, #:lower16:Usartrecive
+ 2260 00d6 C0F20000 		movt	r0, #:upper16:Usartrecive
+ 2261 00da 40F20001 		movw	r1, #:lower16:.LC4
+ 2262 00de C0F20001 		movt	r1, #:upper16:.LC4
+ 2263 00e2 4FF48072 		mov	r2, #256
+ 2264 00e6 4FF00003 		mov	r3, #0
+ 2265 00ea FFF7FEFF 		bl	xTaskGenericCreate
+ 209:src/main.c    **** 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY,
+ 2266              		.loc 2 209 0
+ 2267 00ee 4FF00003 		mov	r3, #0
+ 2268 00f2 0093     		str	r3, [sp, #0]
+ 2269 00f4 4FF00003 		mov	r3, #0
+ 2270 00f8 0193     		str	r3, [sp, #4]
+ 2271 00fa 4FF00003 		mov	r3, #0
+ 2272 00fe 0293     		str	r3, [sp, #8]
+ 2273 0100 4FF00003 		mov	r3, #0
+ 2274 0104 0393     		str	r3, [sp, #12]
+ 2275 0106 40F20000 		movw	r0, #:lower16:shell
+ 2276 010a C0F20000 		movt	r0, #:upper16:shell
+ 2277 010e 40F20001 		movw	r1, #:lower16:.LC5
+ 2278 0112 C0F20001 		movt	r1, #:upper16:.LC5
+ 2279 0116 4FF48072 		mov	r2, #256
+ 2280 011a 4FF00003 		mov	r3, #0
+ 2281 011e FFF7FEFF 		bl	xTaskGenericCreate
+ 210:src/main.c    **** 
+ 211:src/main.c    **** 	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "vMEMSTask", configMINIMAL_STACK_SIZE, NULL,tskIDLE_P
+ 2282              		.loc 2 211 0
+ 2283 0122 4FF00003 		mov	r3, #0
+ 2284 0126 0093     		str	r3, [sp, #0]
+ 2285 0128 4FF00003 		mov	r3, #0
+ 2286 012c 0193     		str	r3, [sp, #4]
+ 2287 012e 4FF00003 		mov	r3, #0
+ 2288 0132 0293     		str	r3, [sp, #8]
+ 2289 0134 4FF00003 		mov	r3, #0
+ 2290 0138 0393     		str	r3, [sp, #12]
+ 2291 013a 40F20000 		movw	r0, #:lower16:vMEMSTask
+ 2292 013e C0F20000 		movt	r0, #:upper16:vMEMSTask
+ 2293 0142 40F20001 		movw	r1, #:lower16:.LC6
+ 2294 0146 C0F20001 		movt	r1, #:upper16:.LC6
+ 2295 014a 4FF48072 		mov	r2, #256
+ 2296 014e 4FF00003 		mov	r3, #0
+ 2297 0152 FFF7FEFF 		bl	xTaskGenericCreate
+ 212:src/main.c    **** 
+ 213:src/main.c    **** 	/* Start the scheduler. */
+ 214:src/main.c    **** 	vTaskStartScheduler();
+ 2298              		.loc 2 214 0
+ 2299 0156 FFF7FEFF 		bl	vTaskStartScheduler
  215:src/main.c    **** 
- 216:src/main.c    **** 
- 217:src/main.c    **** 
- 218:src/main.c    **** /* Task functions ------------------------------------------------- */
+ 216:src/main.c    **** 	/* Will only get here if there was not enough heap space to create the idle task. */
+ 217:src/main.c    **** 	return 0;  
+ 2300              		.loc 2 217 0
+ 2301 015a 4FF00003 		mov	r3, #0
+ 218:src/main.c    **** }
+ 2302              		.loc 2 218 0
+ 2303 015e 1846     		mov	r0, r3
+ 2304 0160 BD46     		mov	sp, r7
+ 2305 0162 80BD     		pop	{r7, pc}
+ 2306              		.cfi_endproc
+ 2307              	.LFE132:
+ 2309              		.section	.text.UsartTask,"ax",%progbits
+ 2310              		.align	2
+ 2311              		.thumb
+ 2312              		.thumb_func
+ 2314              	UsartTask:
+ 2315              	.LFB133:
  219:src/main.c    **** 
- 220:src/main.c    **** //Task For Sending Data Via USART
- 221:src/main.c    **** static void UsartTask(void *pvParameters)
- 222:src/main.c    **** {
- 2309              		.loc 2 222 0
- 2310              		.cfi_startproc
- 2311              		@ args = 0, pretend = 0, frame = 64
- 2312              		@ frame_needed = 1, uses_anonymous_args = 0
- 2313 0000 80B5     		push	{r7, lr}
- 2314              	.LCFI71:
- 2315              		.cfi_def_cfa_offset 8
- 2316              		.cfi_offset 14, -4
- 2317              		.cfi_offset 7, -8
- 2318 0002 90B0     		sub	sp, sp, #64
- 2319              	.LCFI72:
- 2320              		.cfi_def_cfa_offset 72
- 2321 0004 00AF     		add	r7, sp, #0
- 2322              	.LCFI73:
- 2323              		.cfi_def_cfa_register 7
- 2324 0006 7860     		str	r0, [r7, #4]
- 2325              	.LBB3:
- 223:src/main.c    **** 	//Variable to store received data	
- 224:src/main.c    **** 	uint32_t Data;
- 225:src/main.c    **** 	uint8_t curr_char;	
- 226:src/main.c    **** 
- 227:src/main.c    **** 	while(1) {
- 228:src/main.c    **** 
- 229:src/main.c    **** 
- 230:src/main.c    **** 		serial_str_msg msg;
- 231:src/main.c    **** 
- 232:src/main.c    **** 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
- 2326              		.loc 2 232 0
- 2327 0008 FFE7     		b	.L124
- 2328              	.L123:
- 2329              	.L124:
- 2330 000a 00BF     		nop
- 2331              	.L118:
- 2332              		.loc 2 232 0 is_stmt 0 discriminator 1
- 2333 000c 40F20003 		movw	r3, #:lower16:xQueueUARTSend
- 2334 0010 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
- 2335 0014 1B68     		ldr	r3, [r3, #0]
- 2336 0016 1846     		mov	r0, r3
- 2337 0018 07F10C03 		add	r3, r7, #12
- 2338 001c 1946     		mov	r1, r3
- 2339 001e 4FF0FF32 		mov	r2, #-1
- 2340 0022 4FF00003 		mov	r3, #0
- 2341 0026 FFF7FEFF 		bl	xQueueGenericReceive
- 2342 002a 0346     		mov	r3, r0
- 2343 002c 002B     		cmp	r3, #0
- 2344 002e EDD0     		beq	.L118
+ 220:src/main.c    **** 
+ 221:src/main.c    **** 
+ 222:src/main.c    **** /* Task functions ------------------------------------------------- */
+ 223:src/main.c    **** 
+ 224:src/main.c    **** //Task For Sending Data Via USART
+ 225:src/main.c    **** static void UsartTask(void *pvParameters)
+ 226:src/main.c    **** {
+ 2316              		.loc 2 226 0
+ 2317              		.cfi_startproc
+ 2318              		@ args = 0, pretend = 0, frame = 64
+ 2319              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2320 0000 80B5     		push	{r7, lr}
+ 2321              	.LCFI71:
+ 2322              		.cfi_def_cfa_offset 8
+ 2323              		.cfi_offset 14, -4
+ 2324              		.cfi_offset 7, -8
+ 2325 0002 90B0     		sub	sp, sp, #64
+ 2326              	.LCFI72:
+ 2327              		.cfi_def_cfa_offset 72
+ 2328 0004 00AF     		add	r7, sp, #0
+ 2329              	.LCFI73:
+ 2330              		.cfi_def_cfa_register 7
+ 2331 0006 7860     		str	r0, [r7, #4]
+ 2332              	.LBB3:
+ 227:src/main.c    **** 	//Variable to store received data	
+ 228:src/main.c    **** 	uint32_t Data;
+ 229:src/main.c    **** 	uint8_t curr_char;	
+ 230:src/main.c    **** 
+ 231:src/main.c    **** 	while(1) {
+ 232:src/main.c    **** 
  233:src/main.c    **** 
- 234:src/main.c    **** 		/* Write each character of the message to the RS232 port. */
- 235:src/main.c    **** 		curr_char = 0;
- 2345              		.loc 2 235 0 is_stmt 1
- 2346 0030 4FF00003 		mov	r3, #0
- 2347 0034 87F83F30 		strb	r3, [r7, #63]
- 236:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
- 2348              		.loc 2 236 0
- 2349 0038 1FE0     		b	.L119
- 2350              	.L125:
- 237:src/main.c    **** 			//Wait till the flag resets
- 238:src/main.c    **** 			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
- 2351              		.loc 2 238 0
- 2352 003a 00BF     		nop
- 2353              	.L120:
- 2354              		.loc 2 238 0 is_stmt 0 discriminator 1
- 2355 003c 4FF48840 		mov	r0, #17408
- 2356 0040 C4F20000 		movt	r0, 16384
- 2357 0044 4FF08001 		mov	r1, #128
- 2358 0048 FFF7FEFF 		bl	USART_GetFlagStatus
- 2359 004c 0346     		mov	r3, r0
- 2360 004e 002B     		cmp	r3, #0
- 2361 0050 F4D0     		beq	.L120
- 239:src/main.c    **** 			//Send the data
- 240:src/main.c    **** 			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
- 2362              		.loc 2 240 0 is_stmt 1
- 2363 0052 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
- 2364 0056 07F14002 		add	r2, r7, #64
- 2365 005a D318     		adds	r3, r2, r3
- 2366 005c 13F8343C 		ldrb	r3, [r3, #-52]	@ zero_extendqisi2
- 2367 0060 4FF48840 		mov	r0, #17408
- 2368 0064 C4F20000 		movt	r0, 16384
- 2369 0068 1946     		mov	r1, r3
- 2370 006a FFF7FEFF 		bl	USART_SendData
- 241:src/main.c    **** 			curr_char++;
- 2371              		.loc 2 241 0
- 2372 006e 97F83F30 		ldrb	r3, [r7, #63]
- 2373 0072 03F10103 		add	r3, r3, #1
- 2374 0076 87F83F30 		strb	r3, [r7, #63]
- 2375              	.L119:
- 236:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
- 2376              		.loc 2 236 0 discriminator 1
- 2377 007a 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
- 2378 007e 07F14002 		add	r2, r7, #64
- 2379 0082 D318     		adds	r3, r2, r3
- 2380 0084 13F8343C 		ldrb	r3, [r3, #-52]	@ zero_extendqisi2
- 2381 0088 002B     		cmp	r3, #0
- 2382 008a D6D1     		bne	.L125
- 2383              	.LBE3:
- 242:src/main.c    **** 		}
- 243:src/main.c    **** 	}
- 2384              		.loc 2 243 0
- 2385 008c BDE7     		b	.L123
- 2386              		.cfi_endproc
- 2387              	.LFE133:
- 2389 008e 00BF     		.section	.rodata
- 2390 0036 0000     		.align	2
- 2391              	.LC7:
- 2392 0038 256300   		.ascii	"%c\000"
- 2393 003b 00       		.section	.text.Usartrecive,"ax",%progbits
- 2394              		.align	2
- 2395              		.thumb
- 2396              		.thumb_func
- 2398              	Usartrecive:
- 2399              	.LFB134:
- 244:src/main.c    **** 
- 245:src/main.c    **** 	while(1);
- 246:src/main.c    **** }
- 247:src/main.c    **** 
- 248:src/main.c    **** //Task For Sending Data Via USART
- 249:src/main.c    **** static void Usartrecive(void *pvParameters)
- 250:src/main.c    **** {
- 2400              		.loc 2 250 0
- 2401              		.cfi_startproc
- 2402              		@ args = 0, pretend = 0, frame = 64
- 2403              		@ frame_needed = 1, uses_anonymous_args = 0
- 2404 0000 80B5     		push	{r7, lr}
- 2405              	.LCFI74:
- 2406              		.cfi_def_cfa_offset 8
- 2407              		.cfi_offset 14, -4
- 2408              		.cfi_offset 7, -8
- 2409 0002 90B0     		sub	sp, sp, #64
- 2410              	.LCFI75:
- 2411              		.cfi_def_cfa_offset 72
- 2412 0004 00AF     		add	r7, sp, #0
- 2413              	.LCFI76:
- 2414              		.cfi_def_cfa_register 7
- 2415 0006 7860     		str	r0, [r7, #4]
- 2416              	.LBB4:
- 251:src/main.c    **** 	//Variable to store received data	
- 252:src/main.c    **** 	uint32_t Data;
- 253:src/main.c    **** 	uint8_t curr_char;	
- 254:src/main.c    **** 
- 255:src/main.c    **** 	while(1) {
- 256:src/main.c    **** 
- 257:src/main.c    **** 	
- 258:src/main.c    **** 		serial_str_msg msg;
- 259:src/main.c    **** 		//Wait for character
- 260:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
- 2417              		.loc 2 260 0
- 2418 0008 10E0     		b	.L127
- 2419              	.L128:
- 261:src/main.c    ****   		           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | US
- 2420              		.loc 2 261 0
- 2421 000a 4FF48840 		mov	r0, #17408
- 2422 000e C4F20000 		movt	r0, 16384
- 2423 0012 4FF00F01 		mov	r1, #15
- 2424 0016 FFF7FEFF 		bl	USART_GetFlagStatus
- 2425 001a 0346     		mov	r3, r0
- 2426 001c 002B     		cmp	r3, #0
- 2427 001e 05D0     		beq	.L127
- 262:src/main.c    **** 		 		USART_ReceiveData(USART2); // Clear Error
- 2428              		.loc 2 262 0
- 2429 0020 4FF48840 		mov	r0, #17408
- 2430 0024 C4F20000 		movt	r0, 16384
- 2431 0028 FFF7FEFF 		bl	USART_ReceiveData
- 2432              	.L127:
- 260:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
- 2433              		.loc 2 260 0 discriminator 1
- 2434 002c 4FF48840 		mov	r0, #17408
- 2435 0030 C4F20000 		movt	r0, 16384
- 2436 0034 4FF02001 		mov	r1, #32
- 2437 0038 FFF7FEFF 		bl	USART_GetFlagStatus
- 2438 003c 0346     		mov	r3, r0
- 2439 003e 002B     		cmp	r3, #0
- 2440 0040 E3D0     		beq	.L128
- 263:src/main.c    **** 		 }
- 264:src/main.c    **** 
- 265:src/main.c    **** 		//Collect the caracter
- 266:src/main.c    **** 		Data = USART_ReceiveData(USART2);
- 2441              		.loc 2 266 0
- 2442 0042 4FF48840 		mov	r0, #17408
- 2443 0046 C4F20000 		movt	r0, 16384
- 2444 004a FFF7FEFF 		bl	USART_ReceiveData
- 2445 004e 0346     		mov	r3, r0
- 2446 0050 FB63     		str	r3, [r7, #60]
- 267:src/main.c    **** 		qprintf(xQueueUARTRecvie, "%c", Data); 
- 2447              		.loc 2 267 0
- 2448 0052 40F20003 		movw	r3, #:lower16:xQueueUARTRecvie
- 2449 0056 C0F20003 		movt	r3, #:upper16:xQueueUARTRecvie
- 2450 005a 1B68     		ldr	r3, [r3, #0]
- 2451 005c 1846     		mov	r0, r3
- 2452 005e 40F20001 		movw	r1, #:lower16:.LC7
- 2453 0062 C0F20001 		movt	r1, #:upper16:.LC7
- 2454 0066 FA6B     		ldr	r2, [r7, #60]
- 2455 0068 FFF7FEFF 		bl	qprintf
- 2456              	.LBE4:
- 268:src/main.c    **** 		
- 269:src/main.c    **** 			}
- 2457              		.loc 2 269 0
- 2458 006c 00BF     		nop
- 2459              	.LBB5:
- 260:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
- 2460              		.loc 2 260 0
- 2461 006e DDE7     		b	.L127
- 2462              	.LBE5:
- 2463              		.cfi_endproc
- 2464              	.LFE134:
- 2466              		.section	.text.vMEMSTask,"ax",%progbits
- 2467              		.align	2
- 2468              		.thumb
- 2469              		.thumb_func
- 2471              	vMEMSTask:
- 2472              	.LFB135:
- 270:src/main.c    **** 
- 271:src/main.c    **** 	while(1);
- 272:src/main.c    **** }
- 273:src/main.c    **** 
+ 234:src/main.c    **** 		serial_str_msg msg;
+ 235:src/main.c    **** 
+ 236:src/main.c    **** 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
+ 2333              		.loc 2 236 0
+ 2334 0008 FFE7     		b	.L124
+ 2335              	.L123:
+ 2336              	.L124:
+ 2337 000a 00BF     		nop
+ 2338              	.L118:
+ 2339              		.loc 2 236 0 is_stmt 0 discriminator 1
+ 2340 000c 40F20003 		movw	r3, #:lower16:xQueueUARTSend
+ 2341 0010 C0F20003 		movt	r3, #:upper16:xQueueUARTSend
+ 2342 0014 1B68     		ldr	r3, [r3, #0]
+ 2343 0016 1846     		mov	r0, r3
+ 2344 0018 07F10C03 		add	r3, r7, #12
+ 2345 001c 1946     		mov	r1, r3
+ 2346 001e 4FF0FF32 		mov	r2, #-1
+ 2347 0022 4FF00003 		mov	r3, #0
+ 2348 0026 FFF7FEFF 		bl	xQueueGenericReceive
+ 2349 002a 0346     		mov	r3, r0
+ 2350 002c 002B     		cmp	r3, #0
+ 2351 002e EDD0     		beq	.L118
+ 237:src/main.c    **** 
+ 238:src/main.c    **** 		/* Write each character of the message to the RS232 port. */
+ 239:src/main.c    **** 		curr_char = 0;
+ 2352              		.loc 2 239 0 is_stmt 1
+ 2353 0030 4FF00003 		mov	r3, #0
+ 2354 0034 87F83F30 		strb	r3, [r7, #63]
+ 240:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
+ 2355              		.loc 2 240 0
+ 2356 0038 1FE0     		b	.L119
+ 2357              	.L125:
+ 241:src/main.c    **** 			//Wait till the flag resets
+ 242:src/main.c    **** 			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
+ 2358              		.loc 2 242 0
+ 2359 003a 00BF     		nop
+ 2360              	.L120:
+ 2361              		.loc 2 242 0 is_stmt 0 discriminator 1
+ 2362 003c 4FF48840 		mov	r0, #17408
+ 2363 0040 C4F20000 		movt	r0, 16384
+ 2364 0044 4FF08001 		mov	r1, #128
+ 2365 0048 FFF7FEFF 		bl	USART_GetFlagStatus
+ 2366 004c 0346     		mov	r3, r0
+ 2367 004e 002B     		cmp	r3, #0
+ 2368 0050 F4D0     		beq	.L120
+ 243:src/main.c    **** 			//Send the data
+ 244:src/main.c    **** 			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
+ 2369              		.loc 2 244 0 is_stmt 1
+ 2370 0052 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
+ 2371 0056 07F14002 		add	r2, r7, #64
+ 2372 005a D318     		adds	r3, r2, r3
+ 2373 005c 13F8343C 		ldrb	r3, [r3, #-52]	@ zero_extendqisi2
+ 2374 0060 4FF48840 		mov	r0, #17408
+ 2375 0064 C4F20000 		movt	r0, 16384
+ 2376 0068 1946     		mov	r1, r3
+ 2377 006a FFF7FEFF 		bl	USART_SendData
+ 245:src/main.c    **** 			curr_char++;
+ 2378              		.loc 2 245 0
+ 2379 006e 97F83F30 		ldrb	r3, [r7, #63]
+ 2380 0072 03F10103 		add	r3, r3, #1
+ 2381 0076 87F83F30 		strb	r3, [r7, #63]
+ 2382              	.L119:
+ 240:src/main.c    **** 		while (msg.str[curr_char] != '\0') {
+ 2383              		.loc 2 240 0 discriminator 1
+ 2384 007a 97F83F30 		ldrb	r3, [r7, #63]	@ zero_extendqisi2
+ 2385 007e 07F14002 		add	r2, r7, #64
+ 2386 0082 D318     		adds	r3, r2, r3
+ 2387 0084 13F8343C 		ldrb	r3, [r3, #-52]	@ zero_extendqisi2
+ 2388 0088 002B     		cmp	r3, #0
+ 2389 008a D6D1     		bne	.L125
+ 2390              	.LBE3:
+ 246:src/main.c    **** 		}
+ 247:src/main.c    **** 	}
+ 2391              		.loc 2 247 0
+ 2392 008c BDE7     		b	.L123
+ 2393              		.cfi_endproc
+ 2394              	.LFE133:
+ 2396 008e 00BF     		.section	.rodata
+ 2397 0036 0000     		.align	2
+ 2398              	.LC7:
+ 2399 0038 256300   		.ascii	"%c\000"
+ 2400 003b 00       		.section	.text.Usartrecive,"ax",%progbits
+ 2401              		.align	2
+ 2402              		.thumb
+ 2403              		.thumb_func
+ 2405              	Usartrecive:
+ 2406              	.LFB134:
+ 248:src/main.c    **** 
+ 249:src/main.c    **** 	while(1);
+ 250:src/main.c    **** }
+ 251:src/main.c    **** 
+ 252:src/main.c    **** //Task For Sending Data Via USART
+ 253:src/main.c    **** static void Usartrecive(void *pvParameters)
+ 254:src/main.c    **** {
+ 2407              		.loc 2 254 0
+ 2408              		.cfi_startproc
+ 2409              		@ args = 0, pretend = 0, frame = 64
+ 2410              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2411 0000 80B5     		push	{r7, lr}
+ 2412              	.LCFI74:
+ 2413              		.cfi_def_cfa_offset 8
+ 2414              		.cfi_offset 14, -4
+ 2415              		.cfi_offset 7, -8
+ 2416 0002 90B0     		sub	sp, sp, #64
+ 2417              	.LCFI75:
+ 2418              		.cfi_def_cfa_offset 72
+ 2419 0004 00AF     		add	r7, sp, #0
+ 2420              	.LCFI76:
+ 2421              		.cfi_def_cfa_register 7
+ 2422 0006 7860     		str	r0, [r7, #4]
+ 2423              	.LBB4:
+ 255:src/main.c    **** 	//Variable to store received data	
+ 256:src/main.c    **** 	uint32_t Data;
+ 257:src/main.c    **** 	uint8_t curr_char;	
+ 258:src/main.c    **** 
+ 259:src/main.c    **** 	while(1) {
+ 260:src/main.c    **** 
+ 261:src/main.c    **** 	
+ 262:src/main.c    **** 		serial_str_msg msg;
+ 263:src/main.c    **** 		//Wait for character
+ 264:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+ 2424              		.loc 2 264 0
+ 2425 0008 10E0     		b	.L127
+ 2426              	.L128:
+ 265:src/main.c    ****   		           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | US
+ 2427              		.loc 2 265 0
+ 2428 000a 4FF48840 		mov	r0, #17408
+ 2429 000e C4F20000 		movt	r0, 16384
+ 2430 0012 4FF00F01 		mov	r1, #15
+ 2431 0016 FFF7FEFF 		bl	USART_GetFlagStatus
+ 2432 001a 0346     		mov	r3, r0
+ 2433 001c 002B     		cmp	r3, #0
+ 2434 001e 05D0     		beq	.L127
+ 266:src/main.c    **** 		 		USART_ReceiveData(USART2); // Clear Error
+ 2435              		.loc 2 266 0
+ 2436 0020 4FF48840 		mov	r0, #17408
+ 2437 0024 C4F20000 		movt	r0, 16384
+ 2438 0028 FFF7FEFF 		bl	USART_ReceiveData
+ 2439              	.L127:
+ 264:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+ 2440              		.loc 2 264 0 discriminator 1
+ 2441 002c 4FF48840 		mov	r0, #17408
+ 2442 0030 C4F20000 		movt	r0, 16384
+ 2443 0034 4FF02001 		mov	r1, #32
+ 2444 0038 FFF7FEFF 		bl	USART_GetFlagStatus
+ 2445 003c 0346     		mov	r3, r0
+ 2446 003e 002B     		cmp	r3, #0
+ 2447 0040 E3D0     		beq	.L128
+ 267:src/main.c    **** 		 }
+ 268:src/main.c    **** 
+ 269:src/main.c    **** 		//Collect the caracter
+ 270:src/main.c    **** 		Data = USART_ReceiveData(USART2);
+ 2448              		.loc 2 270 0
+ 2449 0042 4FF48840 		mov	r0, #17408
+ 2450 0046 C4F20000 		movt	r0, 16384
+ 2451 004a FFF7FEFF 		bl	USART_ReceiveData
+ 2452 004e 0346     		mov	r3, r0
+ 2453 0050 FB63     		str	r3, [r7, #60]
+ 271:src/main.c    **** 		qprintf(xQueueUARTRecvie, "%c", Data); 
+ 2454              		.loc 2 271 0
+ 2455 0052 40F20003 		movw	r3, #:lower16:xQueueUARTRecvie
+ 2456 0056 C0F20003 		movt	r3, #:upper16:xQueueUARTRecvie
+ 2457 005a 1B68     		ldr	r3, [r3, #0]
+ 2458 005c 1846     		mov	r0, r3
+ 2459 005e 40F20001 		movw	r1, #:lower16:.LC7
+ 2460 0062 C0F20001 		movt	r1, #:upper16:.LC7
+ 2461 0066 FA6B     		ldr	r2, [r7, #60]
+ 2462 0068 FFF7FEFF 		bl	qprintf
+ 2463              	.LBE4:
+ 272:src/main.c    **** 		
+ 273:src/main.c    **** 			}
+ 2464              		.loc 2 273 0
+ 2465 006c 00BF     		nop
+ 2466              	.LBB5:
+ 264:src/main.c    **** 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
+ 2467              		.loc 2 264 0
+ 2468 006e DDE7     		b	.L127
+ 2469              	.LBE5:
+ 2470              		.cfi_endproc
+ 2471              	.LFE134:
+ 2473              		.section	.text.vMEMSTask,"ax",%progbits
+ 2474              		.align	2
+ 2475              		.thumb
+ 2476              		.thumb_func
+ 2478              	vMEMSTask:
+ 2479              	.LFB135:
  274:src/main.c    **** 
- 275:src/main.c    **** void vMEMSTask(void *pvParameters)
- 276:src/main.c    **** {
- 2473              		.loc 2 276 0
- 2474              		.cfi_startproc
- 2475              		@ args = 0, pretend = 0, frame = 72
- 2476              		@ frame_needed = 1, uses_anonymous_args = 0
- 2477 0000 80B5     		push	{r7, lr}
- 2478              	.LCFI77:
- 2479              		.cfi_def_cfa_offset 8
- 2480              		.cfi_offset 14, -4
- 2481              		.cfi_offset 7, -8
- 2482 0002 92B0     		sub	sp, sp, #72
- 2483              	.LCFI78:
- 2484              		.cfi_def_cfa_offset 80
- 2485 0004 00AF     		add	r7, sp, #0
- 2486              	.LCFI79:
- 2487              		.cfi_def_cfa_register 7
- 2488 0006 7860     		str	r0, [r7, #4]
- 277:src/main.c    **** 	/* queue for MEMS data length */
- 278:src/main.c    ****     volatile int *LED;
- 279:src/main.c    ****     LED = (int *) pvParameters;
- 2489              		.loc 2 279 0
- 2490 0008 7B68     		ldr	r3, [r7, #4]
- 2491 000a 3B64     		str	r3, [r7, #64]
- 280:src/main.c    **** 
- 281:src/main.c    **** 	uint8_t Buffer_Hx[1];
- 282:src/main.c    **** 	uint8_t Buffer_Hy[1];
- 283:src/main.c    **** 	uint8_t Buffer_Hz[1];
- 284:src/main.c    **** 	uint8_t Buffer_Lx[1];
- 285:src/main.c    **** 	uint8_t Buffer_Ly[1];
- 286:src/main.c    **** 	uint8_t Buffer_Lz[1];
- 287:src/main.c    **** 
- 288:src/main.c    **** 	uint8_t counter  = 0;
- 2492              		.loc 2 288 0
- 2493 000c 4FF00003 		mov	r3, #0
- 2494 0010 87F84730 		strb	r3, [r7, #71]
- 289:src/main.c    **** 
- 290:src/main.c    **** 	__IO float XOffset;
- 291:src/main.c    **** 	__IO float YOffset;
- 292:src/main.c    **** 	__IO float ZOffset;
+ 275:src/main.c    **** 	while(1);
+ 276:src/main.c    **** }
+ 277:src/main.c    **** 
+ 278:src/main.c    **** 
+ 279:src/main.c    **** void vMEMSTask(void *pvParameters)
+ 280:src/main.c    **** {
+ 2480              		.loc 2 280 0
+ 2481              		.cfi_startproc
+ 2482              		@ args = 0, pretend = 0, frame = 72
+ 2483              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2484 0000 80B5     		push	{r7, lr}
+ 2485              	.LCFI77:
+ 2486              		.cfi_def_cfa_offset 8
+ 2487              		.cfi_offset 14, -4
+ 2488              		.cfi_offset 7, -8
+ 2489 0002 92B0     		sub	sp, sp, #72
+ 2490              	.LCFI78:
+ 2491              		.cfi_def_cfa_offset 80
+ 2492 0004 00AF     		add	r7, sp, #0
+ 2493              	.LCFI79:
+ 2494              		.cfi_def_cfa_register 7
+ 2495 0006 7860     		str	r0, [r7, #4]
+ 281:src/main.c    **** 	/* queue for MEMS data length */
+ 282:src/main.c    ****     volatile int *LED;
+ 283:src/main.c    ****     LED = (int *) pvParameters;
+ 2496              		.loc 2 283 0
+ 2497 0008 7B68     		ldr	r3, [r7, #4]
+ 2498 000a 3B64     		str	r3, [r7, #64]
+ 284:src/main.c    **** 
+ 285:src/main.c    **** 	uint8_t Buffer_Hx[1];
+ 286:src/main.c    **** 	uint8_t Buffer_Hy[1];
+ 287:src/main.c    **** 	uint8_t Buffer_Hz[1];
+ 288:src/main.c    **** 	uint8_t Buffer_Lx[1];
+ 289:src/main.c    **** 	uint8_t Buffer_Ly[1];
+ 290:src/main.c    **** 	uint8_t Buffer_Lz[1];
+ 291:src/main.c    **** 
+ 292:src/main.c    **** 	uint8_t counter  = 0;
+ 2499              		.loc 2 292 0
+ 2500 000c 4FF00003 		mov	r3, #0
+ 2501 0010 87F84730 		strb	r3, [r7, #71]
  293:src/main.c    **** 
- 294:src/main.c    **** 	int16_t temp4 = 0;
- 2495              		.loc 2 294 0
- 2496 0014 4FF00003 		mov	r3, #0
- 2497 0018 FB87     		strh	r3, [r7, #62]	@ movhi
- 295:src/main.c    **** 	int16_t temp5 = 0;
- 2498              		.loc 2 295 0
- 2499 001a 4FF00003 		mov	r3, #0
- 2500 001e BB87     		strh	r3, [r7, #60]	@ movhi
- 296:src/main.c    **** 	int16_t temp6 = 0;
- 2501              		.loc 2 296 0
- 2502 0020 4FF00003 		mov	r3, #0
- 2503 0024 7B87     		strh	r3, [r7, #58]	@ movhi
+ 294:src/main.c    **** 	__IO float XOffset;
+ 295:src/main.c    **** 	__IO float YOffset;
+ 296:src/main.c    **** 	__IO float ZOffset;
  297:src/main.c    **** 
- 298:src/main.c    **** 	float x;
- 299:src/main.c    **** 	float y;
- 300:src/main.c    **** 	float z;
+ 298:src/main.c    **** 	int16_t temp4 = 0;
+ 2502              		.loc 2 298 0
+ 2503 0014 4FF00003 		mov	r3, #0
+ 2504 0018 FB87     		strh	r3, [r7, #62]	@ movhi
+ 299:src/main.c    **** 	int16_t temp5 = 0;
+ 2505              		.loc 2 299 0
+ 2506 001a 4FF00003 		mov	r3, #0
+ 2507 001e BB87     		strh	r3, [r7, #60]	@ movhi
+ 300:src/main.c    **** 	int16_t temp6 = 0;
+ 2508              		.loc 2 300 0
+ 2509 0020 4FF00003 		mov	r3, #0
+ 2510 0024 7B87     		strh	r3, [r7, #58]	@ movhi
  301:src/main.c    **** 
- 302:src/main.c    **** 	/* reset offset */
- 303:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
- 2504              		.loc 2 303 0
- 2505 0026 07F12803 		add	r3, r7, #40
- 2506 002a 1846     		mov	r0, r3
- 2507 002c 4FF02901 		mov	r1, #41
- 2508 0030 4FF00102 		mov	r2, #1
- 2509 0034 FFF7FEFF 		bl	LIS3DSH_Read
- 304:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
- 2510              		.loc 2 304 0
- 2511 0038 07F12403 		add	r3, r7, #36
- 2512 003c 1846     		mov	r0, r3
- 2513 003e 4FF02B01 		mov	r1, #43
- 2514 0042 4FF00102 		mov	r2, #1
- 2515 0046 FFF7FEFF 		bl	LIS3DSH_Read
- 305:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
- 2516              		.loc 2 305 0
- 2517 004a 07F12003 		add	r3, r7, #32
- 2518 004e 1846     		mov	r0, r3
- 2519 0050 4FF02D01 		mov	r1, #45
- 2520 0054 4FF00102 		mov	r2, #1
- 2521 0058 FFF7FEFF 		bl	LIS3DSH_Read
- 306:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
- 2522              		.loc 2 306 0
- 2523 005c 07F11C03 		add	r3, r7, #28
- 2524 0060 1846     		mov	r0, r3
- 2525 0062 4FF02801 		mov	r1, #40
- 2526 0066 4FF00102 		mov	r2, #1
- 2527 006a FFF7FEFF 		bl	LIS3DSH_Read
- 307:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
- 2528              		.loc 2 307 0
- 2529 006e 07F11803 		add	r3, r7, #24
- 2530 0072 1846     		mov	r0, r3
- 2531 0074 4FF02A01 		mov	r1, #42
- 2532 0078 4FF00102 		mov	r2, #1
- 2533 007c FFF7FEFF 		bl	LIS3DSH_Read
- 308:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
- 2534              		.loc 2 308 0
- 2535 0080 07F11403 		add	r3, r7, #20
- 2536 0084 1846     		mov	r0, r3
- 2537 0086 4FF02C01 		mov	r1, #44
- 2538 008a 4FF00102 		mov	r2, #1
- 2539 008e FFF7FEFF 		bl	LIS3DSH_Read
- 309:src/main.c    **** 
- 310:src/main.c    **** 	    /* Update autoreload and capture compare registers value*/
- 311:src/main.c    **** 
- 312:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
- 2540              		.loc 2 312 0
- 2541 0092 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
- 2542 0096 4FEA0323 		lsl	r3, r3, #8
- 2543 009a 9AB2     		uxth	r2, r3
- 2544 009c 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
- 2545 009e 1343     		orrs	r3, r3, r2
- 2546 00a0 FB87     		strh	r3, [r7, #62]	@ movhi
- 313:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
- 2547              		.loc 2 313 0
- 2548 00a2 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
- 2549 00a6 4FEA0323 		lsl	r3, r3, #8
- 2550 00aa 9AB2     		uxth	r2, r3
- 2551 00ac 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 2552 00ae 1343     		orrs	r3, r3, r2
- 2553 00b0 BB87     		strh	r3, [r7, #60]	@ movhi
- 314:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
- 2554              		.loc 2 314 0
- 2555 00b2 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
- 2556 00b6 4FEA0323 		lsl	r3, r3, #8
- 2557 00ba 9AB2     		uxth	r2, r3
- 2558 00bc 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 2559 00be 1343     		orrs	r3, r3, r2
- 2560 00c0 7B87     		strh	r3, [r7, #58]	@ movhi
+ 302:src/main.c    **** 	float x;
+ 303:src/main.c    **** 	float y;
+ 304:src/main.c    **** 	float z;
+ 305:src/main.c    **** 
+ 306:src/main.c    **** 	/* reset offset */
+ 307:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 2511              		.loc 2 307 0
+ 2512 0026 07F12803 		add	r3, r7, #40
+ 2513 002a 1846     		mov	r0, r3
+ 2514 002c 4FF02901 		mov	r1, #41
+ 2515 0030 4FF00102 		mov	r2, #1
+ 2516 0034 FFF7FEFF 		bl	LIS3DSH_Read
+ 308:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 2517              		.loc 2 308 0
+ 2518 0038 07F12403 		add	r3, r7, #36
+ 2519 003c 1846     		mov	r0, r3
+ 2520 003e 4FF02B01 		mov	r1, #43
+ 2521 0042 4FF00102 		mov	r2, #1
+ 2522 0046 FFF7FEFF 		bl	LIS3DSH_Read
+ 309:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 2523              		.loc 2 309 0
+ 2524 004a 07F12003 		add	r3, r7, #32
+ 2525 004e 1846     		mov	r0, r3
+ 2526 0050 4FF02D01 		mov	r1, #45
+ 2527 0054 4FF00102 		mov	r2, #1
+ 2528 0058 FFF7FEFF 		bl	LIS3DSH_Read
+ 310:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 2529              		.loc 2 310 0
+ 2530 005c 07F11C03 		add	r3, r7, #28
+ 2531 0060 1846     		mov	r0, r3
+ 2532 0062 4FF02801 		mov	r1, #40
+ 2533 0066 4FF00102 		mov	r2, #1
+ 2534 006a FFF7FEFF 		bl	LIS3DSH_Read
+ 311:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 2535              		.loc 2 311 0
+ 2536 006e 07F11803 		add	r3, r7, #24
+ 2537 0072 1846     		mov	r0, r3
+ 2538 0074 4FF02A01 		mov	r1, #42
+ 2539 0078 4FF00102 		mov	r2, #1
+ 2540 007c FFF7FEFF 		bl	LIS3DSH_Read
+ 312:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 2541              		.loc 2 312 0
+ 2542 0080 07F11403 		add	r3, r7, #20
+ 2543 0084 1846     		mov	r0, r3
+ 2544 0086 4FF02C01 		mov	r1, #44
+ 2545 008a 4FF00102 		mov	r2, #1
+ 2546 008e FFF7FEFF 		bl	LIS3DSH_Read
+ 313:src/main.c    **** 
+ 314:src/main.c    **** 	    /* Update autoreload and capture compare registers value*/
  315:src/main.c    **** 
- 316:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
- 2561              		.loc 2 316 0
- 2562 00c2 B7F93E30 		ldrsh	r3, [r7, #62]
- 2563 00c6 07EE903A 		fmsr	s15, r3	@ int
- 2564 00ca B8EEE77A 		fsitos	s14, s15
- 2565 00ce DFED187A 		flds	s15, .L147
- 2566 00d2 67EE277A 		fmuls	s15, s14, s15
- 2567 00d6 9FED177A 		flds	s14, .L147+4
- 2568 00da C7EE877A 		fdivs	s15, s15, s14
- 2569 00de C7ED0D7A 		fsts	s15, [r7, #52]
- 317:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
- 2570              		.loc 2 317 0
- 2571 00e2 B7F93C30 		ldrsh	r3, [r7, #60]
- 2572 00e6 07EE903A 		fmsr	s15, r3	@ int
- 2573 00ea B8EEE77A 		fsitos	s14, s15
- 2574 00ee DFED107A 		flds	s15, .L147
- 2575 00f2 67EE277A 		fmuls	s15, s14, s15
- 2576 00f6 9FED0F7A 		flds	s14, .L147+4
- 2577 00fa C7EE877A 		fdivs	s15, s15, s14
- 2578 00fe C7ED0C7A 		fsts	s15, [r7, #48]
- 318:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
- 2579              		.loc 2 318 0
- 2580 0102 B7F93A30 		ldrsh	r3, [r7, #58]
- 2581 0106 07EE903A 		fmsr	s15, r3	@ int
- 2582 010a B8EEE77A 		fsitos	s14, s15
- 2583 010e DFED087A 		flds	s15, .L147
- 2584 0112 67EE277A 		fmuls	s15, s14, s15
- 2585 0116 9FED077A 		flds	s14, .L147+4
- 2586 011a C7EE877A 		fdivs	s15, s15, s14
- 2587 011e C7ED0B7A 		fsts	s15, [r7, #44]
+ 316:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+ 2547              		.loc 2 316 0
+ 2548 0092 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2549 0096 4FEA0323 		lsl	r3, r3, #8
+ 2550 009a 9AB2     		uxth	r2, r3
+ 2551 009c 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2552 009e 1343     		orrs	r3, r3, r2
+ 2553 00a0 FB87     		strh	r3, [r7, #62]	@ movhi
+ 317:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+ 2554              		.loc 2 317 0
+ 2555 00a2 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2556 00a6 4FEA0323 		lsl	r3, r3, #8
+ 2557 00aa 9AB2     		uxth	r2, r3
+ 2558 00ac 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2559 00ae 1343     		orrs	r3, r3, r2
+ 2560 00b0 BB87     		strh	r3, [r7, #60]	@ movhi
+ 318:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+ 2561              		.loc 2 318 0
+ 2562 00b2 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2563 00b6 4FEA0323 		lsl	r3, r3, #8
+ 2564 00ba 9AB2     		uxth	r2, r3
+ 2565 00bc 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 2566 00be 1343     		orrs	r3, r3, r2
+ 2567 00c0 7B87     		strh	r3, [r7, #58]	@ movhi
  319:src/main.c    **** 
- 320:src/main.c    ****   	XOffset = x;
- 2588              		.loc 2 320 0
- 2589 0122 7B6B     		ldr	r3, [r7, #52]	@ float
- 2590 0124 3B61     		str	r3, [r7, #16]	@ float
- 321:src/main.c    ****  	YOffset = y;
- 2591              		.loc 2 321 0
- 2592 0126 3B6B     		ldr	r3, [r7, #48]	@ float
- 2593 0128 FB60     		str	r3, [r7, #12]	@ float
- 322:src/main.c    ****   	ZOffset = z;
- 2594              		.loc 2 322 0
- 2595 012a FB6A     		ldr	r3, [r7, #44]	@ float
- 2596 012c BB60     		str	r3, [r7, #8]	@ float
- 2597 012e 04E0     		b	.L145
- 2598              	.L148:
- 2599              		.align	2
- 2600              	.L147:
- 2601 0130 CDCC1C41 		.word	1092406477
- 2602 0134 00007A46 		.word	1182400512
- 2603              	.L146:
+ 320:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
+ 2568              		.loc 2 320 0
+ 2569 00c2 B7F93E30 		ldrsh	r3, [r7, #62]
+ 2570 00c6 07EE903A 		fmsr	s15, r3	@ int
+ 2571 00ca B8EEE77A 		fsitos	s14, s15
+ 2572 00ce DFED187A 		flds	s15, .L147
+ 2573 00d2 67EE277A 		fmuls	s15, s14, s15
+ 2574 00d6 9FED177A 		flds	s14, .L147+4
+ 2575 00da C7EE877A 		fdivs	s15, s15, s14
+ 2576 00de C7ED0D7A 		fsts	s15, [r7, #52]
+ 321:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
+ 2577              		.loc 2 321 0
+ 2578 00e2 B7F93C30 		ldrsh	r3, [r7, #60]
+ 2579 00e6 07EE903A 		fmsr	s15, r3	@ int
+ 2580 00ea B8EEE77A 		fsitos	s14, s15
+ 2581 00ee DFED107A 		flds	s15, .L147
+ 2582 00f2 67EE277A 		fmuls	s15, s14, s15
+ 2583 00f6 9FED0F7A 		flds	s14, .L147+4
+ 2584 00fa C7EE877A 		fdivs	s15, s15, s14
+ 2585 00fe C7ED0C7A 		fsts	s15, [r7, #48]
+ 322:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
+ 2586              		.loc 2 322 0
+ 2587 0102 B7F93A30 		ldrsh	r3, [r7, #58]
+ 2588 0106 07EE903A 		fmsr	s15, r3	@ int
+ 2589 010a B8EEE77A 		fsitos	s14, s15
+ 2590 010e DFED087A 		flds	s15, .L147
+ 2591 0112 67EE277A 		fmuls	s15, s14, s15
+ 2592 0116 9FED077A 		flds	s14, .L147+4
+ 2593 011a C7EE877A 		fdivs	s15, s15, s14
+ 2594 011e C7ED0B7A 		fsts	s15, [r7, #44]
  323:src/main.c    **** 
- 324:src/main.c    **** 	/* reset */
- 325:src/main.c    **** 
- 326:src/main.c    **** 	for( ;; )
- 327:src/main.c    **** 	{
- 328:src/main.c    **** 		counter++;
- 329:src/main.c    **** 		if (counter == 10)
- 330:src/main.c    **** 		{
- 331:src/main.c    **** 
- 332:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
- 333:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
- 334:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
- 335:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
- 336:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
- 337:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
- 338:src/main.c    **** 
- 339:src/main.c    **** 	    /* Update autoreload and capture compare registers value*/
- 340:src/main.c    **** 
- 341:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
- 342:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
- 343:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+ 324:src/main.c    ****   	XOffset = x;
+ 2595              		.loc 2 324 0
+ 2596 0122 7B6B     		ldr	r3, [r7, #52]	@ float
+ 2597 0124 3B61     		str	r3, [r7, #16]	@ float
+ 325:src/main.c    ****  	YOffset = y;
+ 2598              		.loc 2 325 0
+ 2599 0126 3B6B     		ldr	r3, [r7, #48]	@ float
+ 2600 0128 FB60     		str	r3, [r7, #12]	@ float
+ 326:src/main.c    ****   	ZOffset = z;
+ 2601              		.loc 2 326 0
+ 2602 012a FB6A     		ldr	r3, [r7, #44]	@ float
+ 2603 012c BB60     		str	r3, [r7, #8]	@ float
+ 2604 012e 04E0     		b	.L145
+ 2605              	.L148:
+ 2606              		.align	2
+ 2607              	.L147:
+ 2608 0130 CDCC1C41 		.word	1092406477
+ 2609 0134 00007A46 		.word	1182400512
+ 2610              	.L146:
+ 327:src/main.c    **** 
+ 328:src/main.c    **** 	/* reset */
+ 329:src/main.c    **** 
+ 330:src/main.c    **** 	for( ;; )
+ 331:src/main.c    **** 	{
+ 332:src/main.c    **** 		counter++;
+ 333:src/main.c    **** 		if (counter == 10)
+ 334:src/main.c    **** 		{
+ 335:src/main.c    **** 
+ 336:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 337:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 338:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 339:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 340:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 341:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 342:src/main.c    **** 
+ 343:src/main.c    **** 	    /* Update autoreload and capture compare registers value*/
  344:src/main.c    **** 
- 345:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
- 346:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
- 347:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
+ 345:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+ 346:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+ 347:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
  348:src/main.c    **** 
- 349:src/main.c    ****             
- 350:src/main.c    **** 	    x -= XOffset;
- 351:src/main.c    **** 	    y -= YOffset;
- 352:src/main.c    **** 	    z -= ZOffset;
- 353:src/main.c    **** 		  
- 354:src/main.c    **** 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
- 355:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (i
- 356:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", x, y, z);
- 357:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int)x, (int)y, (int)z);
- 358:src/main.c    **** 		
- 359:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
- 360:src/main.c    **** 		{
- 361:src/main.c    ****                 if ((int)x < -G)
- 362:src/main.c    ****                 {
- 363:src/main.c    ****                     STM_EVAL_LEDOn(LED4);
- 364:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
- 365:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
- 366:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 367:src/main.c    ****                 }
- 368:src/main.c    ****                 if ((int)x > G)
- 369:src/main.c    ****                 {
- 370:src/main.c    ****                     STM_EVAL_LEDOn(LED5);
- 371:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 372:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
- 373:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 374:src/main.c    ****                 }
- 375:src/main.c    ****                 if ((int)y > G)
- 376:src/main.c    ****                 {
- 377:src/main.c    ****                     STM_EVAL_LEDOn(LED3);
- 378:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
- 379:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 380:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 381:src/main.c    ****                 }
- 382:src/main.c    ****                 if ((int)y < -G)
- 383:src/main.c    ****                 {
- 384:src/main.c    ****                     STM_EVAL_LEDOn(LED6);
- 385:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
- 386:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 387:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
- 388:src/main.c    ****                 }
- 389:src/main.c    ****                 counter = 0x00;
- 390:src/main.c    **** 
- 391:src/main.c    **** 	    }
- 392:src/main.c    **** 	  }
- 393:src/main.c    **** 	}
- 2604              		.loc 2 393 0
- 2605 0138 00BF     		nop
- 2606              	.L145:
- 328:src/main.c    **** 		counter++;
- 2607              		.loc 2 328 0
- 2608 013a 97F84730 		ldrb	r3, [r7, #71]
- 2609 013e 03F10103 		add	r3, r3, #1
- 2610 0142 87F84730 		strb	r3, [r7, #71]
- 329:src/main.c    **** 		if (counter == 10)
- 2611              		.loc 2 329 0
- 2612 0146 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
- 2613 014a 0A2B     		cmp	r3, #10
- 2614 014c F4D1     		bne	.L146
- 332:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
- 2615              		.loc 2 332 0
- 2616 014e 07F12803 		add	r3, r7, #40
- 2617 0152 1846     		mov	r0, r3
- 2618 0154 4FF02901 		mov	r1, #41
- 2619 0158 4FF00102 		mov	r2, #1
- 2620 015c FFF7FEFF 		bl	LIS3DSH_Read
- 333:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
- 2621              		.loc 2 333 0
- 2622 0160 07F12403 		add	r3, r7, #36
- 2623 0164 1846     		mov	r0, r3
- 2624 0166 4FF02B01 		mov	r1, #43
- 2625 016a 4FF00102 		mov	r2, #1
- 2626 016e FFF7FEFF 		bl	LIS3DSH_Read
- 334:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
- 2627              		.loc 2 334 0
- 2628 0172 07F12003 		add	r3, r7, #32
- 2629 0176 1846     		mov	r0, r3
- 2630 0178 4FF02D01 		mov	r1, #45
- 2631 017c 4FF00102 		mov	r2, #1
- 2632 0180 FFF7FEFF 		bl	LIS3DSH_Read
- 335:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
- 2633              		.loc 2 335 0
- 2634 0184 07F11C03 		add	r3, r7, #28
- 2635 0188 1846     		mov	r0, r3
- 2636 018a 4FF02801 		mov	r1, #40
- 2637 018e 4FF00102 		mov	r2, #1
- 2638 0192 FFF7FEFF 		bl	LIS3DSH_Read
- 336:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
- 2639              		.loc 2 336 0
- 2640 0196 07F11803 		add	r3, r7, #24
- 2641 019a 1846     		mov	r0, r3
- 2642 019c 4FF02A01 		mov	r1, #42
- 2643 01a0 4FF00102 		mov	r2, #1
- 2644 01a4 FFF7FEFF 		bl	LIS3DSH_Read
- 337:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
- 2645              		.loc 2 337 0
- 2646 01a8 07F11403 		add	r3, r7, #20
- 2647 01ac 1846     		mov	r0, r3
- 2648 01ae 4FF02C01 		mov	r1, #44
- 2649 01b2 4FF00102 		mov	r2, #1
- 2650 01b6 FFF7FEFF 		bl	LIS3DSH_Read
- 341:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
- 2651              		.loc 2 341 0
- 2652 01ba 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
- 2653 01be 4FEA0323 		lsl	r3, r3, #8
- 2654 01c2 9AB2     		uxth	r2, r3
- 2655 01c4 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
- 2656 01c6 1343     		orrs	r3, r3, r2
- 2657 01c8 FB87     		strh	r3, [r7, #62]	@ movhi
- 342:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
- 2658              		.loc 2 342 0
- 2659 01ca 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
- 2660 01ce 4FEA0323 		lsl	r3, r3, #8
- 2661 01d2 9AB2     		uxth	r2, r3
- 2662 01d4 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
- 2663 01d6 1343     		orrs	r3, r3, r2
- 2664 01d8 BB87     		strh	r3, [r7, #60]	@ movhi
- 343:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
- 2665              		.loc 2 343 0
- 2666 01da 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
- 2667 01de 4FEA0323 		lsl	r3, r3, #8
- 2668 01e2 9AB2     		uxth	r2, r3
- 2669 01e4 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
- 2670 01e6 1343     		orrs	r3, r3, r2
- 2671 01e8 7B87     		strh	r3, [r7, #58]	@ movhi
- 345:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
- 2672              		.loc 2 345 0
- 2673 01ea B7F93E30 		ldrsh	r3, [r7, #62]
- 2674 01ee 07EE903A 		fmsr	s15, r3	@ int
- 2675 01f2 B8EEE77A 		fsitos	s14, s15
- 2676 01f6 5FED327A 		flds	s15, .L147
- 2677 01fa 67EE277A 		fmuls	s15, s14, s15
- 2678 01fe 1FED337A 		flds	s14, .L147+4
- 2679 0202 C7EE877A 		fdivs	s15, s15, s14
- 2680 0206 C7ED0D7A 		fsts	s15, [r7, #52]
- 346:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
- 2681              		.loc 2 346 0
- 2682 020a B7F93C30 		ldrsh	r3, [r7, #60]
- 2683 020e 07EE903A 		fmsr	s15, r3	@ int
- 2684 0212 B8EEE77A 		fsitos	s14, s15
- 2685 0216 5FED3A7A 		flds	s15, .L147
- 2686 021a 67EE277A 		fmuls	s15, s14, s15
- 2687 021e 1FED3B7A 		flds	s14, .L147+4
- 2688 0222 C7EE877A 		fdivs	s15, s15, s14
- 2689 0226 C7ED0C7A 		fsts	s15, [r7, #48]
- 347:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
- 2690              		.loc 2 347 0
- 2691 022a B7F93A30 		ldrsh	r3, [r7, #58]
- 2692 022e 07EE903A 		fmsr	s15, r3	@ int
- 2693 0232 B8EEE77A 		fsitos	s14, s15
- 2694 0236 5FED427A 		flds	s15, .L147
- 2695 023a 67EE277A 		fmuls	s15, s14, s15
- 2696 023e 1FED437A 		flds	s14, .L147+4
- 2697 0242 C7EE877A 		fdivs	s15, s15, s14
- 2698 0246 C7ED0B7A 		fsts	s15, [r7, #44]
- 350:src/main.c    **** 	    x -= XOffset;
- 2699              		.loc 2 350 0
- 2700 024a D7ED047A 		flds	s15, [r7, #16]
- 2701 024e 97ED0D7A 		flds	s14, [r7, #52]
- 2702 0252 77EE677A 		fsubs	s15, s14, s15
- 2703 0256 C7ED0D7A 		fsts	s15, [r7, #52]
- 351:src/main.c    **** 	    y -= YOffset;
- 2704              		.loc 2 351 0
- 2705 025a D7ED037A 		flds	s15, [r7, #12]
- 2706 025e 97ED0C7A 		flds	s14, [r7, #48]
- 2707 0262 77EE677A 		fsubs	s15, s14, s15
- 2708 0266 C7ED0C7A 		fsts	s15, [r7, #48]
- 352:src/main.c    **** 	    z -= ZOffset;
- 2709              		.loc 2 352 0
- 2710 026a D7ED027A 		flds	s15, [r7, #8]
- 2711 026e 97ED0B7A 		flds	s14, [r7, #44]
- 2712 0272 77EE677A 		fsubs	s15, s14, s15
- 2713 0276 C7ED0B7A 		fsts	s15, [r7, #44]
- 359:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
- 2714              		.loc 2 359 0
- 2715 027a D7ED0D7A 		flds	s15, [r7, #52]
- 2716 027e FDEEE77A 		ftosizs	s15, s15
- 2717 0282 17EE903A 		fmrs	r3, s15	@ int
- 2718 0286 002B     		cmp	r3, #0
- 2719 0288 08D1     		bne	.L132
- 359:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
- 2720              		.loc 2 359 0 is_stmt 0 discriminator 1
- 2721 028a D7ED0C7A 		flds	s15, [r7, #48]
- 2722 028e FDEEE77A 		ftosizs	s15, s15
- 2723 0292 17EE903A 		fmrs	r3, s15	@ int
- 2724 0296 002B     		cmp	r3, #0
- 2725 0298 3FF44EAF 		beq	.L146
- 2726              	.L132:
- 361:src/main.c    ****                 if ((int)x < -G)
- 2727              		.loc 2 361 0 is_stmt 1
- 2728 029c D7ED0D7A 		flds	s15, [r7, #52]
- 2729 02a0 FDEEE77A 		ftosizs	s15, s15
- 2730 02a4 17EE903A 		fmrs	r3, s15	@ int
- 2731 02a8 13F1020F 		cmn	r3, #2
- 2732 02ac 28DA     		bge	.L133
- 363:src/main.c    ****                     STM_EVAL_LEDOn(LED4);
- 2733              		.loc 2 363 0
- 2734 02ae 4FF00000 		mov	r0, #0
- 2735 02b2 FFF7FEFF 		bl	STM_EVAL_LEDOn
- 364:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
- 2736              		.loc 2 364 0
- 2737 02b6 D7ED0D7A 		flds	s15, [r7, #52]
- 2738 02ba FDEEE77A 		ftosizs	s15, s15
- 2739 02be 17EE903A 		fmrs	r3, s15	@ int
- 2740 02c2 022B     		cmp	r3, #2
- 2741 02c4 03DC     		bgt	.L134
- 364:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
- 2742              		.loc 2 364 0 is_stmt 0 discriminator 1
- 2743 02c6 4FF00100 		mov	r0, #1
- 2744 02ca FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2745              	.L134:
- 365:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
- 2746              		.loc 2 365 0 is_stmt 1
- 2747 02ce D7ED0C7A 		flds	s15, [r7, #48]
- 2748 02d2 FDEEE77A 		ftosizs	s15, s15
- 2749 02d6 17EE903A 		fmrs	r3, s15	@ int
- 2750 02da 022B     		cmp	r3, #2
- 2751 02dc 03DC     		bgt	.L135
- 365:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
- 2752              		.loc 2 365 0 is_stmt 0 discriminator 1
- 2753 02de 4FF00300 		mov	r0, #3
- 2754 02e2 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2755              	.L135:
- 366:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 2756              		.loc 2 366 0 is_stmt 1
- 2757 02e6 D7ED0C7A 		flds	s15, [r7, #48]
- 2758 02ea FDEEE77A 		ftosizs	s15, s15
- 2759 02ee 17EE903A 		fmrs	r3, s15	@ int
- 2760 02f2 13F1020F 		cmn	r3, #2
- 2761 02f6 03DB     		blt	.L133
- 366:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 2762              		.loc 2 366 0 is_stmt 0 discriminator 1
- 2763 02f8 4FF00200 		mov	r0, #2
- 2764 02fc FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2765              	.L133:
- 368:src/main.c    ****                 if ((int)x > G)
- 2766              		.loc 2 368 0 is_stmt 1
- 2767 0300 D7ED0D7A 		flds	s15, [r7, #52]
- 2768 0304 FDEEE77A 		ftosizs	s15, s15
- 2769 0308 17EE903A 		fmrs	r3, s15	@ int
- 2770 030c 022B     		cmp	r3, #2
- 2771 030e 29DD     		ble	.L136
- 370:src/main.c    ****                     STM_EVAL_LEDOn(LED5);
- 2772              		.loc 2 370 0
- 2773 0310 4FF00200 		mov	r0, #2
- 2774 0314 FFF7FEFF 		bl	STM_EVAL_LEDOn
- 371:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 2775              		.loc 2 371 0
- 2776 0318 D7ED0C7A 		flds	s15, [r7, #48]
- 2777 031c FDEEE77A 		ftosizs	s15, s15
- 2778 0320 17EE903A 		fmrs	r3, s15	@ int
- 2779 0324 022B     		cmp	r3, #2
- 2780 0326 03DC     		bgt	.L137
- 371:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 2781              		.loc 2 371 0 is_stmt 0 discriminator 1
- 2782 0328 4FF00000 		mov	r0, #0
- 2783 032c FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2784              	.L137:
- 372:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
- 2785              		.loc 2 372 0 is_stmt 1
- 2786 0330 D7ED0C7A 		flds	s15, [r7, #48]
- 2787 0334 FDEEE77A 		ftosizs	s15, s15
- 2788 0338 17EE903A 		fmrs	r3, s15	@ int
- 2789 033c 13F1020F 		cmn	r3, #2
- 2790 0340 03DB     		blt	.L138
- 372:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
- 2791              		.loc 2 372 0 is_stmt 0 discriminator 1
- 2792 0342 4FF00100 		mov	r0, #1
- 2793 0346 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2794              	.L138:
- 373:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 2795              		.loc 2 373 0 is_stmt 1
- 2796 034a D7ED0D7A 		flds	s15, [r7, #52]
- 2797 034e FDEEE77A 		ftosizs	s15, s15
- 2798 0352 17EE903A 		fmrs	r3, s15	@ int
- 2799 0356 13F1020F 		cmn	r3, #2
- 2800 035a 03DB     		blt	.L136
- 373:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 2801              		.loc 2 373 0 is_stmt 0 discriminator 1
- 2802 035c 4FF00300 		mov	r0, #3
- 2803 0360 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2804              	.L136:
- 375:src/main.c    ****                 if ((int)y > G)
- 2805              		.loc 2 375 0 is_stmt 1
- 2806 0364 D7ED0C7A 		flds	s15, [r7, #48]
- 2807 0368 FDEEE77A 		ftosizs	s15, s15
- 2808 036c 17EE903A 		fmrs	r3, s15	@ int
- 2809 0370 022B     		cmp	r3, #2
- 2810 0372 29DD     		ble	.L139
- 377:src/main.c    ****                     STM_EVAL_LEDOn(LED3);
- 2811              		.loc 2 377 0
- 2812 0374 4FF00100 		mov	r0, #1
- 2813 0378 FFF7FEFF 		bl	STM_EVAL_LEDOn
- 378:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
- 2814              		.loc 2 378 0
- 2815 037c D7ED0D7A 		flds	s15, [r7, #52]
- 2816 0380 FDEEE77A 		ftosizs	s15, s15
- 2817 0384 17EE903A 		fmrs	r3, s15	@ int
- 2818 0388 022B     		cmp	r3, #2
- 2819 038a 03DC     		bgt	.L140
- 378:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
- 2820              		.loc 2 378 0 is_stmt 0 discriminator 1
- 2821 038c 4FF00000 		mov	r0, #0
- 2822 0390 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2823              	.L140:
- 379:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 2824              		.loc 2 379 0 is_stmt 1
- 2825 0394 D7ED0C7A 		flds	s15, [r7, #48]
- 2826 0398 FDEEE77A 		ftosizs	s15, s15
- 2827 039c 17EE903A 		fmrs	r3, s15	@ int
- 2828 03a0 13F1020F 		cmn	r3, #2
- 2829 03a4 03DB     		blt	.L141
- 379:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
- 2830              		.loc 2 379 0 is_stmt 0 discriminator 1
- 2831 03a6 4FF00200 		mov	r0, #2
- 2832 03aa FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2833              	.L141:
- 380:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 2834              		.loc 2 380 0 is_stmt 1
- 2835 03ae D7ED0D7A 		flds	s15, [r7, #52]
- 2836 03b2 FDEEE77A 		ftosizs	s15, s15
- 2837 03b6 17EE903A 		fmrs	r3, s15	@ int
- 2838 03ba 13F1020F 		cmn	r3, #2
- 2839 03be 03DB     		blt	.L139
- 380:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
- 2840              		.loc 2 380 0 is_stmt 0 discriminator 1
- 2841 03c0 4FF00300 		mov	r0, #3
- 2842 03c4 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2843              	.L139:
- 382:src/main.c    ****                 if ((int)y < -G)
- 2844              		.loc 2 382 0 is_stmt 1
- 2845 03c8 D7ED0C7A 		flds	s15, [r7, #48]
- 2846 03cc FDEEE77A 		ftosizs	s15, s15
- 2847 03d0 17EE903A 		fmrs	r3, s15	@ int
- 2848 03d4 13F1020F 		cmn	r3, #2
- 2849 03d8 28DA     		bge	.L142
- 384:src/main.c    ****                     STM_EVAL_LEDOn(LED6);
- 2850              		.loc 2 384 0
- 2851 03da 4FF00300 		mov	r0, #3
- 2852 03de FFF7FEFF 		bl	STM_EVAL_LEDOn
- 385:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
- 2853              		.loc 2 385 0
- 2854 03e2 D7ED0D7A 		flds	s15, [r7, #52]
- 2855 03e6 FDEEE77A 		ftosizs	s15, s15
- 2856 03ea 17EE903A 		fmrs	r3, s15	@ int
- 2857 03ee 022B     		cmp	r3, #2
- 2858 03f0 03DC     		bgt	.L143
- 385:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
- 2859              		.loc 2 385 0 is_stmt 0 discriminator 1
- 2860 03f2 4FF00100 		mov	r0, #1
- 2861 03f6 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2862              	.L143:
- 386:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 2863              		.loc 2 386 0 is_stmt 1
- 2864 03fa D7ED0C7A 		flds	s15, [r7, #48]
- 2865 03fe FDEEE77A 		ftosizs	s15, s15
- 2866 0402 17EE903A 		fmrs	r3, s15	@ int
- 2867 0406 022B     		cmp	r3, #2
- 2868 0408 03DC     		bgt	.L144
- 386:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
- 2869              		.loc 2 386 0 is_stmt 0 discriminator 1
- 2870 040a 4FF00000 		mov	r0, #0
- 2871 040e FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2872              	.L144:
- 387:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
- 2873              		.loc 2 387 0 is_stmt 1
- 2874 0412 D7ED0D7A 		flds	s15, [r7, #52]
- 2875 0416 FDEEE77A 		ftosizs	s15, s15
- 2876 041a 17EE903A 		fmrs	r3, s15	@ int
- 2877 041e 13F1020F 		cmn	r3, #2
- 2878 0422 03DB     		blt	.L142
- 387:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
- 2879              		.loc 2 387 0 is_stmt 0 discriminator 1
- 2880 0424 4FF00200 		mov	r0, #2
- 2881 0428 FFF7FEFF 		bl	STM_EVAL_LEDOff
- 2882              	.L142:
- 389:src/main.c    ****                 counter = 0x00;
- 2883              		.loc 2 389 0 is_stmt 1
- 2884 042c 4FF00003 		mov	r3, #0
- 2885 0430 87F84730 		strb	r3, [r7, #71]
- 2886              		.loc 2 393 0
- 2887 0434 80E6     		b	.L146
- 2888              		.cfi_endproc
- 2889              	.LFE135:
- 2891 0436 00BF     		.section	.text.vApplicationIdleHook,"ax",%progbits
- 2892              		.align	2
- 2893              		.global	vApplicationIdleHook
- 2894              		.thumb
- 2895              		.thumb_func
- 2897              	vApplicationIdleHook:
- 2898              	.LFB136:
- 394:src/main.c    **** }
- 395:src/main.c    **** 
- 396:src/main.c    **** /*-----------------------------------------------------------*/
- 397:src/main.c    **** 
- 398:src/main.c    **** 
+ 349:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
+ 350:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
+ 351:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
+ 352:src/main.c    **** 
+ 353:src/main.c    ****             
+ 354:src/main.c    **** 	    x -= XOffset;
+ 355:src/main.c    **** 	    y -= YOffset;
+ 356:src/main.c    **** 	    z -= ZOffset;
+ 357:src/main.c    **** 		  
+ 358:src/main.c    **** 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
+ 359:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (i
+ 360:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", x, y, z);
+ 361:src/main.c    **** 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int)x, (int)y, (int)z);
+ 362:src/main.c    **** 		
+ 363:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
+ 364:src/main.c    **** 		{
+ 365:src/main.c    ****                 if ((int)x < -G)
+ 366:src/main.c    ****                 {
+ 367:src/main.c    ****                     STM_EVAL_LEDOn(LED4);
+ 368:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
+ 369:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
+ 370:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 371:src/main.c    ****                 }
+ 372:src/main.c    ****                 if ((int)x > G)
+ 373:src/main.c    ****                 {
+ 374:src/main.c    ****                     STM_EVAL_LEDOn(LED5);
+ 375:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 376:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
+ 377:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 378:src/main.c    ****                 }
+ 379:src/main.c    ****                 if ((int)y > G)
+ 380:src/main.c    ****                 {
+ 381:src/main.c    ****                     STM_EVAL_LEDOn(LED3);
+ 382:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
+ 383:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 384:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 385:src/main.c    ****                 }
+ 386:src/main.c    ****                 if ((int)y < -G)
+ 387:src/main.c    ****                 {
+ 388:src/main.c    ****                     STM_EVAL_LEDOn(LED6);
+ 389:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
+ 390:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 391:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
+ 392:src/main.c    ****                 }
+ 393:src/main.c    ****                 counter = 0x00;
+ 394:src/main.c    **** 
+ 395:src/main.c    **** 	    }
+ 396:src/main.c    **** 	  }
+ 397:src/main.c    **** 	}
+ 2611              		.loc 2 397 0
+ 2612 0138 00BF     		nop
+ 2613              	.L145:
+ 332:src/main.c    **** 		counter++;
+ 2614              		.loc 2 332 0
+ 2615 013a 97F84730 		ldrb	r3, [r7, #71]
+ 2616 013e 03F10103 		add	r3, r3, #1
+ 2617 0142 87F84730 		strb	r3, [r7, #71]
+ 333:src/main.c    **** 		if (counter == 10)
+ 2618              		.loc 2 333 0
+ 2619 0146 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
+ 2620 014a 0A2B     		cmp	r3, #10
+ 2621 014c F4D1     		bne	.L146
+ 336:src/main.c    ****   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+ 2622              		.loc 2 336 0
+ 2623 014e 07F12803 		add	r3, r7, #40
+ 2624 0152 1846     		mov	r0, r3
+ 2625 0154 4FF02901 		mov	r1, #41
+ 2626 0158 4FF00102 		mov	r2, #1
+ 2627 015c FFF7FEFF 		bl	LIS3DSH_Read
+ 337:src/main.c    **** 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+ 2628              		.loc 2 337 0
+ 2629 0160 07F12403 		add	r3, r7, #36
+ 2630 0164 1846     		mov	r0, r3
+ 2631 0166 4FF02B01 		mov	r1, #43
+ 2632 016a 4FF00102 		mov	r2, #1
+ 2633 016e FFF7FEFF 		bl	LIS3DSH_Read
+ 338:src/main.c    **** 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+ 2634              		.loc 2 338 0
+ 2635 0172 07F12003 		add	r3, r7, #32
+ 2636 0176 1846     		mov	r0, r3
+ 2637 0178 4FF02D01 		mov	r1, #45
+ 2638 017c 4FF00102 		mov	r2, #1
+ 2639 0180 FFF7FEFF 		bl	LIS3DSH_Read
+ 339:src/main.c    ****   		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+ 2640              		.loc 2 339 0
+ 2641 0184 07F11C03 		add	r3, r7, #28
+ 2642 0188 1846     		mov	r0, r3
+ 2643 018a 4FF02801 		mov	r1, #40
+ 2644 018e 4FF00102 		mov	r2, #1
+ 2645 0192 FFF7FEFF 		bl	LIS3DSH_Read
+ 340:src/main.c    **** 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+ 2646              		.loc 2 340 0
+ 2647 0196 07F11803 		add	r3, r7, #24
+ 2648 019a 1846     		mov	r0, r3
+ 2649 019c 4FF02A01 		mov	r1, #42
+ 2650 01a0 4FF00102 		mov	r2, #1
+ 2651 01a4 FFF7FEFF 		bl	LIS3DSH_Read
+ 341:src/main.c    **** 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+ 2652              		.loc 2 341 0
+ 2653 01a8 07F11403 		add	r3, r7, #20
+ 2654 01ac 1846     		mov	r0, r3
+ 2655 01ae 4FF02C01 		mov	r1, #44
+ 2656 01b2 4FF00102 		mov	r2, #1
+ 2657 01b6 FFF7FEFF 		bl	LIS3DSH_Read
+ 345:src/main.c    **** 	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+ 2658              		.loc 2 345 0
+ 2659 01ba 97F82830 		ldrb	r3, [r7, #40]	@ zero_extendqisi2
+ 2660 01be 4FEA0323 		lsl	r3, r3, #8
+ 2661 01c2 9AB2     		uxth	r2, r3
+ 2662 01c4 3B7F     		ldrb	r3, [r7, #28]	@ zero_extendqisi2
+ 2663 01c6 1343     		orrs	r3, r3, r2
+ 2664 01c8 FB87     		strh	r3, [r7, #62]	@ movhi
+ 346:src/main.c    **** 	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+ 2665              		.loc 2 346 0
+ 2666 01ca 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 2667 01ce 4FEA0323 		lsl	r3, r3, #8
+ 2668 01d2 9AB2     		uxth	r2, r3
+ 2669 01d4 3B7E     		ldrb	r3, [r7, #24]	@ zero_extendqisi2
+ 2670 01d6 1343     		orrs	r3, r3, r2
+ 2671 01d8 BB87     		strh	r3, [r7, #60]	@ movhi
+ 347:src/main.c    **** 	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+ 2672              		.loc 2 347 0
+ 2673 01da 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 2674 01de 4FEA0323 		lsl	r3, r3, #8
+ 2675 01e2 9AB2     		uxth	r2, r3
+ 2676 01e4 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 2677 01e6 1343     		orrs	r3, r3, r2
+ 2678 01e8 7B87     		strh	r3, [r7, #58]	@ movhi
+ 349:src/main.c    **** 		x = ((float)temp4)*9.8 / 16000;
+ 2679              		.loc 2 349 0
+ 2680 01ea B7F93E30 		ldrsh	r3, [r7, #62]
+ 2681 01ee 07EE903A 		fmsr	s15, r3	@ int
+ 2682 01f2 B8EEE77A 		fsitos	s14, s15
+ 2683 01f6 5FED327A 		flds	s15, .L147
+ 2684 01fa 67EE277A 		fmuls	s15, s14, s15
+ 2685 01fe 1FED337A 		flds	s14, .L147+4
+ 2686 0202 C7EE877A 		fdivs	s15, s15, s14
+ 2687 0206 C7ED0D7A 		fsts	s15, [r7, #52]
+ 350:src/main.c    **** 		y = ((float)temp5)*9.8 / 16000;
+ 2688              		.loc 2 350 0
+ 2689 020a B7F93C30 		ldrsh	r3, [r7, #60]
+ 2690 020e 07EE903A 		fmsr	s15, r3	@ int
+ 2691 0212 B8EEE77A 		fsitos	s14, s15
+ 2692 0216 5FED3A7A 		flds	s15, .L147
+ 2693 021a 67EE277A 		fmuls	s15, s14, s15
+ 2694 021e 1FED3B7A 		flds	s14, .L147+4
+ 2695 0222 C7EE877A 		fdivs	s15, s15, s14
+ 2696 0226 C7ED0C7A 		fsts	s15, [r7, #48]
+ 351:src/main.c    **** 		z = ((float)temp6)*9.8 / 16000;
+ 2697              		.loc 2 351 0
+ 2698 022a B7F93A30 		ldrsh	r3, [r7, #58]
+ 2699 022e 07EE903A 		fmsr	s15, r3	@ int
+ 2700 0232 B8EEE77A 		fsitos	s14, s15
+ 2701 0236 5FED427A 		flds	s15, .L147
+ 2702 023a 67EE277A 		fmuls	s15, s14, s15
+ 2703 023e 1FED437A 		flds	s14, .L147+4
+ 2704 0242 C7EE877A 		fdivs	s15, s15, s14
+ 2705 0246 C7ED0B7A 		fsts	s15, [r7, #44]
+ 354:src/main.c    **** 	    x -= XOffset;
+ 2706              		.loc 2 354 0
+ 2707 024a D7ED047A 		flds	s15, [r7, #16]
+ 2708 024e 97ED0D7A 		flds	s14, [r7, #52]
+ 2709 0252 77EE677A 		fsubs	s15, s14, s15
+ 2710 0256 C7ED0D7A 		fsts	s15, [r7, #52]
+ 355:src/main.c    **** 	    y -= YOffset;
+ 2711              		.loc 2 355 0
+ 2712 025a D7ED037A 		flds	s15, [r7, #12]
+ 2713 025e 97ED0C7A 		flds	s14, [r7, #48]
+ 2714 0262 77EE677A 		fsubs	s15, s14, s15
+ 2715 0266 C7ED0C7A 		fsts	s15, [r7, #48]
+ 356:src/main.c    **** 	    z -= ZOffset;
+ 2716              		.loc 2 356 0
+ 2717 026a D7ED027A 		flds	s15, [r7, #8]
+ 2718 026e 97ED0B7A 		flds	s14, [r7, #44]
+ 2719 0272 77EE677A 		fsubs	s15, s14, s15
+ 2720 0276 C7ED0B7A 		fsts	s15, [r7, #44]
+ 363:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
+ 2721              		.loc 2 363 0
+ 2722 027a D7ED0D7A 		flds	s15, [r7, #52]
+ 2723 027e FDEEE77A 		ftosizs	s15, s15
+ 2724 0282 17EE903A 		fmrs	r3, s15	@ int
+ 2725 0286 002B     		cmp	r3, #0
+ 2726 0288 08D1     		bne	.L132
+ 363:src/main.c    **** 		if(((int)x != 0) || ((int)y != 0))
+ 2727              		.loc 2 363 0 is_stmt 0 discriminator 1
+ 2728 028a D7ED0C7A 		flds	s15, [r7, #48]
+ 2729 028e FDEEE77A 		ftosizs	s15, s15
+ 2730 0292 17EE903A 		fmrs	r3, s15	@ int
+ 2731 0296 002B     		cmp	r3, #0
+ 2732 0298 3FF44EAF 		beq	.L146
+ 2733              	.L132:
+ 365:src/main.c    ****                 if ((int)x < -G)
+ 2734              		.loc 2 365 0 is_stmt 1
+ 2735 029c D7ED0D7A 		flds	s15, [r7, #52]
+ 2736 02a0 FDEEE77A 		ftosizs	s15, s15
+ 2737 02a4 17EE903A 		fmrs	r3, s15	@ int
+ 2738 02a8 13F1020F 		cmn	r3, #2
+ 2739 02ac 28DA     		bge	.L133
+ 367:src/main.c    ****                     STM_EVAL_LEDOn(LED4);
+ 2740              		.loc 2 367 0
+ 2741 02ae 4FF00000 		mov	r0, #0
+ 2742 02b2 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 368:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
+ 2743              		.loc 2 368 0
+ 2744 02b6 D7ED0D7A 		flds	s15, [r7, #52]
+ 2745 02ba FDEEE77A 		ftosizs	s15, s15
+ 2746 02be 17EE903A 		fmrs	r3, s15	@ int
+ 2747 02c2 022B     		cmp	r3, #2
+ 2748 02c4 03DC     		bgt	.L134
+ 368:src/main.c    ****                     if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
+ 2749              		.loc 2 368 0 is_stmt 0 discriminator 1
+ 2750 02c6 4FF00100 		mov	r0, #1
+ 2751 02ca FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2752              	.L134:
+ 369:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
+ 2753              		.loc 2 369 0 is_stmt 1
+ 2754 02ce D7ED0C7A 		flds	s15, [r7, #48]
+ 2755 02d2 FDEEE77A 		ftosizs	s15, s15
+ 2756 02d6 17EE903A 		fmrs	r3, s15	@ int
+ 2757 02da 022B     		cmp	r3, #2
+ 2758 02dc 03DC     		bgt	.L135
+ 369:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
+ 2759              		.loc 2 369 0 is_stmt 0 discriminator 1
+ 2760 02de 4FF00300 		mov	r0, #3
+ 2761 02e2 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2762              	.L135:
+ 370:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 2763              		.loc 2 370 0 is_stmt 1
+ 2764 02e6 D7ED0C7A 		flds	s15, [r7, #48]
+ 2765 02ea FDEEE77A 		ftosizs	s15, s15
+ 2766 02ee 17EE903A 		fmrs	r3, s15	@ int
+ 2767 02f2 13F1020F 		cmn	r3, #2
+ 2768 02f6 03DB     		blt	.L133
+ 370:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 2769              		.loc 2 370 0 is_stmt 0 discriminator 1
+ 2770 02f8 4FF00200 		mov	r0, #2
+ 2771 02fc FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2772              	.L133:
+ 372:src/main.c    ****                 if ((int)x > G)
+ 2773              		.loc 2 372 0 is_stmt 1
+ 2774 0300 D7ED0D7A 		flds	s15, [r7, #52]
+ 2775 0304 FDEEE77A 		ftosizs	s15, s15
+ 2776 0308 17EE903A 		fmrs	r3, s15	@ int
+ 2777 030c 022B     		cmp	r3, #2
+ 2778 030e 29DD     		ble	.L136
+ 374:src/main.c    ****                     STM_EVAL_LEDOn(LED5);
+ 2779              		.loc 2 374 0
+ 2780 0310 4FF00200 		mov	r0, #2
+ 2781 0314 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 375:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 2782              		.loc 2 375 0
+ 2783 0318 D7ED0C7A 		flds	s15, [r7, #48]
+ 2784 031c FDEEE77A 		ftosizs	s15, s15
+ 2785 0320 17EE903A 		fmrs	r3, s15	@ int
+ 2786 0324 022B     		cmp	r3, #2
+ 2787 0326 03DC     		bgt	.L137
+ 375:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 2788              		.loc 2 375 0 is_stmt 0 discriminator 1
+ 2789 0328 4FF00000 		mov	r0, #0
+ 2790 032c FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2791              	.L137:
+ 376:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
+ 2792              		.loc 2 376 0 is_stmt 1
+ 2793 0330 D7ED0C7A 		flds	s15, [r7, #48]
+ 2794 0334 FDEEE77A 		ftosizs	s15, s15
+ 2795 0338 17EE903A 		fmrs	r3, s15	@ int
+ 2796 033c 13F1020F 		cmn	r3, #2
+ 2797 0340 03DB     		blt	.L138
+ 376:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
+ 2798              		.loc 2 376 0 is_stmt 0 discriminator 1
+ 2799 0342 4FF00100 		mov	r0, #1
+ 2800 0346 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2801              	.L138:
+ 377:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 2802              		.loc 2 377 0 is_stmt 1
+ 2803 034a D7ED0D7A 		flds	s15, [r7, #52]
+ 2804 034e FDEEE77A 		ftosizs	s15, s15
+ 2805 0352 17EE903A 		fmrs	r3, s15	@ int
+ 2806 0356 13F1020F 		cmn	r3, #2
+ 2807 035a 03DB     		blt	.L136
+ 377:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 2808              		.loc 2 377 0 is_stmt 0 discriminator 1
+ 2809 035c 4FF00300 		mov	r0, #3
+ 2810 0360 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2811              	.L136:
+ 379:src/main.c    ****                 if ((int)y > G)
+ 2812              		.loc 2 379 0 is_stmt 1
+ 2813 0364 D7ED0C7A 		flds	s15, [r7, #48]
+ 2814 0368 FDEEE77A 		ftosizs	s15, s15
+ 2815 036c 17EE903A 		fmrs	r3, s15	@ int
+ 2816 0370 022B     		cmp	r3, #2
+ 2817 0372 29DD     		ble	.L139
+ 381:src/main.c    ****                     STM_EVAL_LEDOn(LED3);
+ 2818              		.loc 2 381 0
+ 2819 0374 4FF00100 		mov	r0, #1
+ 2820 0378 FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 382:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
+ 2821              		.loc 2 382 0
+ 2822 037c D7ED0D7A 		flds	s15, [r7, #52]
+ 2823 0380 FDEEE77A 		ftosizs	s15, s15
+ 2824 0384 17EE903A 		fmrs	r3, s15	@ int
+ 2825 0388 022B     		cmp	r3, #2
+ 2826 038a 03DC     		bgt	.L140
+ 382:src/main.c    ****                     if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
+ 2827              		.loc 2 382 0 is_stmt 0 discriminator 1
+ 2828 038c 4FF00000 		mov	r0, #0
+ 2829 0390 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2830              	.L140:
+ 383:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 2831              		.loc 2 383 0 is_stmt 1
+ 2832 0394 D7ED0C7A 		flds	s15, [r7, #48]
+ 2833 0398 FDEEE77A 		ftosizs	s15, s15
+ 2834 039c 17EE903A 		fmrs	r3, s15	@ int
+ 2835 03a0 13F1020F 		cmn	r3, #2
+ 2836 03a4 03DB     		blt	.L141
+ 383:src/main.c    ****                     if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
+ 2837              		.loc 2 383 0 is_stmt 0 discriminator 1
+ 2838 03a6 4FF00200 		mov	r0, #2
+ 2839 03aa FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2840              	.L141:
+ 384:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 2841              		.loc 2 384 0 is_stmt 1
+ 2842 03ae D7ED0D7A 		flds	s15, [r7, #52]
+ 2843 03b2 FDEEE77A 		ftosizs	s15, s15
+ 2844 03b6 17EE903A 		fmrs	r3, s15	@ int
+ 2845 03ba 13F1020F 		cmn	r3, #2
+ 2846 03be 03DB     		blt	.L139
+ 384:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
+ 2847              		.loc 2 384 0 is_stmt 0 discriminator 1
+ 2848 03c0 4FF00300 		mov	r0, #3
+ 2849 03c4 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2850              	.L139:
+ 386:src/main.c    ****                 if ((int)y < -G)
+ 2851              		.loc 2 386 0 is_stmt 1
+ 2852 03c8 D7ED0C7A 		flds	s15, [r7, #48]
+ 2853 03cc FDEEE77A 		ftosizs	s15, s15
+ 2854 03d0 17EE903A 		fmrs	r3, s15	@ int
+ 2855 03d4 13F1020F 		cmn	r3, #2
+ 2856 03d8 28DA     		bge	.L142
+ 388:src/main.c    ****                     STM_EVAL_LEDOn(LED6);
+ 2857              		.loc 2 388 0
+ 2858 03da 4FF00300 		mov	r0, #3
+ 2859 03de FFF7FEFF 		bl	STM_EVAL_LEDOn
+ 389:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
+ 2860              		.loc 2 389 0
+ 2861 03e2 D7ED0D7A 		flds	s15, [r7, #52]
+ 2862 03e6 FDEEE77A 		ftosizs	s15, s15
+ 2863 03ea 17EE903A 		fmrs	r3, s15	@ int
+ 2864 03ee 022B     		cmp	r3, #2
+ 2865 03f0 03DC     		bgt	.L143
+ 389:src/main.c    **** 				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
+ 2866              		.loc 2 389 0 is_stmt 0 discriminator 1
+ 2867 03f2 4FF00100 		mov	r0, #1
+ 2868 03f6 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2869              	.L143:
+ 390:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 2870              		.loc 2 390 0 is_stmt 1
+ 2871 03fa D7ED0C7A 		flds	s15, [r7, #48]
+ 2872 03fe FDEEE77A 		ftosizs	s15, s15
+ 2873 0402 17EE903A 		fmrs	r3, s15	@ int
+ 2874 0406 022B     		cmp	r3, #2
+ 2875 0408 03DC     		bgt	.L144
+ 390:src/main.c    ****                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
+ 2876              		.loc 2 390 0 is_stmt 0 discriminator 1
+ 2877 040a 4FF00000 		mov	r0, #0
+ 2878 040e FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2879              	.L144:
+ 391:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
+ 2880              		.loc 2 391 0 is_stmt 1
+ 2881 0412 D7ED0D7A 		flds	s15, [r7, #52]
+ 2882 0416 FDEEE77A 		ftosizs	s15, s15
+ 2883 041a 17EE903A 		fmrs	r3, s15	@ int
+ 2884 041e 13F1020F 		cmn	r3, #2
+ 2885 0422 03DB     		blt	.L142
+ 391:src/main.c    ****                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
+ 2886              		.loc 2 391 0 is_stmt 0 discriminator 1
+ 2887 0424 4FF00200 		mov	r0, #2
+ 2888 0428 FFF7FEFF 		bl	STM_EVAL_LEDOff
+ 2889              	.L142:
+ 393:src/main.c    ****                 counter = 0x00;
+ 2890              		.loc 2 393 0 is_stmt 1
+ 2891 042c 4FF00003 		mov	r3, #0
+ 2892 0430 87F84730 		strb	r3, [r7, #71]
+ 2893              		.loc 2 397 0
+ 2894 0434 80E6     		b	.L146
+ 2895              		.cfi_endproc
+ 2896              	.LFE135:
+ 2898 0436 00BF     		.section	.text.vApplicationIdleHook,"ax",%progbits
+ 2899              		.align	2
+ 2900              		.global	vApplicationIdleHook
+ 2901              		.thumb
+ 2902              		.thumb_func
+ 2904              	vApplicationIdleHook:
+ 2905              	.LFB136:
+ 398:src/main.c    **** }
  399:src/main.c    **** 
- 400:src/main.c    **** // void vSWITCHTask( void *pvParameters )
- 401:src/main.c    **** // {
- 402:src/main.c    **** // 	static int i=0;
- 403:src/main.c    **** // 	for( ;; )
- 404:src/main.c    **** // 	{
- 405:src/main.c    **** // 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
- 406:src/main.c    **** // 		{
- 407:src/main.c    **** // 			i^=1;		//just switch the state if semaphore was given
- 408:src/main.c    **** 
- 409:src/main.c    **** // 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
- 410:src/main.c    **** // 			{
- 411:src/main.c    **** // 				vTaskSuspend(xBALANCE_Task);
- 412:src/main.c    **** // 				TIM_Cmd(TIM4, DISABLE);
- 413:src/main.c    **** // 				vTaskSuspend(xMEMS_Task);
- 414:src/main.c    **** // 				prvLED_Config(GPIO);
- 415:src/main.c    **** // 				vTaskResume(xLED_Tasks[0]);
- 416:src/main.c    **** // 				vTaskResume(xLED_Tasks[1]);
- 417:src/main.c    **** // 				vTaskResume(xLED_Tasks[2]);
- 418:src/main.c    **** // 				vTaskResume(xLED_Tasks[3]);
- 419:src/main.c    **** // 			}
- 420:src/main.c    **** // 			else		//MEMS and BALANCE ready, LED tasks suspended
- 421:src/main.c    **** // 			{
- 422:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[0]);
- 423:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[1]);
- 424:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[2]);
- 425:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[3]);
- 426:src/main.c    **** // 				prvLED_Config(TIMER);
- 427:src/main.c    **** // 				TIM_Cmd(TIM4, ENABLE);
- 428:src/main.c    **** // 				vTaskResume(xBALANCE_Task);
- 429:src/main.c    **** // 				vTaskResume(xMEMS_Task);
- 430:src/main.c    **** // 			}
- 431:src/main.c    **** // 		}
- 432:src/main.c    **** // 		taskYIELD(); 	//task is going to ready state to allow next one to run
- 433:src/main.c    **** // 	}
- 434:src/main.c    **** // }
- 435:src/main.c    **** 
- 436:src/main.c    **** /*-----------------------------------------------------------*/
- 437:src/main.c    **** 
- 438:src/main.c    **** void vApplicationIdleHook( void )
- 439:src/main.c    **** {
- 2899              		.loc 2 439 0
- 2900              		.cfi_startproc
- 2901              		@ args = 0, pretend = 0, frame = 8
- 2902              		@ frame_needed = 1, uses_anonymous_args = 0
- 2903 0000 80B5     		push	{r7, lr}
- 2904              	.LCFI80:
- 2905              		.cfi_def_cfa_offset 8
- 2906              		.cfi_offset 14, -4
- 2907              		.cfi_offset 7, -8
- 2908 0002 82B0     		sub	sp, sp, #8
- 2909              	.LCFI81:
- 2910              		.cfi_def_cfa_offset 16
- 2911 0004 00AF     		add	r7, sp, #0
- 2912              	.LCFI82:
- 2913              		.cfi_def_cfa_register 7
- 440:src/main.c    **** volatile size_t xFreeStackSpace;
+ 400:src/main.c    **** /*-----------------------------------------------------------*/
+ 401:src/main.c    **** 
+ 402:src/main.c    **** 
+ 403:src/main.c    **** 
+ 404:src/main.c    **** // void vSWITCHTask( void *pvParameters )
+ 405:src/main.c    **** // {
+ 406:src/main.c    **** // 	static int i=0;
+ 407:src/main.c    **** // 	for( ;; )
+ 408:src/main.c    **** // 	{
+ 409:src/main.c    **** // 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
+ 410:src/main.c    **** // 		{
+ 411:src/main.c    **** // 			i^=1;		//just switch the state if semaphore was given
+ 412:src/main.c    **** 
+ 413:src/main.c    **** // 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
+ 414:src/main.c    **** // 			{
+ 415:src/main.c    **** // 				vTaskSuspend(xBALANCE_Task);
+ 416:src/main.c    **** // 				TIM_Cmd(TIM4, DISABLE);
+ 417:src/main.c    **** // 				vTaskSuspend(xMEMS_Task);
+ 418:src/main.c    **** // 				prvLED_Config(GPIO);
+ 419:src/main.c    **** // 				vTaskResume(xLED_Tasks[0]);
+ 420:src/main.c    **** // 				vTaskResume(xLED_Tasks[1]);
+ 421:src/main.c    **** // 				vTaskResume(xLED_Tasks[2]);
+ 422:src/main.c    **** // 				vTaskResume(xLED_Tasks[3]);
+ 423:src/main.c    **** // 			}
+ 424:src/main.c    **** // 			else		//MEMS and BALANCE ready, LED tasks suspended
+ 425:src/main.c    **** // 			{
+ 426:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[0]);
+ 427:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[1]);
+ 428:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[2]);
+ 429:src/main.c    **** // 				vTaskSuspend(xLED_Tasks[3]);
+ 430:src/main.c    **** // 				prvLED_Config(TIMER);
+ 431:src/main.c    **** // 				TIM_Cmd(TIM4, ENABLE);
+ 432:src/main.c    **** // 				vTaskResume(xBALANCE_Task);
+ 433:src/main.c    **** // 				vTaskResume(xMEMS_Task);
+ 434:src/main.c    **** // 			}
+ 435:src/main.c    **** // 		}
+ 436:src/main.c    **** // 		taskYIELD(); 	//task is going to ready state to allow next one to run
+ 437:src/main.c    **** // 	}
+ 438:src/main.c    **** // }
+ 439:src/main.c    **** 
+ 440:src/main.c    **** /*-----------------------------------------------------------*/
  441:src/main.c    **** 
- 442:src/main.c    **** 	/* This function is called on each cycle of the idle task.  In this case it
- 443:src/main.c    **** 	does nothing useful, other than report the amout of FreeRTOS heap that 
- 444:src/main.c    **** 	remains unallocated. */
- 445:src/main.c    **** 	xFreeStackSpace = xPortGetFreeHeapSize();
- 2914              		.loc 2 445 0
- 2915 0006 FFF7FEFF 		bl	xPortGetFreeHeapSize
- 2916 000a 0346     		mov	r3, r0
- 2917 000c 7B60     		str	r3, [r7, #4]
- 446:src/main.c    **** 
- 447:src/main.c    **** 	if( xFreeStackSpace > 100 )
- 2918              		.loc 2 447 0
- 2919 000e 7B68     		ldr	r3, [r7, #4]
- 448:src/main.c    **** 	{
- 449:src/main.c    **** 		/* By now, the kernel has allocated everything it is going to, so
- 450:src/main.c    **** 		if there is a lot of heap remaining unallocated then
- 451:src/main.c    **** 		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
- 452:src/main.c    **** 		reduced accordingly. */
- 453:src/main.c    **** 	}
- 454:src/main.c    **** }
- 2920              		.loc 2 454 0
- 2921 0010 07F10807 		add	r7, r7, #8
- 2922 0014 BD46     		mov	sp, r7
- 2923 0016 80BD     		pop	{r7, pc}
- 2924              		.cfi_endproc
- 2925              	.LFE136:
- 2927              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
- 2928              		.align	2
- 2929              		.global	vApplicationMallocFailedHook
- 2930              		.thumb
- 2931              		.thumb_func
- 2933              	vApplicationMallocFailedHook:
- 2934              	.LFB137:
- 455:src/main.c    **** 
- 456:src/main.c    **** /*-----------------------------------------------------------*/
- 457:src/main.c    **** 
- 458:src/main.c    **** void vApplicationMallocFailedHook( void )
- 459:src/main.c    **** {
- 2935              		.loc 2 459 0
- 2936              		.cfi_startproc
- 2937              		@ args = 0, pretend = 0, frame = 0
- 2938              		@ frame_needed = 1, uses_anonymous_args = 0
- 2939              		@ link register save eliminated.
- 2940 0000 80B4     		push	{r7}
- 2941              	.LCFI83:
- 2942              		.cfi_def_cfa_offset 4
- 2943              		.cfi_offset 7, -4
- 2944 0002 00AF     		add	r7, sp, #0
- 2945              	.LCFI84:
- 2946              		.cfi_def_cfa_register 7
- 2947              	.L151:
- 460:src/main.c    **** 	/* Called if a call to pvPortMalloc() fails because there is insufficient
- 461:src/main.c    **** 	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
- 462:src/main.c    **** 	internally by FreeRTOS API functions that create tasks, queues, software 
- 463:src/main.c    **** 	timers, and semaphores.  The size of the FreeRTOS heap is set by the
- 464:src/main.c    **** 	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
- 465:src/main.c    **** 	for( ;; );
- 2948              		.loc 2 465 0 discriminator 1
- 2949 0004 FEE7     		b	.L151
- 2950              		.cfi_endproc
- 2951              	.LFE137:
- 2953 0006 00BF     		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
- 2954              		.align	2
- 2955              		.global	vApplicationStackOverflowHook
- 2956              		.thumb
- 2957              		.thumb_func
- 2959              	vApplicationStackOverflowHook:
- 2960              	.LFB138:
- 466:src/main.c    **** }
- 467:src/main.c    **** /*-----------------------------------------------------------*/
- 468:src/main.c    **** 
- 469:src/main.c    **** void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
- 470:src/main.c    **** {
- 2961              		.loc 2 470 0
- 2962              		.cfi_startproc
- 2963              		@ args = 0, pretend = 0, frame = 8
- 2964              		@ frame_needed = 1, uses_anonymous_args = 0
- 2965              		@ link register save eliminated.
- 2966 0000 80B4     		push	{r7}
- 2967              	.LCFI85:
- 2968              		.cfi_def_cfa_offset 4
- 2969              		.cfi_offset 7, -4
- 2970 0002 83B0     		sub	sp, sp, #12
- 2971              	.LCFI86:
- 2972              		.cfi_def_cfa_offset 16
- 2973 0004 00AF     		add	r7, sp, #0
- 2974              	.LCFI87:
- 2975              		.cfi_def_cfa_register 7
- 2976 0006 7860     		str	r0, [r7, #4]
- 2977 0008 3960     		str	r1, [r7, #0]
- 2978              	.L153:
- 471:src/main.c    **** 	( void ) pcTaskName;
- 472:src/main.c    **** 	( void ) pxTask;
- 473:src/main.c    **** 
- 474:src/main.c    **** 	/* Run time stack overflow checking is performed if
- 475:src/main.c    **** 	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
- 476:src/main.c    **** 	function is called if a stack overflow is detected. */
- 477:src/main.c    **** 	for( ;; );
- 2979              		.loc 2 477 0 discriminator 1
- 2980 000a FEE7     		b	.L153
- 2981              		.cfi_endproc
- 2982              	.LFE138:
- 2984              		.text
- 2985              	.Letext0:
- 2986              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
- 2987              		.file 4 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
- 2988              		.file 5 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
- 2989              		.file 6 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
- 2990              		.file 7 "FreeRTOS/Source/include/task.h"
- 2991              		.file 8 "FreeRTOS/Source/include/queue.h"
- 2992              		.file 9 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stdarg.h"
- 2993              		.file 10 "src/include/stm32f4_discovery.h"
- 2994              		.file 11 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
- 2995              		.file 12 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
- 2996              		.file 13 "libs/CMSIS/Include/core_cm4.h"
- 2997              		.file 14 "<built-in>"
+ 442:src/main.c    **** void vApplicationIdleHook( void )
+ 443:src/main.c    **** {
+ 2906              		.loc 2 443 0
+ 2907              		.cfi_startproc
+ 2908              		@ args = 0, pretend = 0, frame = 8
+ 2909              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2910 0000 80B5     		push	{r7, lr}
+ 2911              	.LCFI80:
+ 2912              		.cfi_def_cfa_offset 8
+ 2913              		.cfi_offset 14, -4
+ 2914              		.cfi_offset 7, -8
+ 2915 0002 82B0     		sub	sp, sp, #8
+ 2916              	.LCFI81:
+ 2917              		.cfi_def_cfa_offset 16
+ 2918 0004 00AF     		add	r7, sp, #0
+ 2919              	.LCFI82:
+ 2920              		.cfi_def_cfa_register 7
+ 444:src/main.c    **** volatile size_t xFreeStackSpace;
+ 445:src/main.c    **** 
+ 446:src/main.c    **** 	/* This function is called on each cycle of the idle task.  In this case it
+ 447:src/main.c    **** 	does nothing useful, other than report the amout of FreeRTOS heap that 
+ 448:src/main.c    **** 	remains unallocated. */
+ 449:src/main.c    **** 	xFreeStackSpace = xPortGetFreeHeapSize();
+ 2921              		.loc 2 449 0
+ 2922 0006 FFF7FEFF 		bl	xPortGetFreeHeapSize
+ 2923 000a 0346     		mov	r3, r0
+ 2924 000c 7B60     		str	r3, [r7, #4]
+ 450:src/main.c    **** 
+ 451:src/main.c    **** 	if( xFreeStackSpace > 100 )
+ 2925              		.loc 2 451 0
+ 2926 000e 7B68     		ldr	r3, [r7, #4]
+ 452:src/main.c    **** 	{
+ 453:src/main.c    **** 		/* By now, the kernel has allocated everything it is going to, so
+ 454:src/main.c    **** 		if there is a lot of heap remaining unallocated then
+ 455:src/main.c    **** 		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
+ 456:src/main.c    **** 		reduced accordingly. */
+ 457:src/main.c    **** 	}
+ 458:src/main.c    **** }
+ 2927              		.loc 2 458 0
+ 2928 0010 07F10807 		add	r7, r7, #8
+ 2929 0014 BD46     		mov	sp, r7
+ 2930 0016 80BD     		pop	{r7, pc}
+ 2931              		.cfi_endproc
+ 2932              	.LFE136:
+ 2934              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
+ 2935              		.align	2
+ 2936              		.global	vApplicationMallocFailedHook
+ 2937              		.thumb
+ 2938              		.thumb_func
+ 2940              	vApplicationMallocFailedHook:
+ 2941              	.LFB137:
+ 459:src/main.c    **** 
+ 460:src/main.c    **** /*-----------------------------------------------------------*/
+ 461:src/main.c    **** 
+ 462:src/main.c    **** void vApplicationMallocFailedHook( void )
+ 463:src/main.c    **** {
+ 2942              		.loc 2 463 0
+ 2943              		.cfi_startproc
+ 2944              		@ args = 0, pretend = 0, frame = 0
+ 2945              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2946              		@ link register save eliminated.
+ 2947 0000 80B4     		push	{r7}
+ 2948              	.LCFI83:
+ 2949              		.cfi_def_cfa_offset 4
+ 2950              		.cfi_offset 7, -4
+ 2951 0002 00AF     		add	r7, sp, #0
+ 2952              	.LCFI84:
+ 2953              		.cfi_def_cfa_register 7
+ 2954              	.L151:
+ 464:src/main.c    **** 	/* Called if a call to pvPortMalloc() fails because there is insufficient
+ 465:src/main.c    **** 	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
+ 466:src/main.c    **** 	internally by FreeRTOS API functions that create tasks, queues, software 
+ 467:src/main.c    **** 	timers, and semaphores.  The size of the FreeRTOS heap is set by the
+ 468:src/main.c    **** 	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+ 469:src/main.c    **** 	for( ;; );
+ 2955              		.loc 2 469 0 discriminator 1
+ 2956 0004 FEE7     		b	.L151
+ 2957              		.cfi_endproc
+ 2958              	.LFE137:
+ 2960 0006 00BF     		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
+ 2961              		.align	2
+ 2962              		.global	vApplicationStackOverflowHook
+ 2963              		.thumb
+ 2964              		.thumb_func
+ 2966              	vApplicationStackOverflowHook:
+ 2967              	.LFB138:
+ 470:src/main.c    **** }
+ 471:src/main.c    **** /*-----------------------------------------------------------*/
+ 472:src/main.c    **** 
+ 473:src/main.c    **** void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
+ 474:src/main.c    **** {
+ 2968              		.loc 2 474 0
+ 2969              		.cfi_startproc
+ 2970              		@ args = 0, pretend = 0, frame = 8
+ 2971              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2972              		@ link register save eliminated.
+ 2973 0000 80B4     		push	{r7}
+ 2974              	.LCFI85:
+ 2975              		.cfi_def_cfa_offset 4
+ 2976              		.cfi_offset 7, -4
+ 2977 0002 83B0     		sub	sp, sp, #12
+ 2978              	.LCFI86:
+ 2979              		.cfi_def_cfa_offset 16
+ 2980 0004 00AF     		add	r7, sp, #0
+ 2981              	.LCFI87:
+ 2982              		.cfi_def_cfa_register 7
+ 2983 0006 7860     		str	r0, [r7, #4]
+ 2984 0008 3960     		str	r1, [r7, #0]
+ 2985              	.L153:
+ 475:src/main.c    **** 	( void ) pcTaskName;
+ 476:src/main.c    **** 	( void ) pxTask;
+ 477:src/main.c    **** 
+ 478:src/main.c    **** 	/* Run time stack overflow checking is performed if
+ 479:src/main.c    **** 	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+ 480:src/main.c    **** 	function is called if a stack overflow is detected. */
+ 481:src/main.c    **** 	for( ;; );
+ 2986              		.loc 2 481 0 discriminator 1
+ 2987 000a FEE7     		b	.L153
+ 2988              		.cfi_endproc
+ 2989              	.LFE138:
+ 2991              		.text
+ 2992              	.Letext0:
+ 2993              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
+ 2994              		.file 4 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
+ 2995              		.file 5 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stddef.h"
+ 2996              		.file 6 "FreeRTOS/Source/include/../../Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 2997              		.file 7 "FreeRTOS/Source/include/task.h"
+ 2998              		.file 8 "FreeRTOS/Source/include/queue.h"
+ 2999              		.file 9 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/include/stdarg.h"
+ 3000              		.file 10 "src/include/stm32f4_discovery.h"
+ 3001              		.file 11 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
+ 3002              		.file 12 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/
+ 3003              		.file 13 "libs/CMSIS/Include/core_cm4.h"
+ 3004              		.file 14 "<built-in>"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
-     /tmp/ccVqyKGm.s:20     .text.memset:00000000 $t
-     /tmp/ccVqyKGm.s:25     .text.memset:00000000 memset
-     /tmp/ccVqyKGm.s:145    .text.memcpy:00000000 $t
-     /tmp/ccVqyKGm.s:150    .text.memcpy:00000000 memcpy
-     /tmp/ccVqyKGm.s:275    .text.strchr:00000000 $t
-     /tmp/ccVqyKGm.s:280    .text.strchr:00000000 strchr
-     /tmp/ccVqyKGm.s:343    .text.strcpy:00000000 $t
-     /tmp/ccVqyKGm.s:348    .text.strcpy:00000000 strcpy
-     /tmp/ccVqyKGm.s:408    .text.strncpy:00000000 $t
-     /tmp/ccVqyKGm.s:413    .text.strncpy:00000000 strncpy
-     /tmp/ccVqyKGm.s:487    .text.strncmp:00000000 $t
-     /tmp/ccVqyKGm.s:492    .text.strncmp:00000000 strncmp
-     /tmp/ccVqyKGm.s:568    .text.atoi:00000000 $t
-     /tmp/ccVqyKGm.s:573    .text.atoi:00000000 atoi
-     /tmp/ccVqyKGm.s:634    .text._toa:00000000 $t
-     /tmp/ccVqyKGm.s:639    .text._toa:00000000 _toa
-     /tmp/ccVqyKGm.s:843    .text.xtoa:00000000 $t
-     /tmp/ccVqyKGm.s:848    .text.xtoa:00000000 xtoa
-     /tmp/ccVqyKGm.s:881    .text.itoa:00000000 $t
-     /tmp/ccVqyKGm.s:886    .text.itoa:00000000 itoa
-     /tmp/ccVqyKGm.s:919    .rodata:00000000 $d
-     /tmp/ccVqyKGm.s:920    .rodata:00000000 .LC0
-     /tmp/ccVqyKGm.s:925    .text.qprintf:00000000 $t
-     /tmp/ccVqyKGm.s:930    .text.qprintf:00000000 qprintf
-     /tmp/ccVqyKGm.s:1211   .text.strlen:00000000 $t
-     /tmp/ccVqyKGm.s:1216   .text.strlen:00000000 strlen
-     /tmp/ccVqyKGm.s:1270   .text.strcat:00000000 $t
-     /tmp/ccVqyKGm.s:1275   .text.strcat:00000000 strcat
-     /tmp/ccVqyKGm.s:1337   .text.puts:00000000 $t
-     /tmp/ccVqyKGm.s:1342   .text.puts:00000000 puts
-     /tmp/ccVqyKGm.s:1387   .text.printf_cb:00000000 $t
-     /tmp/ccVqyKGm.s:1391   .text.printf_cb:00000000 printf_cb
-     /tmp/ccVqyKGm.s:1423   .text.sprintf_cb:00000000 $t
-     /tmp/ccVqyKGm.s:1427   .text.sprintf_cb:00000000 sprintf_cb
-     /tmp/ccVqyKGm.s:1460   .text.base_printf:00000000 $t
-     /tmp/ccVqyKGm.s:1464   .text.base_printf:00000000 base_printf
-     /tmp/ccVqyKGm.s:1569   .text.base_printf:000000cc $d
-     /tmp/ccVqyKGm.s:1625   .text.base_printf:000001a4 $t
-     /tmp/ccVqyKGm.s:1728   .text.sprintf:00000000 $t
-     /tmp/ccVqyKGm.s:1733   .text.sprintf:00000000 sprintf
+     /tmp/ccGywBkt.s:20     .text.memset:00000000 $t
+     /tmp/ccGywBkt.s:25     .text.memset:00000000 memset
+     /tmp/ccGywBkt.s:145    .text.memcpy:00000000 $t
+     /tmp/ccGywBkt.s:150    .text.memcpy:00000000 memcpy
+     /tmp/ccGywBkt.s:275    .text.strchr:00000000 $t
+     /tmp/ccGywBkt.s:280    .text.strchr:00000000 strchr
+     /tmp/ccGywBkt.s:343    .text.strcpy:00000000 $t
+     /tmp/ccGywBkt.s:348    .text.strcpy:00000000 strcpy
+     /tmp/ccGywBkt.s:408    .text.strncpy:00000000 $t
+     /tmp/ccGywBkt.s:413    .text.strncpy:00000000 strncpy
+     /tmp/ccGywBkt.s:487    .text.strncmp:00000000 $t
+     /tmp/ccGywBkt.s:492    .text.strncmp:00000000 strncmp
+     /tmp/ccGywBkt.s:568    .text.atoi:00000000 $t
+     /tmp/ccGywBkt.s:573    .text.atoi:00000000 atoi
+     /tmp/ccGywBkt.s:634    .text._toa:00000000 $t
+     /tmp/ccGywBkt.s:639    .text._toa:00000000 _toa
+     /tmp/ccGywBkt.s:843    .text.xtoa:00000000 $t
+     /tmp/ccGywBkt.s:848    .text.xtoa:00000000 xtoa
+     /tmp/ccGywBkt.s:881    .text.itoa:00000000 $t
+     /tmp/ccGywBkt.s:886    .text.itoa:00000000 itoa
+     /tmp/ccGywBkt.s:919    .rodata:00000000 $d
+     /tmp/ccGywBkt.s:920    .rodata:00000000 .LC0
+     /tmp/ccGywBkt.s:925    .text.qprintf:00000000 $t
+     /tmp/ccGywBkt.s:930    .text.qprintf:00000000 qprintf
+     /tmp/ccGywBkt.s:1211   .text.strlen:00000000 $t
+     /tmp/ccGywBkt.s:1216   .text.strlen:00000000 strlen
+     /tmp/ccGywBkt.s:1270   .text.strcat:00000000 $t
+     /tmp/ccGywBkt.s:1275   .text.strcat:00000000 strcat
+     /tmp/ccGywBkt.s:1337   .text.puts:00000000 $t
+     /tmp/ccGywBkt.s:1342   .text.puts:00000000 puts
+     /tmp/ccGywBkt.s:1387   .text.printf_cb:00000000 $t
+     /tmp/ccGywBkt.s:1391   .text.printf_cb:00000000 printf_cb
+     /tmp/ccGywBkt.s:1423   .text.sprintf_cb:00000000 $t
+     /tmp/ccGywBkt.s:1427   .text.sprintf_cb:00000000 sprintf_cb
+     /tmp/ccGywBkt.s:1460   .text.base_printf:00000000 $t
+     /tmp/ccGywBkt.s:1464   .text.base_printf:00000000 base_printf
+     /tmp/ccGywBkt.s:1569   .text.base_printf:000000cc $d
+     /tmp/ccGywBkt.s:1625   .text.base_printf:000001a4 $t
+     /tmp/ccGywBkt.s:1728   .text.sprintf:00000000 $t
+     /tmp/ccGywBkt.s:1733   .text.sprintf:00000000 sprintf
                             *COM*:00000004 xQueueUARTSend
                             *COM*:00000004 xQueueUARTRecvie
                             *COM*:00000004 xQueueShell2PWM
-     /tmp/ccVqyKGm.s:1790   .text.receive_byte:00000000 $t
-     /tmp/ccVqyKGm.s:1795   .text.receive_byte:00000000 receive_byte
-     /tmp/ccVqyKGm.s:1840   .text.receive_byte_noblock:00000000 $t
-     /tmp/ccVqyKGm.s:1845   .text.receive_byte_noblock:00000000 receive_byte_noblock
-     /tmp/ccVqyKGm.s:1895   .rodata:00000004 .LC1
-     /tmp/ccVqyKGm.s:1898   .text.pwmctrl:00000000 $t
-     /tmp/ccVqyKGm.s:1902   .text.pwmctrl:00000000 pwmctrl
-     /tmp/ccVqyKGm.s:2029   .text.Motor_Control:00000000 Motor_Control
-     /tmp/ccVqyKGm.s:2024   .text.Motor_Control:00000000 $t
-     /tmp/ccVqyKGm.s:2148   .rodata:00000008 .LC2
-     /tmp/ccVqyKGm.s:2151   .rodata:00000010 .LC3
-     /tmp/ccVqyKGm.s:2154   .rodata:00000018 .LC4
-     /tmp/ccVqyKGm.s:2157   .rodata:00000024 .LC5
-     /tmp/ccVqyKGm.s:2160   .rodata:0000002c .LC6
-     /tmp/ccVqyKGm.s:2163   .text.main:00000000 $t
-     /tmp/ccVqyKGm.s:2168   .text.main:00000000 main
-     /tmp/ccVqyKGm.s:2307   .text.UsartTask:00000000 UsartTask
-     /tmp/ccVqyKGm.s:2398   .text.Usartrecive:00000000 Usartrecive
-     /tmp/ccVqyKGm.s:2471   .text.vMEMSTask:00000000 vMEMSTask
-     /tmp/ccVqyKGm.s:2303   .text.UsartTask:00000000 $t
-     /tmp/ccVqyKGm.s:2391   .rodata:00000038 .LC7
-     /tmp/ccVqyKGm.s:2394   .text.Usartrecive:00000000 $t
-     /tmp/ccVqyKGm.s:2467   .text.vMEMSTask:00000000 $t
-     /tmp/ccVqyKGm.s:2601   .text.vMEMSTask:00000130 $d
-     /tmp/ccVqyKGm.s:2605   .text.vMEMSTask:00000138 $t
-     /tmp/ccVqyKGm.s:2892   .text.vApplicationIdleHook:00000000 $t
-     /tmp/ccVqyKGm.s:2897   .text.vApplicationIdleHook:00000000 vApplicationIdleHook
-     /tmp/ccVqyKGm.s:2928   .text.vApplicationMallocFailedHook:00000000 $t
-     /tmp/ccVqyKGm.s:2933   .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
-     /tmp/ccVqyKGm.s:2954   .text.vApplicationStackOverflowHook:00000000 $t
-     /tmp/ccVqyKGm.s:2959   .text.vApplicationStackOverflowHook:00000000 vApplicationStackOverflowHook
+     /tmp/ccGywBkt.s:1790   .text.receive_byte:00000000 $t
+     /tmp/ccGywBkt.s:1795   .text.receive_byte:00000000 receive_byte
+     /tmp/ccGywBkt.s:1840   .text.receive_byte_noblock:00000000 $t
+     /tmp/ccGywBkt.s:1845   .text.receive_byte_noblock:00000000 receive_byte_noblock
+     /tmp/ccGywBkt.s:1895   .rodata:00000004 .LC1
+     /tmp/ccGywBkt.s:1898   .text.pwmctrl:00000000 $t
+     /tmp/ccGywBkt.s:1902   .text.pwmctrl:00000000 pwmctrl
+     /tmp/ccGywBkt.s:2028   .text.Motor_Control:00000000 Motor_Control
+     /tmp/ccGywBkt.s:2023   .text.Motor_Control:00000000 $t
+     /tmp/ccGywBkt.s:2155   .rodata:00000008 .LC2
+     /tmp/ccGywBkt.s:2158   .rodata:00000010 .LC3
+     /tmp/ccGywBkt.s:2161   .rodata:00000018 .LC4
+     /tmp/ccGywBkt.s:2164   .rodata:00000024 .LC5
+     /tmp/ccGywBkt.s:2167   .rodata:0000002c .LC6
+     /tmp/ccGywBkt.s:2170   .text.main:00000000 $t
+     /tmp/ccGywBkt.s:2175   .text.main:00000000 main
+     /tmp/ccGywBkt.s:2314   .text.UsartTask:00000000 UsartTask
+     /tmp/ccGywBkt.s:2405   .text.Usartrecive:00000000 Usartrecive
+     /tmp/ccGywBkt.s:2478   .text.vMEMSTask:00000000 vMEMSTask
+     /tmp/ccGywBkt.s:2310   .text.UsartTask:00000000 $t
+     /tmp/ccGywBkt.s:2398   .rodata:00000038 .LC7
+     /tmp/ccGywBkt.s:2401   .text.Usartrecive:00000000 $t
+     /tmp/ccGywBkt.s:2474   .text.vMEMSTask:00000000 $t
+     /tmp/ccGywBkt.s:2608   .text.vMEMSTask:00000130 $d
+     /tmp/ccGywBkt.s:2612   .text.vMEMSTask:00000138 $t
+     /tmp/ccGywBkt.s:2899   .text.vApplicationIdleHook:00000000 $t
+     /tmp/ccGywBkt.s:2904   .text.vApplicationIdleHook:00000000 vApplicationIdleHook
+     /tmp/ccGywBkt.s:2935   .text.vApplicationMallocFailedHook:00000000 $t
+     /tmp/ccGywBkt.s:2940   .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
+     /tmp/ccGywBkt.s:2961   .text.vApplicationStackOverflowHook:00000000 $t
+     /tmp/ccGywBkt.s:2966   .text.vApplicationStackOverflowHook:00000000 vApplicationStackOverflowHook
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
