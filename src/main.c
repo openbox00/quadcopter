@@ -145,10 +145,10 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1;
-	PWM_Motor2 = Motor2;
-	PWM_Motor3 = Motor3;
-	PWM_Motor4 = Motor4;
+	PWM_Motor1 = Motor1+26;	// 12 	18 + 2.4=20.4
+	PWM_Motor2 = Motor2;	// 13	18  	
+	PWM_Motor3 = Motor3-2;	// 14	18 - 0.2 = 17.8
+	PWM_Motor4 = Motor4+11;	// 15	18 + 1 = 19
 }
 
 /*********************************************************************************************************/
@@ -177,7 +177,7 @@ int main(void)
 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+//	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -317,11 +317,10 @@ void Balance(void *pvParameters)
 
 		qprintf(xQueueUARTSend, "------------------------------------------------------------------------\n\r");
 		qprintf(xQueueUARTSend, "x	:	%d, y		:	%d,	z	:	%d\n\r", x, y, z);
-		vTaskDelay( 300 ); 
+		vTaskDelay( 100 ); 
 		qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
- 		vTaskDelay( 300 );  
+ 		vTaskDelay( 100 );  
 		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);
-	    vTaskDelay( 300 );  
 	}
 	
 }
