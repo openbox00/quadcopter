@@ -104,6 +104,12 @@ static void pwmctrl(void *pvParameters)
 
   int pwm_speed;
 
+  const portTickType xDelay = 6000; 
+
+  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+  vTaskDelay( 6000 );  //6S
+  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+
   while(1)  // Do not exit
   {
   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
@@ -145,19 +151,6 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	PWM_Motor4 = Motor4;
 }
 
-
-void pwm_init()
-{
-  const portTickType xDelay = 6000; // portTICK_RATE_MS;
- // vTaskDelay( xDelay );	
-
-  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( 8000 );  // 8 SEC
-
-  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-}
-
-
 /*********************************************************************************************************/
 /* Private functions ---------------------------------------------------------*/
 
@@ -177,7 +170,6 @@ int main(void)
 
 	/* initialize hardware... */
 	prvSetupHardware();
-	pwm_init();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
@@ -185,7 +177,7 @@ int main(void)
 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-	xTaskCreate(balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -206,8 +198,6 @@ static void UsartTask(void *pvParameters)
 	uint8_t curr_char;	
 
 	while(1) {
-
-
 		serial_str_msg msg;
 
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
@@ -234,7 +224,6 @@ static void Usartrecive(void *pvParameters)
 	uint8_t curr_char;	
 
 	while(1) {
-
 	
 		serial_str_msg msg;
 		//Wait for character
@@ -247,7 +236,7 @@ static void Usartrecive(void *pvParameters)
 		Data = USART_ReceiveData(USART2);
 		qprintf(xQueueUARTRecvie, "%c", Data); 
 		
-			}
+	}
 
 	while(1);
 }
@@ -255,123 +244,84 @@ static void Usartrecive(void *pvParameters)
 
 void Balance(void *pvParameters)
 {
-	/* queue for MEMS data length */
-    volatile int *LED;
-    LED = (int *) pvParameters;
-
 	uint8_t Buffer_Hx[1];
 	uint8_t Buffer_Hy[1];
 	uint8_t Buffer_Hz[1];
-	uint8_t Buffer_Lx[1];
-	uint8_t Buffer_Ly[1];
-	uint8_t Buffer_Lz[1];
 
-	__IO float XOffset;
-	__IO float YOffset;
-	__IO float ZOffset;
+	__IO int8_t XOffset;
+	__IO int8_t YOffset;
+	__IO int8_t ZOffset;
 
 	float x_acc;
 	float y_acc;
-	float z_acc;	
+	float z_acc;
 
-	int16_t temp4 = 0;
-	int16_t temp5 = 0;
-	int16_t temp6 = 0;
+	int8_t x;
+	int8_t y;
+	int8_t z;
 
-	float x;
-	float y;
-	float z;
+ 	const portTickType xDelay = 6000; 
 
 	/* reset offset */
+
   	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
-	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
-	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
-	LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
-    x = (float)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
-   	y = (float)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
-   	z = (float)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+	
+	x = (int8_t)Buffer_Hx[0];
+	y = (int8_t)Buffer_Hy[0];
+	z = (int8_t)Buffer_Hz[0];
 
-  	XOffset = x;
- 	YOffset = y;
-  	ZOffset = z;
+	
 
-  	x_acc = (x - XOffset) * Sensitivity_2G;
-  	y_acc = (y - YOffset) * Sensitivity_2G;
-  	z_acc = (z - ZOffset) * Sensitivity_2G;
+  	XOffset = (int8_t)x;
+ 	YOffset = (int8_t)y;
+ 	ZOffset = (int8_t)z;
+
+	x_acc = (float)(x - XOffset);// * Sensitivity_2G;
+	y_acc = (float)(y - YOffset);// * Sensitivity_2G;
+	z_acc = (float)(z - ZOffset);// * Sensitivity_2G;
 
 
-  	float angle_x = 0;
-  	float angle_y = 0;
+  	float angle_x;
+  	float angle_y;
+  	float angle_z;
 
   	/* for test */
-  	float gyro = 1;
+  	float gyro;
 	/* reset */
+
+	angle_x = 0;
+	angle_y = 0;
+	angle_z = 0;
 
 	for( ;; )
 	{
+		gyro = 0;
+
   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
-	    x = (float)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
-    	y = (float)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
-    	z = (float)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+	
+		x = (int8_t)Buffer_Hx[0];
+		y = (int8_t)Buffer_Hy[0];
+		z = (int8_t)Buffer_Hz[0];
 
-  		x_acc = (x - XOffset) * Sensitivity_2G;
-  		y_acc = (y - YOffset) * Sensitivity_2G;
-  		z_acc = (z - ZOffset) * Sensitivity_2G;
+		x_acc = (float)(x - XOffset);// * Sensitivity_2G;
+		y_acc = (float)(y - YOffset);// * Sensitivity_2G;
+		z_acc = (float)(z - ZOffset);// * Sensitivity_2G;
 
-		angle_x = (0.966) * (angle + gyro * 0.0262) + (0.034) * (x_acc);  		
-		angle_y = (0.966) * (angle + gyro * 0.0262) + (0.034) * (y_acc); 
+		angle_x = (0.966)*(angle_x + gyro*0.0262) + (0.034)*(x_acc);  		
+		angle_y = (0.966)*(angle_y + gyro*0.0262) + (0.034)*(y_acc); 
+		angle_z = (0.966)*(angle_z + gyro*0.0262) + (0.034)*(z_acc); 
 
-		qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", (int)angle_x, (int)angle_y);
-
-
-
-
-
-		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
-		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
-		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", x, y, z);
-		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int)x, (int)y, (int)z);
-#if 0		
-		if(((int)x != 0) || ((int)y != 0))
-		{
-                if ((int)x < -G)
-                {
-                    STM_EVAL_LEDOn(LED4);
-                    if ((int)x<= G){STM_EVAL_LEDOff(LED3);}
-                    if ((int)y <= G){STM_EVAL_LEDOff(LED6);}
-                    if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
-                }
-                if ((int)x > G)
-                {
-                    STM_EVAL_LEDOn(LED5);
-                    if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
-                    if ((int)y >= -G){STM_EVAL_LEDOff(LED3);}
-                    if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
-                }
-                if ((int)y > G)
-                {
-                    STM_EVAL_LEDOn(LED3);
-                    if ((int)x <= G){STM_EVAL_LEDOff(LED4);}
-                    if ((int)y >= -G){STM_EVAL_LEDOff(LED5);}
-                    if ((int)x >= -G){STM_EVAL_LEDOff(LED6);}
-                }
-                if ((int)y < -G)
-                {
-                    STM_EVAL_LEDOn(LED6);
-				    if ((int)x <= G){STM_EVAL_LEDOff(LED3);}
-                    if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
-                    if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
-                }
-
-	    }
-#endif
+		qprintf(xQueueUARTSend, "------------------------------------------------------------------------\n\r");
+		qprintf(xQueueUARTSend, "x	:	%d, y		:	%d,	z	:	%d\n\r", x, y, z);
+		vTaskDelay( 300 ); 
+		qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
+ 		vTaskDelay( 300 );  
+		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);
+	    vTaskDelay( 300 );  
 	}
 	
 }

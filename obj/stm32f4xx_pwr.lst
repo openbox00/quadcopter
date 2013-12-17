@@ -1484,30 +1484,30 @@
  594              		.file 5 "libs/Device/STM32F4xx/Include/stm32f4xx.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_pwr.c
-     /tmp/cc2j0O7B.s:20     .text.PWR_DeInit:00000000 $t
-     /tmp/cc2j0O7B.s:25     .text.PWR_DeInit:00000000 PWR_DeInit
-     /tmp/cc2j0O7B.s:54     .text.PWR_BackupAccessCmd:00000000 $t
-     /tmp/cc2j0O7B.s:59     .text.PWR_BackupAccessCmd:00000000 PWR_BackupAccessCmd
-     /tmp/cc2j0O7B.s:92     .text.PWR_PVDLevelConfig:00000000 $t
-     /tmp/cc2j0O7B.s:97     .text.PWR_PVDLevelConfig:00000000 PWR_PVDLevelConfig
-     /tmp/cc2j0O7B.s:146    .text.PWR_PVDCmd:00000000 $t
-     /tmp/cc2j0O7B.s:151    .text.PWR_PVDCmd:00000000 PWR_PVDCmd
-     /tmp/cc2j0O7B.s:184    .text.PWR_WakeUpPinCmd:00000000 $t
-     /tmp/cc2j0O7B.s:189    .text.PWR_WakeUpPinCmd:00000000 PWR_WakeUpPinCmd
-     /tmp/cc2j0O7B.s:222    .text.PWR_BackupRegulatorCmd:00000000 $t
-     /tmp/cc2j0O7B.s:227    .text.PWR_BackupRegulatorCmd:00000000 PWR_BackupRegulatorCmd
-     /tmp/cc2j0O7B.s:260    .text.PWR_HighPerformanceModeCmd:00000000 $t
-     /tmp/cc2j0O7B.s:265    .text.PWR_HighPerformanceModeCmd:00000000 PWR_HighPerformanceModeCmd
-     /tmp/cc2j0O7B.s:298    .text.PWR_FlashPowerDownCmd:00000000 $t
-     /tmp/cc2j0O7B.s:303    .text.PWR_FlashPowerDownCmd:00000000 PWR_FlashPowerDownCmd
-     /tmp/cc2j0O7B.s:336    .text.PWR_EnterSTOPMode:00000000 $t
-     /tmp/cc2j0O7B.s:341    .text.PWR_EnterSTOPMode:00000000 PWR_EnterSTOPMode
-     /tmp/cc2j0O7B.s:434    .text.PWR_EnterSTANDBYMode:00000000 $t
-     /tmp/cc2j0O7B.s:439    .text.PWR_EnterSTANDBYMode:00000000 PWR_EnterSTANDBYMode
-     /tmp/cc2j0O7B.s:494    .text.PWR_GetFlagStatus:00000000 $t
-     /tmp/cc2j0O7B.s:499    .text.PWR_GetFlagStatus:00000000 PWR_GetFlagStatus
-     /tmp/cc2j0O7B.s:549    .text.PWR_ClearFlag:00000000 $t
-     /tmp/cc2j0O7B.s:554    .text.PWR_ClearFlag:00000000 PWR_ClearFlag
+     /tmp/cc0YmsV8.s:20     .text.PWR_DeInit:00000000 $t
+     /tmp/cc0YmsV8.s:25     .text.PWR_DeInit:00000000 PWR_DeInit
+     /tmp/cc0YmsV8.s:54     .text.PWR_BackupAccessCmd:00000000 $t
+     /tmp/cc0YmsV8.s:59     .text.PWR_BackupAccessCmd:00000000 PWR_BackupAccessCmd
+     /tmp/cc0YmsV8.s:92     .text.PWR_PVDLevelConfig:00000000 $t
+     /tmp/cc0YmsV8.s:97     .text.PWR_PVDLevelConfig:00000000 PWR_PVDLevelConfig
+     /tmp/cc0YmsV8.s:146    .text.PWR_PVDCmd:00000000 $t
+     /tmp/cc0YmsV8.s:151    .text.PWR_PVDCmd:00000000 PWR_PVDCmd
+     /tmp/cc0YmsV8.s:184    .text.PWR_WakeUpPinCmd:00000000 $t
+     /tmp/cc0YmsV8.s:189    .text.PWR_WakeUpPinCmd:00000000 PWR_WakeUpPinCmd
+     /tmp/cc0YmsV8.s:222    .text.PWR_BackupRegulatorCmd:00000000 $t
+     /tmp/cc0YmsV8.s:227    .text.PWR_BackupRegulatorCmd:00000000 PWR_BackupRegulatorCmd
+     /tmp/cc0YmsV8.s:260    .text.PWR_HighPerformanceModeCmd:00000000 $t
+     /tmp/cc0YmsV8.s:265    .text.PWR_HighPerformanceModeCmd:00000000 PWR_HighPerformanceModeCmd
+     /tmp/cc0YmsV8.s:298    .text.PWR_FlashPowerDownCmd:00000000 $t
+     /tmp/cc0YmsV8.s:303    .text.PWR_FlashPowerDownCmd:00000000 PWR_FlashPowerDownCmd
+     /tmp/cc0YmsV8.s:336    .text.PWR_EnterSTOPMode:00000000 $t
+     /tmp/cc0YmsV8.s:341    .text.PWR_EnterSTOPMode:00000000 PWR_EnterSTOPMode
+     /tmp/cc0YmsV8.s:434    .text.PWR_EnterSTANDBYMode:00000000 $t
+     /tmp/cc0YmsV8.s:439    .text.PWR_EnterSTANDBYMode:00000000 PWR_EnterSTANDBYMode
+     /tmp/cc0YmsV8.s:494    .text.PWR_GetFlagStatus:00000000 $t
+     /tmp/cc0YmsV8.s:499    .text.PWR_GetFlagStatus:00000000 PWR_GetFlagStatus
+     /tmp/cc0YmsV8.s:549    .text.PWR_ClearFlag:00000000 $t
+     /tmp/cc0YmsV8.s:554    .text.PWR_ClearFlag:00000000 PWR_ClearFlag
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

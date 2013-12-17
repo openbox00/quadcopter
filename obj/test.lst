@@ -1290,28 +1290,28 @@
  1140              		.file 3 "/usr/local/csl/arm-2012.03/bin/../lib/gcc/arm-none-eabi/4.6.3/../../../../arm-none-eabi/i
 DEFINED SYMBOLS
                             *ABS*:00000000 test.c
-     /tmp/ccxWZoTq.s:20     .rodata.crcHi:00000000 $d
-     /tmp/ccxWZoTq.s:23     .rodata.crcHi:00000000 crcHi
-     /tmp/ccxWZoTq.s:281    .rodata.crcLo:00000000 $d
-     /tmp/ccxWZoTq.s:284    .rodata.crcLo:00000000 crcLo
-     /tmp/ccxWZoTq.s:542    .text.storeReadCoilData:00000000 $t
-     /tmp/ccxWZoTq.s:547    .text.storeReadCoilData:00000000 storeReadCoilData
-     /tmp/ccxWZoTq.s:608    .text.storeReadDiscreteInputsData:00000000 $t
-     /tmp/ccxWZoTq.s:613    .text.storeReadDiscreteInputsData:00000000 storeReadDiscreteInputsData
-     /tmp/ccxWZoTq.s:675    .text.storeReadHoldingRegistersData:00000000 $t
-     /tmp/ccxWZoTq.s:680    .text.storeReadHoldingRegistersData:00000000 storeReadHoldingRegistersData
-     /tmp/ccxWZoTq.s:742    .text.storeReadInputRegistersData:00000000 $t
-     /tmp/ccxWZoTq.s:747    .text.storeReadInputRegistersData:00000000 storeReadInputRegistersData
-     /tmp/ccxWZoTq.s:809    .text.storeWriteSingleCoilData:00000000 $t
-     /tmp/ccxWZoTq.s:814    .text.storeWriteSingleCoilData:00000000 storeWriteSingleCoilData
-     /tmp/ccxWZoTq.s:874    .text.storeWriteSingleRegisterData:00000000 $t
-     /tmp/ccxWZoTq.s:879    .text.storeWriteSingleRegisterData:00000000 storeWriteSingleRegisterData
-     /tmp/ccxWZoTq.s:941    .text.storeReadExceptionStatusData:00000000 $t
-     /tmp/ccxWZoTq.s:946    .text.storeReadExceptionStatusData:00000000 storeReadExceptionStatusData
-     /tmp/ccxWZoTq.s:1006   .text.storeWriteMultipleCoilsData:00000000 $t
-     /tmp/ccxWZoTq.s:1011   .text.storeWriteMultipleCoilsData:00000000 storeWriteMultipleCoilsData
-     /tmp/ccxWZoTq.s:1071   .text.storeWriteMultipleRegistersData:00000000 $t
-     /tmp/ccxWZoTq.s:1076   .text.storeWriteMultipleRegistersData:00000000 storeWriteMultipleRegistersData
+     /tmp/ccBcwhr2.s:20     .rodata.crcHi:00000000 $d
+     /tmp/ccBcwhr2.s:23     .rodata.crcHi:00000000 crcHi
+     /tmp/ccBcwhr2.s:281    .rodata.crcLo:00000000 $d
+     /tmp/ccBcwhr2.s:284    .rodata.crcLo:00000000 crcLo
+     /tmp/ccBcwhr2.s:542    .text.storeReadCoilData:00000000 $t
+     /tmp/ccBcwhr2.s:547    .text.storeReadCoilData:00000000 storeReadCoilData
+     /tmp/ccBcwhr2.s:608    .text.storeReadDiscreteInputsData:00000000 $t
+     /tmp/ccBcwhr2.s:613    .text.storeReadDiscreteInputsData:00000000 storeReadDiscreteInputsData
+     /tmp/ccBcwhr2.s:675    .text.storeReadHoldingRegistersData:00000000 $t
+     /tmp/ccBcwhr2.s:680    .text.storeReadHoldingRegistersData:00000000 storeReadHoldingRegistersData
+     /tmp/ccBcwhr2.s:742    .text.storeReadInputRegistersData:00000000 $t
+     /tmp/ccBcwhr2.s:747    .text.storeReadInputRegistersData:00000000 storeReadInputRegistersData
+     /tmp/ccBcwhr2.s:809    .text.storeWriteSingleCoilData:00000000 $t
+     /tmp/ccBcwhr2.s:814    .text.storeWriteSingleCoilData:00000000 storeWriteSingleCoilData
+     /tmp/ccBcwhr2.s:874    .text.storeWriteSingleRegisterData:00000000 $t
+     /tmp/ccBcwhr2.s:879    .text.storeWriteSingleRegisterData:00000000 storeWriteSingleRegisterData
+     /tmp/ccBcwhr2.s:941    .text.storeReadExceptionStatusData:00000000 $t
+     /tmp/ccBcwhr2.s:946    .text.storeReadExceptionStatusData:00000000 storeReadExceptionStatusData
+     /tmp/ccBcwhr2.s:1006   .text.storeWriteMultipleCoilsData:00000000 $t
+     /tmp/ccBcwhr2.s:1011   .text.storeWriteMultipleCoilsData:00000000 storeWriteMultipleCoilsData
+     /tmp/ccBcwhr2.s:1071   .text.storeWriteMultipleRegistersData:00000000 $t
+     /tmp/ccBcwhr2.s:1076   .text.storeWriteMultipleRegistersData:00000000 storeWriteMultipleRegistersData
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
