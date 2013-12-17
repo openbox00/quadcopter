@@ -23,7 +23,7 @@ static uint8_t LIS3DSH_SendByte(uint8_t byte);
   */
 void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
 {
-	uint8_t ctrl = 0x00;	//?????
+	uint8_t ctrl = 0x00;	
   	uint32_t i=0;		//simple index for software delay
   
 	/* Configure the low level interface ---------------------------------------*/
@@ -31,15 +31,14 @@ void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
   
 	/* Required delay for the MEMS Accelerometer: Turn-on time = 3/Output data Rate
 	                                                            = 3/100 = 30ms */
-//	for(i=0;i<0x1FFFF;i++);
-
   /* 0x20 */  
   /* 
   ctrl=(uint8_t) (LIS3DSH_InitStruct->CR4_Odr|LIS3DSH_InitStruct->CR4_Bdu|
      LIS3DSH_InitStruct->CR4_Zen|LIS3DSH_InitStruct->CR4_Yen|
      LIS3DSH_InitStruct->CR4_Xen);
 */
-  ctrl = 0x47;  
+ //ctrl = 0x47;  
+  ctrl = 0x67; //100Hz
   LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
 
 #if 0

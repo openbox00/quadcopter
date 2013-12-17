@@ -1,25 +1,3 @@
-/**
-  ******************************************************************************
-  * @file    STM32F4-Discovery FreeRTOS demo\main.c
-  * @author  T.O.M.A.S. Team
-  * @version V1.1.0
-  * @date    14-October-2011
-  * @brief   Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-  ******************************************************************************
-  */ 
-
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 
 /* FreeRTOS includes */
@@ -50,10 +28,14 @@
 #define queueSIZE	6
 
 /*brushless motor PWM max and min duty cycle*/
-#define PWM_MOTOR_MIN 1000
-#define PWM_MOTOR_MAX 10000
+#define PWM_MOTOR_MIN 100
+#define PWM_MOTOR_MAX 1000
 
-
+#define Sensitivity_2G	0.06  	
+#define Sensitivity_4G	0.12  
+#define Sensitivity_6G	0.18  
+#define Sensitivity_8G	0.24  
+#define Sensitivity_16G	0.72    	
 /* angle */
 #define G 2
 
@@ -66,7 +48,7 @@
 
 /* Task functions declarations */
 static void pwmctrl(void *pvParameters);
-static void vMEMSTask(void *pvParameters);
+static void Balance(void *pvParameters);
 
 static void UsartTask(void *pvParameters);
 static void Usartrecive(void *pvParameters);
@@ -116,23 +98,11 @@ int receive_byte_noblock(char *ch)
 
 static void pwmctrl(void *pvParameters)
 {
-  const portTickType xDelay = 6000; // portTICK_RATE_MS;
-
   char pwm_speed_char[4];
 
   int pwm_speed_int = 100;
 
   int pwm_speed;
-
- // vTaskDelay( xDelay );	
-
-  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( 10000 );
-
-  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-
- // vTaskDelay( xDelay );
-
 
   while(1)  // Do not exit
   {
@@ -144,21 +114,15 @@ static void pwmctrl(void *pvParameters)
 	
    pwm_speed = (pwm_speed_int *1000) / 100;
 
-   if (pwm_speed >10000) {
-	pwm_speed = 10000;
-	}else if (pwm_speed <1000){
+   if (pwm_speed >1000) {
 	pwm_speed = 1000;
+	}else if (pwm_speed <100){
+	pwm_speed = 100;
 	}else{
 	pwm_speed = pwm_speed;
 	}
-	
-		
    Motor_Control(pwm_speed, pwm_speed, pwm_speed, pwm_speed);
-
-
   }
- 
-  return(0); // System will implode
 } 
 
 void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
@@ -182,6 +146,18 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 }
 
 
+void pwm_init()
+{
+  const portTickType xDelay = 6000; // portTICK_RATE_MS;
+ // vTaskDelay( xDelay );	
+
+  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
+  vTaskDelay( 8000 );  // 8 SEC
+
+  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+}
+
+
 /*********************************************************************************************************/
 /* Private functions ---------------------------------------------------------*/
 
@@ -201,6 +177,7 @@ int main(void)
 
 	/* initialize hardware... */
 	prvSetupHardware();
+	pwm_init();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
@@ -208,7 +185,7 @@ int main(void)
 	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-	xTaskCreate(vMEMSTask, ( signed portCHAR * ) "vMEMSTask", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -276,7 +253,7 @@ static void Usartrecive(void *pvParameters)
 }
 
 
-void vMEMSTask(void *pvParameters)
+void Balance(void *pvParameters)
 {
 	/* queue for MEMS data length */
     volatile int *LED;
@@ -289,11 +266,13 @@ void vMEMSTask(void *pvParameters)
 	uint8_t Buffer_Ly[1];
 	uint8_t Buffer_Lz[1];
 
-	uint8_t counter  = 0;
-
 	__IO float XOffset;
 	__IO float YOffset;
 	__IO float ZOffset;
+
+	float x_acc;
+	float y_acc;
+	float z_acc;	
 
 	int16_t temp4 = 0;
 	int16_t temp5 = 0;
@@ -304,62 +283,62 @@ void vMEMSTask(void *pvParameters)
 	float z;
 
 	/* reset offset */
-  		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
-  		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
-
-	    /* Update autoreload and capture compare registers value*/
-
-	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
-	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
-	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
-
-		x = ((float)temp4)*9.8 / 16000;
-		y = ((float)temp5)*9.8 / 16000;
-		z = ((float)temp6)*9.8 / 16000;
+  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+    x = (float)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+   	y = (float)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+   	z = (float)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
 
   	XOffset = x;
  	YOffset = y;
   	ZOffset = z;
 
+  	x_acc = (x - XOffset) * Sensitivity_2G;
+  	y_acc = (y - YOffset) * Sensitivity_2G;
+  	z_acc = (z - ZOffset) * Sensitivity_2G;
+
+
+  	float angle_x = 0;
+  	float angle_y = 0;
+
+  	/* for test */
+  	float gyro = 1;
 	/* reset */
 
 	for( ;; )
 	{
-		counter++;
-		if (counter == 10)
-		{
-
   		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
-  		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+		LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);
+	    x = (float)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
+    	y = (float)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
+    	z = (float)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
 
-	    /* Update autoreload and capture compare registers value*/
+  		x_acc = (x - XOffset) * Sensitivity_2G;
+  		y_acc = (y - YOffset) * Sensitivity_2G;
+  		z_acc = (z - ZOffset) * Sensitivity_2G;
 
-	    temp4 = (int16_t)((Buffer_Hx[0]<<8) | (Buffer_Lx[0]));
-	    temp5 = (int16_t)((Buffer_Hy[0]<<8) | (Buffer_Ly[0]));
-	    temp6 = (int16_t)((Buffer_Hz[0]<<8) | (Buffer_Lz[0]));
+		angle_x = (0.966) * (angle + gyro * 0.0262) + (0.034) * (x_acc);  		
+		angle_y = (0.966) * (angle + gyro * 0.0262) + (0.034) * (y_acc); 
 
-		x = ((float)temp4)*9.8 / 16000;
-		y = ((float)temp5)*9.8 / 16000;
-		z = ((float)temp6)*9.8 / 16000;
+		qprintf(xQueueUARTSend, "x: %d, y: %d\n\r", (int)angle_x, (int)angle_y);
 
-            
-	    x -= XOffset;
-	    y -= YOffset;
-	    z -= ZOffset;
-		  
+
+
+
+
 		//qprintf(xQueueUARTSend, "abcdefghijklmn1234567890\n\r");  
 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int8_t)Buffer_x[0], (int8_t)Buffer_y[0], (int8_t)Buffer_z[0]);
 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", x, y, z);
 		//qprintf(xQueueUARTSend, "x: %d, y: %d, z: %d\n\r", (int)x, (int)y, (int)z);
-		
+#if 0		
 		if(((int)x != 0) || ((int)y != 0))
 		{
                 if ((int)x < -G)
@@ -390,11 +369,11 @@ void vMEMSTask(void *pvParameters)
                     if ((int)y <= G){STM_EVAL_LEDOff(LED4);}
                     if ((int)x >= -G){STM_EVAL_LEDOff(LED5);}
                 }
-                counter = 0x00;
 
 	    }
-	  }
+#endif
 	}
+	
 }
 
 /*-----------------------------------------------------------*/

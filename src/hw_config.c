@@ -46,6 +46,8 @@ void prvSetupHardware( void )
   GPIO_Configuration();
   TIM_Configuration();
   USART_Configuration();
+
+
 }
 
 void prvLED_Config(char state)
@@ -159,7 +161,7 @@ void TIM_Configuration(void)
     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
     TIM_TimeBaseInitStruct.TIM_Period = 33600 - 1;   
-    TIM_TimeBaseInitStruct.TIM_Prescaler = 50 - 1; 
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );
     
@@ -211,7 +213,7 @@ void prvMEMS_Config(void)
 	uint8_t ctrl = 0;
 
 	LIS3DSH_InitTypeDef  LIS3DSH_InitStruct;
-/*
+
     LIS3DSH_InitStruct.SM1_Hysteresis=0x00;
     LIS3DSH_InitStruct.SM1_Pin=LIS3DSH_SM1_INT_TO_PIN_INT1;
     LIS3DSH_InitStruct.SM1_Enable=LIS3DSH_SM1_DISABLE;
@@ -247,7 +249,7 @@ void prvMEMS_Config(void)
     LIS3DSH_InitStruct.CR6_P1Wtm=LIS3DSH_CR6_FIFO_WTM_TO_INT1_DISABLED;
     LIS3DSH_InitStruct.CR6_P1OverRun=LIS3DSH_CR6_FIFO_OVERRUN_TO_INT1_DISABLED;
     LIS3DSH_InitStruct.CR6_P2Boot=LIS3DSH_CR6_BOOT_TO_INT2_DISABLED;
-*/
+
 	
 	LIS3DSH_Init(&LIS3DSH_InitStruct);	
 }
