@@ -5,3 +5,6 @@
 *.hex
 *.lss
 *.sym
+*.d
+*.lst
+/obj

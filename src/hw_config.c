@@ -161,7 +161,7 @@ void TIM_Configuration(void)
     // Solving for prescaler gives 240.
     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
-    TIM_TimeBaseInitStruct.TIM_Period = 33600 - 1;   
+    TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
     TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );

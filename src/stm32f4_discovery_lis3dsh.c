@@ -37,7 +37,7 @@ void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
      LIS3DSH_InitStruct->CR4_Zen|LIS3DSH_InitStruct->CR4_Yen|
      LIS3DSH_InitStruct->CR4_Xen);
 */
- //ctrl = 0x47;  
+  //ctrl = 0x47;  
   ctrl = 0x67; //100Hz
   LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
 
