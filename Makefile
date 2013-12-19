@@ -15,6 +15,7 @@ TARGET = $(OBJDIR)/STM32F4_Test
 # Define all C source files (dependencies are generated automatically)
 #
 SOURCES += src/uart.c
+SOURCES += src/I2C.c
 SOURCES += src/ustime.c
 SOURCES += src/main.c
 SOURCES += src/startup_stm32f4xx.s
