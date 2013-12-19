@@ -140,7 +140,7 @@ typedef struct
     uint16_t x;
     uint16_t y;
     uint16_t z;
-} accel_vector;
+} gyro_vector;
 
 
 /** @defgroup STM32F4_DISCOVERY_L3G4200DH_Exported_Functions

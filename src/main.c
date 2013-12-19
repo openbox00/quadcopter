@@ -31,13 +31,18 @@
 #define PWM_MOTOR_MIN 100
 #define PWM_MOTOR_MAX 1000
 
+/*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
 #define Sensitivity_4G	0.12  
 #define Sensitivity_6G	0.18  
 #define Sensitivity_8G	0.24  
-#define Sensitivity_16G	0.72    	
-/* angle */
-#define G 2
+#define Sensitivity_16G	0.72   
+
+/*gyro sensitivity*/
+#define Sensitivity_250		8.75  	
+#define Sensitivity_500		17.5  
+#define Sensitivity_2000	70  
+  	
 
 /* Private macro -------------------------------------------------------------*/
 /*PWM signal to drive brushless motor*/
@@ -176,7 +181,7 @@ int main(void)
 	xTaskCreate(UsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-//	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -251,71 +256,94 @@ void Balance(void *pvParameters)
 	float y_acc;
 	float z_acc;
 
-	int8_t x;
-	int8_t y;
-	int8_t z;
-
  	const portTickType xDelay = 6000; 
+
+	uint8_t Buffer_GHx[1];
+	uint8_t Buffer_GHy[1];
+	uint8_t Buffer_GHz[1];
+
+	__IO int8_t GXOffset;
+	__IO int8_t GYOffset;
+	__IO int8_t GZOffset;
+
+	float x_gyro;
+	float y_gyro;
+	float z_gyro;
 
 	/* reset offset */
 
   	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+
+  	XOffset = (int8_t)Buffer_Hx[0];
+ 	YOffset = (int8_t)Buffer_Hy[0];
+ 	ZOffset = (int8_t)Buffer_Hz[0];
+
+	x_acc = (float)((int8_t)Buffer_Hx[0] - XOffset)*Sensitivity_2G;
+	y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
+	z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 	
-	x = (int8_t)Buffer_Hx[0];
-	y = (int8_t)Buffer_Hy[0];
-	z = (int8_t)Buffer_Hz[0];
+	/* reset gyro offset */	
 
-	
+  	L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
+	L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
+	L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
 
-  	XOffset = (int8_t)x;
- 	YOffset = (int8_t)y;
- 	ZOffset = (int8_t)z;
+  	GXOffset = (int8_t)Buffer_GHx[0];
+ 	GYOffset = (int8_t)Buffer_GHy[0];
+ 	GZOffset = (int8_t)Buffer_GHz[0];
 
-	x_acc = (float)(x - XOffset)*Sensitivity_2G;
-	y_acc = (float)(y - YOffset)*Sensitivity_2G;
-	z_acc = (float)(z - ZOffset)*Sensitivity_2G;
+	x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
+	y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
+	z_gyro = (float)((int8_t)Buffer_GHz[0] - GZOffset)*Sensitivity_250;
 
 
   	float angle_x;
   	float angle_y;
   	float angle_z;
 
-  	/* for test */
-  	float gyro;
-	/* reset */
+
 
 	angle_x = 0;
 	angle_y = 0;
 	angle_z = 0;
 
+
 	for( ;; )
 	{
-		gyro = 0;
-
-  		LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+	  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
-	
-		x = (int8_t)Buffer_Hx[0];
-		y = (int8_t)Buffer_Hy[0];
-		z = (int8_t)Buffer_Hz[0];
 
-		x_acc = (float)(x - XOffset)*Sensitivity_2G;
-		y_acc = (float)(y - YOffset)*Sensitivity_2G;
-		z_acc = (float)(z - ZOffset)*Sensitivity_2G;
+		x_acc = (float)((int8_t)Buffer_Hx[0] - XOffset)*Sensitivity_2G;
+		y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
+		z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 
-		angle_x = (0.966)*(angle_x + gyro*0.0262) + (0.034)*(x_acc);  		
-		angle_y = (0.966)*(angle_y + gyro*0.0262) + (0.034)*(y_acc); 
-		angle_z = (0.966)*(angle_z + gyro*0.0262) + (0.034)*(z_acc); 
+  		L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
+		L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
+		L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
 
-		qprintf(xQueueUARTSend, "------------------------------------------------------------------------\n\r");
-		qprintf(xQueueUARTSend, "x	:	%d, y		:	%d,	z	:	%d\n\r", x, y, z);
+		x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
+		y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
+		z_gyro = (float)((int8_t)Buffer_GHz[0] - GZOffset)*Sensitivity_250;
+
+
+		angle_x = (0.966)*(angle_x + x_gyro*0.0262) + (0.034)*(x_acc);  		
+		angle_y = (0.966)*(angle_y + y_gyro*0.0262) + (0.034)*(y_acc); 
+		angle_z = (0.966)*(angle_z + z_gyro*0.0262) + (0.034)*(z_acc); 
+
+		qprintf(xQueueUARTSend, "--------------------------------------------------------------------\n\r");
+		qprintf(xQueueUARTSend, "ax	:	%d, ay		:	%d,	az	:	%d\n\r", (int8_t)Buffer_Hx[0], (int8_t)Buffer_Hy[0] , (int8_t)Buffer_Hz[0]);
 		vTaskDelay( 100 ); 
 		qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
  		vTaskDelay( 100 );  
+		qprintf(xQueueUARTSend, "gx	:	%d, gy		:	%d,	gz	:	%d\n\r", (int8_t)Buffer_GHx[0], (int8_t)Buffer_GHy[0] , (int8_t)Buffer_GHz[0]);
+		vTaskDelay( 100 ); 
+		qprintf(xQueueUARTSend, "x_gyro	:	%d, y_gyro	:	%d,	z_gyro	:	%d\n\r", (int)x_gyro, (int)y_gyro, (int)z_gyro);
+ 		vTaskDelay( 100 );  
 		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);
+
 	}
 	
 }

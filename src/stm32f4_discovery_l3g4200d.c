@@ -179,7 +179,7 @@ static uint8_t L3G4200D_SendByte(uint8_t byte)
   L3G4200DTimeout = L3G4200D_FLAG_TIMEOUT;
   while (SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_TXE) == RESET)
   {
-    if((L3G4200DTimeout--) == 0) return L3G4200D_TIMEOUT_UserCallback();
+    if((L3G4200DTimeout--) == 0) return 0;//L3G4200D_TIMEOUT_UserCallback();
   }
   
   /* Send a Byte through the SPI peripheral */
@@ -189,7 +189,7 @@ static uint8_t L3G4200D_SendByte(uint8_t byte)
   L3G4200DTimeout = L3G4200D_FLAG_TIMEOUT;
   while (SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_RXNE) == RESET)
   {
-    if((L3G4200DTimeout--) == 0) return L3G4200D_TIMEOUT_UserCallback();
+    if((L3G4200DTimeout--) == 0) return 0;//L3G4200D_TIMEOUT_UserCallback();
   }
   
   /* Return the Byte read from the SPI bus */
@@ -197,7 +197,6 @@ static uint8_t L3G4200D_SendByte(uint8_t byte)
 }
 
 
-#ifdef USE_DEFAULT_TIMEOUT_CALLBACK
 uint32_t L3G4200D_TIMEOUT_UserCallback(void)
 {
   /* Block communication and all processes */
@@ -205,7 +204,7 @@ uint32_t L3G4200D_TIMEOUT_UserCallback(void)
   {   
   }
 }
-#endif /* USE_DEFAULT_TIMEOUT_CALLBACK */
+
 
 
 
