@@ -50,9 +50,8 @@
 static void pwmctrl(void *pvParameters);
 static void Balance(void *pvParameters);
 
-static void UsartTask(void *pvParameters);
-static void Usartrecive(void *pvParameters);
-
+static void UsartSendTask(void *pvParameters);
+static void UsartReciveTask(void *pvParameters);
 
 /* semaphores, queues declarations */
 xQueueHandle xQueueUARTSend;
@@ -165,7 +164,7 @@ int main(void)
 	
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
-    xQueueUARTRecvie = xQueueCreate(1, sizeof(serial_ch_msg));
+    xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
     xQueueShell2PWM = xQueueCreate(1, 24);
 
 	/* initialize hardware... */
@@ -173,8 +172,8 @@ int main(void)
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
-	xTaskCreate(UsartTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	xTaskCreate(Usartrecive, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(UsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(UsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 //	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
@@ -191,7 +190,7 @@ int main(void)
 /* Task functions ------------------------------------------------- */
 
 //Task For Sending Data Via USART
-static void UsartTask(void *pvParameters)
+static void UsartSendTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
@@ -217,28 +216,24 @@ static void UsartTask(void *pvParameters)
 }
 
 //Task For Sending Data Via USART
-static void Usartrecive(void *pvParameters)
+static void UsartReciveTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
 	uint8_t curr_char;	
 
 	while(1) {
-	
-		serial_str_msg msg;
 		//Wait for character
 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
-  		           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
+           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
 		 		USART_ReceiveData(USART2); // Clear Error
 		 }
 
-		//Collect the caracter
+		//Collect the character
 		Data = USART_ReceiveData(USART2);
 		qprintf(xQueueUARTRecvie, "%c", Data); 
-		
 	}
 
-	while(1);
 }
 
 
@@ -278,9 +273,9 @@ void Balance(void *pvParameters)
  	YOffset = (int8_t)y;
  	ZOffset = (int8_t)z;
 
-	x_acc = (float)(x - XOffset);// * Sensitivity_2G;
-	y_acc = (float)(y - YOffset);// * Sensitivity_2G;
-	z_acc = (float)(z - ZOffset);// * Sensitivity_2G;
+	x_acc = (float)(x - XOffset)*Sensitivity_2G;
+	y_acc = (float)(y - YOffset)*Sensitivity_2G;
+	z_acc = (float)(z - ZOffset)*Sensitivity_2G;
 
 
   	float angle_x;
@@ -307,9 +302,9 @@ void Balance(void *pvParameters)
 		y = (int8_t)Buffer_Hy[0];
 		z = (int8_t)Buffer_Hz[0];
 
-		x_acc = (float)(x - XOffset);// * Sensitivity_2G;
-		y_acc = (float)(y - YOffset);// * Sensitivity_2G;
-		z_acc = (float)(z - ZOffset);// * Sensitivity_2G;
+		x_acc = (float)(x - XOffset)*Sensitivity_2G;
+		y_acc = (float)(y - YOffset)*Sensitivity_2G;
+		z_acc = (float)(z - ZOffset)*Sensitivity_2G;
 
 		angle_x = (0.966)*(angle_x + gyro*0.0262) + (0.034)*(x_acc);  		
 		angle_y = (0.966)*(angle_y + gyro*0.0262) + (0.034)*(y_acc); 
@@ -327,45 +322,6 @@ void Balance(void *pvParameters)
 
 /*-----------------------------------------------------------*/
 
-
-
-// void vSWITCHTask( void *pvParameters )
-// {
-// 	static int i=0;
-// 	for( ;; )
-// 	{
-// 		if(xSemaphoreTake(xSemaphoreSW,( portTickType ) 0) == pdTRUE)
-// 		{
-// 			i^=1;		//just switch the state if semaphore was given
-
-// 			if(i==0)	//LED3..LD6 tasks ready, BALANCE, MEMS suspended
-// 			{
-// 				vTaskSuspend(xBALANCE_Task);
-// 				TIM_Cmd(TIM4, DISABLE);
-// 				vTaskSuspend(xMEMS_Task);
-// 				prvLED_Config(GPIO);
-// 				vTaskResume(xLED_Tasks[0]);
-// 				vTaskResume(xLED_Tasks[1]);
-// 				vTaskResume(xLED_Tasks[2]);
-// 				vTaskResume(xLED_Tasks[3]);
-// 			}
-// 			else		//MEMS and BALANCE ready, LED tasks suspended
-// 			{
-// 				vTaskSuspend(xLED_Tasks[0]);
-// 				vTaskSuspend(xLED_Tasks[1]);
-// 				vTaskSuspend(xLED_Tasks[2]);
-// 				vTaskSuspend(xLED_Tasks[3]);
-// 				prvLED_Config(TIMER);
-// 				TIM_Cmd(TIM4, ENABLE);
-// 				vTaskResume(xBALANCE_Task);
-// 				vTaskResume(xMEMS_Task);
-// 			}
-// 		}
-// 		taskYIELD(); 	//task is going to ready state to allow next one to run
-// 	}
-// }
-
-/*-----------------------------------------------------------*/
 
 void vApplicationIdleHook( void )
 {
