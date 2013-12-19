@@ -43,27 +43,28 @@
 
 
 /*************        SPI        *****************/
-#define L3G4200D_SPI                       SPI1
-#define L3G4200D_SPI_CLK                   RCC_APB2Periph_SPI1
+#define L3G4200D_SPI                       SPI2
+#define L3G4200D_SPI_CLK                   RCC_APB1Periph_SPI2
 
-#define L3G4200D_SPI_SCK_PIN               GPIO_Pin_5
-#define L3G4200D_SPI_SCK_GPIO_PORT         GPIOA
-#define L3G4200D_SPI_SCK_GPIO_CLK          RCC_AHB1Periph_GPIOA
-#define L3G4200D_SPI_SCK_SOURCE            GPIO_PinSource5
-#define L3G4200D_SPI_SCK_AF                GPIO_AF_SPI1
+#define L3G4200D_SPI_SCK_PIN               GPIO_Pin_13
+#define L3G4200D_SPI_SCK_GPIO_PORT         GPIOB
+#define L3G4200D_SPI_SCK_GPIO_CLK          RCC_AHB1Periph_GPIOB
+#define L3G4200D_SPI_SCK_SOURCE            GPIO_PinSource13
+#define L3G4200D_SPI_SCK_AF                GPIO_AF_SPI2
 
-#define L3G4200D_SPI_MISO_PIN              GPIO_Pin_6
-#define L3G4200D_SPI_MISO_GPIO_PORT        GPIOA
-#define L3G4200D_SPI_MISO_GPIO_CLK         RCC_AHB1Periph_GPIOA
-#define L3G4200D_SPI_MISO_SOURCE           GPIO_PinSource6
-#define L3G4200D_SPI_MISO_AF               GPIO_AF_SPI1
+#define L3G4200D_SPI_MISO_PIN              GPIO_Pin_14
+#define L3G4200D_SPI_MISO_GPIO_PORT        GPIOB
+#define L3G4200D_SPI_MISO_GPIO_CLK         RCC_AHB1Periph_GPIOB
+#define L3G4200D_SPI_MISO_SOURCE           GPIO_PinSource14
+#define L3G4200D_SPI_MISO_AF               GPIO_AF_SPI2
 
-#define L3G4200D_SPI_MOSI_PIN              GPIO_Pin_7
-#define L3G4200D_SPI_MOSI_GPIO_PORT        GPIOA
-#define L3G4200D_SPI_MOSI_GPIO_CLK         RCC_AHB1Periph_GPIOA
-#define L3G4200D_SPI_MOSI_SOURCE           GPIO_PinSource7
-#define L3G4200D_SPI_MOSI_AF               GPIO_AF_SPI1
+#define L3G4200D_SPI_MOSI_PIN              GPIO_Pin_15
+#define L3G4200D_SPI_MOSI_GPIO_PORT        GPIOB
+#define L3G4200D_SPI_MOSI_GPIO_CLK         RCC_AHB1Periph_GPIOB
+#define L3G4200D_SPI_MOSI_SOURCE           GPIO_PinSource15
+#define L3G4200D_SPI_MOSI_AF               GPIO_AF_SPI2
 
+/****************************************??????????????????**********/
 #define L3G4200D_SPI_CS_PIN                GPIO_Pin_3
 #define L3G4200D_SPI_CS_GPIO_PORT          GPIOE
 #define L3G4200D_SPI_CS_GPIO_CLK           RCC_AHB1Periph_GPIOE
@@ -83,6 +84,8 @@
 #define L3G4200D_SPI_INT2_EXTI_PORT_SOURCE EXTI_PortSourceGPIOE
 #define L3G4200D_SPI_INT2_EXTI_PIN_SOURCE  EXTI_PinSource1
 #define L3G4200D_SPI_INT2_EXTI_IRQn        EXTI1_IRQn
+/**************************************************/
+
 
 #define L3G4200D_CS_LOW()    GPIO_ResetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN)
 #define L3G4200D_CS_HIGH()   GPIO_SetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN)

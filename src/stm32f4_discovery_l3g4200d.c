@@ -96,7 +96,7 @@ static void L3G4200D_LowLevel_Init(void)
   SPI_InitTypeDef  SPI_InitStructure;
 
   /* Enable the SPI periph */
-  RCC_APB2PeriphClockCmd(L3G4200D_SPI_CLK, ENABLE);
+  RCC_APB1PeriphClockCmd(L3G4200D_SPI_CLK, ENABLE);
 
   /* Enable SCK, MOSI and MISO GPIO clocks */
   RCC_AHB1PeriphClockCmd(L3G4200D_SPI_SCK_GPIO_CLK | L3G4200D_SPI_MISO_GPIO_CLK | L3G4200D_SPI_MOSI_GPIO_CLK, ENABLE);
@@ -120,15 +120,15 @@ static void L3G4200D_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
   /* SPI SCK pin configuration */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
   GPIO_Init(L3G4200D_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_;
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_15;
   GPIO_Init(L3G4200D_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI MISO pin configuration */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
   GPIO_Init(L3G4200D_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI configuration -------------------------------------------------------*/

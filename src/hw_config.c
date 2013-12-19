@@ -42,13 +42,12 @@ void prvSetupHardware( void )
 	/* Configure LIS302 in order to produce data used for TIM4 reconfiguration and LED control */
 	prvMEMS_Config();
 
-  RCC_Configuration();
-  GPIO_Configuration();
-  TIM_Configuration();
-  USART_Configuration();
-  prvGRYO_Config();
-
-
+  	RCC_Configuration();
+  	GPIO_Configuration();
+  	TIM_Configuration();
+  	USART_Configuration();
+  	prvGRYO_Config();
+	
 }
 
 void prvLED_Config(char state)
@@ -259,9 +258,9 @@ void prvGRYO_Config(void)
 {
   uint8_t ctrl = 0;
 
-  L3G4200DH_InitTypeDef  L3G4200DH_InitStruct;
+  L3G4200D_InitTypeDef  L3G4200D_InitStruct;
 
-  L3G4200DH_Init(&L3G4200DH_InitStruct);  
+  L3G4200D_Init(&L3G4200D_InitStruct);  
 }
 
 /**
