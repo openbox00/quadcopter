@@ -102,13 +102,13 @@ static void L3G4200D_LowLevel_Init(void)
   RCC_AHB1PeriphClockCmd(L3G4200D_SPI_SCK_GPIO_CLK | L3G4200D_SPI_MISO_GPIO_CLK | L3G4200D_SPI_MOSI_GPIO_CLK, ENABLE);
 
   /* Enable CS  GPIO clock */
-  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_CS_GPIO_CLK, ENABLE);
+//  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_CS_GPIO_CLK, ENABLE);
   
   /* Enable INT1 GPIO clock */
-  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT1_GPIO_CLK, ENABLE);
+  //RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT1_GPIO_CLK, ENABLE);
   
   /* Enable INT2 GPIO clock */
-  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT2_GPIO_CLK, ENABLE);
+  //RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT2_GPIO_CLK, ENABLE);
 
   GPIO_PinAFConfig(L3G4200D_SPI_SCK_GPIO_PORT, L3G4200D_SPI_SCK_SOURCE, L3G4200D_SPI_SCK_AF);
   GPIO_PinAFConfig(L3G4200D_SPI_MISO_GPIO_PORT, L3G4200D_SPI_MISO_SOURCE, L3G4200D_SPI_MISO_AF);
@@ -150,7 +150,7 @@ static void L3G4200D_LowLevel_Init(void)
 
 /*?????????????????????????????????????????????????????????????????????????????*/
   /* Configure GPIO PIN for Lis Chip select */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_CS_PIN;    // PIN3
+  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_CS_PIN;    // PINE1
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -158,7 +158,7 @@ static void L3G4200D_LowLevel_Init(void)
 
   /* Deselect : Chip Select high */
   GPIO_SetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN);
-  
+  #if 0
   /* Configure GPIO PINs to detect Interrupts */
   GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT1_PIN;  // pin0????????????
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
@@ -170,6 +170,7 @@ static void L3G4200D_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT2_PIN;  //pin 1???????????
   GPIO_Init(L3G4200D_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
   /*?????????????????????????????????????????????????????????????????????????????*/
+  #endif
 }
 
 static uint8_t L3G4200D_SendByte(uint8_t byte)

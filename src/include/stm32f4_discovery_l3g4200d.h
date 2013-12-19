@@ -65,7 +65,7 @@
 #define L3G4200D_SPI_MOSI_AF               GPIO_AF_SPI2
 
 /****************************************??????????????????**********/
-#define L3G4200D_SPI_CS_PIN                GPIO_Pin_3
+#define L3G4200D_SPI_CS_PIN                GPIO_Pin_1
 #define L3G4200D_SPI_CS_GPIO_PORT          GPIOE
 #define L3G4200D_SPI_CS_GPIO_CLK           RCC_AHB1Periph_GPIOE
 
