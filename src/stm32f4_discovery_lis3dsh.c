@@ -163,15 +163,15 @@ static void LIS3DSH_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
   /* SPI SCK pin configuration */
-  GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_SCK_PIN;
+  GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_SCK_PIN;  //pina5
   GPIO_Init(LIS3DSH_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  LIS3DSH_SPI_MOSI_PIN;
+  GPIO_InitStructure.GPIO_Pin =  LIS3DSH_SPI_MOSI_PIN;  //pina7
   GPIO_Init(LIS3DSH_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI MISO pin configuration */
-  GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_MISO_PIN;
+  GPIO_InitStructure.GPIO_Pin = LIS3DSH_SPI_MISO_PIN;	//pina6
   GPIO_Init(LIS3DSH_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI configuration -------------------------------------------------------*/

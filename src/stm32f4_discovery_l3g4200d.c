@@ -120,35 +120,37 @@ static void L3G4200D_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
   /* SPI SCK pin configuration */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_SCK_PIN;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_;
   GPIO_Init(L3G4200D_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  L3G4200D_SPI_MOSI_PIN;
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_;
   GPIO_Init(L3G4200D_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI MISO pin configuration */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_MISO_PIN;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_;
   GPIO_Init(L3G4200D_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI configuration -------------------------------------------------------*/
-  SPI_I2S_DeInit(L3G4200D_SPI);
-  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
-  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-  SPI_InitStructure.SPI_CRCPolynomial = 7;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+  SPI_I2S_DeInit(SPI2);  ///// APB2 42M need to change detail
+  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;// set to full duplex mode, seperate MOSI and MISO lines
+  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;// transmit in master mode, NSS pin has to be always high
+  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;// one packet of data is 8 bits wide
+  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;// clock is low when idle
+  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;// data sampled at first edge
+  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;         // set the NSS management to internal and pull internal NSS high
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;// SPI frequency is APB2 frequency / 4
+  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
+  SPI_InitStructure.SPI_CRCPolynomial = 7;  // ??????????????????
   SPI_Init(L3G4200D_SPI, &SPI_InitStructure);
 
   /* Enable SPI1  */
-  SPI_Cmd(L3G4200D_SPI, ENABLE);
+  SPI_Cmd(SPI2, ENABLE);
 
+
+/*?????????????????????????????????????????????????????????????????????????????*/
   /* Configure GPIO PIN for Lis Chip select */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_CS_PIN;
+  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_CS_PIN;    // PIN3
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -158,15 +160,16 @@ static void L3G4200D_LowLevel_Init(void)
   GPIO_SetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN);
   
   /* Configure GPIO PINs to detect Interrupts */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT1_PIN;
+  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT1_PIN;  // pin0????????????
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
   GPIO_Init(L3G4200D_SPI_INT1_GPIO_PORT, &GPIO_InitStructure);
   
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT2_PIN;
+  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT2_PIN;  //pin 1???????????
   GPIO_Init(L3G4200D_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
+  /*?????????????????????????????????????????????????????????????????????????????*/
 }
 
 static uint8_t L3G4200D_SendByte(uint8_t byte)
