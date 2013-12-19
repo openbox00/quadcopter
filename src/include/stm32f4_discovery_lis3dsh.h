@@ -135,7 +135,7 @@
 #define LIS3DSH_CR6_BOOT_TO_INT2_DISABLED   ((uint8_t)0x00)
 #define LIS3DSH_CR6_BOOT_TO_INT2_ENABLED    ((uint8_t)0x01)
 
-#define LIS3DSH_SPI                       GPIO_PinAFConfig
+#define LIS3DSH_SPI                       SPI1
 #define LIS3DSH_SPI_CLK                   RCC_APB2Periph_SPI1
 
 #define LIS3DSH_SPI_SCK_PIN               GPIO_Pin_5
