@@ -2,9 +2,6 @@
 #include "stm32f4_discovery_l3g4200d.h"
 
 
-
-__IO uint32_t  L3G4200DTimeout = L3G4200D_FLAG_TIMEOUT;   
-
 /* Read/Write command */
 #define READWRITE_CMD              ((uint8_t)0x80) 
 /* Multiple byte read/write command */ 
@@ -16,14 +13,14 @@ static void L3G4200D_LowLevel_Init(void);
 static uint8_t L3G4200D_SendByte(uint8_t byte);
 
 
-void L3G4200D_Init(L3G4200D_InitTypeDef *L3G4200D_InitStruct)
+void L3G4200D_Init(void)
 {
 	uint8_t ctrl = 0x00;	
   
 	/* Configure the low level interface ---------------------------------------*/
 	L3G4200D_LowLevel_Init();
   
-  ctrl = 0x17; //100Hz
+  ctrl = 0x0F; //100Hz
   L3G4200D_Write(&ctrl, L3G4200D_CTRL_REG1_ADDR, 1);
 }
 
@@ -96,50 +93,35 @@ static void L3G4200D_LowLevel_Init(void)
   SPI_InitTypeDef  SPI_InitStructure;
 
   /* Enable the SPI periph */
-  RCC_APB1PeriphClockCmd(L3G4200D_SPI_CLK, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
-  /* Enable SCK, MOSI and MISO GPIO clocks */
-  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_SCK_GPIO_CLK | L3G4200D_SPI_MISO_GPIO_CLK | L3G4200D_SPI_MOSI_GPIO_CLK, ENABLE);
+  RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI2, ENABLE);
+  RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI2, DISABLE);
 
-  /* Enable CS  GPIO clock */
-//  RCC_AHB1PeriphClockCmd(L3G4200D_SPI_CS_GPIO_CLK, ENABLE);
-  
-  /* Enable INT1 GPIO clock */
-  //RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT1_GPIO_CLK, ENABLE);
-  
-  /* Enable INT2 GPIO clock */
-  //RCC_AHB1PeriphClockCmd(L3G4200D_SPI_INT2_GPIO_CLK, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-  GPIO_PinAFConfig(L3G4200D_SPI_SCK_GPIO_PORT, L3G4200D_SPI_SCK_SOURCE, L3G4200D_SPI_SCK_AF);
-  GPIO_PinAFConfig(L3G4200D_SPI_MISO_GPIO_PORT, L3G4200D_SPI_MISO_SOURCE, L3G4200D_SPI_MISO_AF);
-  GPIO_PinAFConfig(L3G4200D_SPI_MOSI_GPIO_PORT, L3G4200D_SPI_MOSI_SOURCE, L3G4200D_SPI_MOSI_AF);
-
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;	//GPIO_OType_OD
+  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;	//GPIO_PuPd_UP
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-  /* SPI SCK pin configuration */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
-  GPIO_Init(L3G4200D_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
 
-  /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_15;
-  GPIO_Init(L3G4200D_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource13,GPIO_AF_SPI2); // SCK
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource14,GPIO_AF_SPI2); // MISO
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource15,GPIO_AF_SPI2); // MOSI
 
-  /* SPI MISO pin configuration */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
-  GPIO_Init(L3G4200D_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI configuration -------------------------------------------------------*/
-  SPI_I2S_DeInit(SPI2);  ///// APB2 42M need to change detail
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;// set to full duplex mode, seperate MOSI and MISO lines
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;// transmit in master mode, NSS pin has to be always high
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;// one packet of data is 8 bits wide
   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;// clock is low when idle
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;// data sampled at first edge
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;         // set the NSS management to internal and pull internal NSS high
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;// SPI frequency is APB2 frequency / 4
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;// SPI frequency is APB2 frequency / 4
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;// data is transmitted MSB first
   SPI_InitStructure.SPI_CRCPolynomial = 7;  // ??????????????????
   SPI_Init(L3G4200D_SPI, &SPI_InitStructure);
@@ -147,63 +129,30 @@ static void L3G4200D_LowLevel_Init(void)
   /* Enable SPI1  */
   SPI_Cmd(SPI2, ENABLE);
 
-
-/*?????????????????????????????????????????????????????????????????????????????*/
   /* Configure GPIO PIN for Lis Chip select */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_CS_PIN;    // PINE1
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;    // PINE1
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(L3G4200D_SPI_CS_GPIO_PORT, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_Init(GPIOE, &GPIO_InitStructure);
 
   /* Deselect : Chip Select high */
-  GPIO_SetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN);
-  #if 0
-  /* Configure GPIO PINs to detect Interrupts */
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT1_PIN;  // pin0????????????
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-  GPIO_Init(L3G4200D_SPI_INT1_GPIO_PORT, &GPIO_InitStructure);
-  
-  GPIO_InitStructure.GPIO_Pin = L3G4200D_SPI_INT2_PIN;  //pin 1???????????
-  GPIO_Init(L3G4200D_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
-  /*?????????????????????????????????????????????????????????????????????????????*/
-  #endif
+  GPIO_SetBits(GPIOE, GPIO_Pin_1);
 }
 
 static uint8_t L3G4200D_SendByte(uint8_t byte)
 {
-  /* Loop while DR register in not emplty */
-  L3G4200DTimeout = L3G4200D_FLAG_TIMEOUT;
-  while (SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_TXE) == RESET)
-  {
-    if((L3G4200DTimeout--) == 0) return 0;//L3G4200D_TIMEOUT_UserCallback();
-  }
-  
+
+  while (!SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_TXE));  
   /* Send a Byte through the SPI peripheral */
   SPI_I2S_SendData(L3G4200D_SPI, byte);
-  
-  /* Wait to receive a Byte */
-  L3G4200DTimeout = L3G4200D_FLAG_TIMEOUT;
-  while (SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_RXNE) == RESET)
-  {
-    if((L3G4200DTimeout--) == 0) return 0;//L3G4200D_TIMEOUT_UserCallback();
-  }
-  
+
+  while (!SPI_I2S_GetFlagStatus(L3G4200D_SPI, SPI_I2S_FLAG_RXNE));
+   
   /* Return the Byte read from the SPI bus */
   return (uint8_t)SPI_I2S_ReceiveData(L3G4200D_SPI);
 }
 
-
-uint32_t L3G4200D_TIMEOUT_UserCallback(void)
-{
-  /* Block communication and all processes */
-  while (1)
-  {   
-  }
-}
 
 
 

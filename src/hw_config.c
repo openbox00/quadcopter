@@ -46,7 +46,6 @@ void prvSetupHardware( void )
   	GPIO_Configuration();
   	TIM_Configuration();
   	USART_Configuration();
-  	prvGRYO_Config();
 	
 }
 
@@ -252,15 +251,6 @@ void prvMEMS_Config(void)
 
 	
 	LIS3DSH_Init(&LIS3DSH_InitStruct);	
-}
-
-void prvGRYO_Config(void)
-{
-  uint8_t ctrl = 0;
-
-  L3G4200D_InitTypeDef  L3G4200D_InitStruct;
-
-  L3G4200D_Init(&L3G4200D_InitStruct);  
 }
 
 /**

@@ -87,10 +87,8 @@
 /**************************************************/
 
 
-#define L3G4200D_CS_LOW()    GPIO_ResetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN)
-#define L3G4200D_CS_HIGH()   GPIO_SetBits(L3G4200D_SPI_CS_GPIO_PORT, L3G4200D_SPI_CS_PIN)
-
-#define L3G4200D_FLAG_TIMEOUT    ((uint32_t)0x1000)
+#define L3G4200D_CS_LOW()    GPIO_ResetBits(GPIOE, GPIO_Pin_1)
+#define L3G4200D_CS_HIGH()   GPIO_SetBits(GPIOE, GPIO_Pin_1)
 
 typedef struct
 {
@@ -146,11 +144,10 @@ typedef struct
 /** @defgroup STM32F4_DISCOVERY_L3G4200DH_Exported_Functions
   * @{
   */ 
-void L3G4200D_Init(L3G4200D_InitTypeDef *L3G4200D_InitStruct);
+void L3G4200D_Init(void);
 void L3G4200D_Read(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteToRead);
 void L3G4200D_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite);
 
-uint32_t L3G4200D_TIMEOUT_UserCallback(void);
 
 #endif /* __STM32F4_DISCOVERY_L3G4200DH_H */
 

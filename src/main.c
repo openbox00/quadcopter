@@ -13,6 +13,7 @@
 #include "main.h"
 #include "shell.h"
 #include "I2C.h"
+#include "stm32f4_discovery_l3g4200d.h"
 
 #include "string-util.c"
 
@@ -177,8 +178,8 @@ int main(void)
 
 	/* initialize hardware... */
 	prvSetupHardware();
-	init_I2C1();
-	//sensor_ayarla();
+	//init_I2C1();
+	L3G4200D_Init();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
@@ -261,7 +262,7 @@ void Balance(void *pvParameters)
 	float y_acc;
 	float z_acc;
 
- 	const portTickType xDelay = 6000; 
+ 	const portTickType xDelay = 1000; 
 
 	uint8_t Buffer_GHx[1];
 	uint8_t Buffer_GHy[1];
@@ -290,16 +291,16 @@ void Balance(void *pvParameters)
 	z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 	
 	/* reset gyro offset */	
-
+/*
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
     Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
     Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
-
- /*
+*/
+ 
   	L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
 	L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
 	L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
-*/
+
   	GXOffset = (int8_t)Buffer_GHx[0];
  	GYOffset = (int8_t)Buffer_GHy[0];
  	GZOffset = (int8_t)Buffer_GHz[0];
@@ -329,10 +330,15 @@ void Balance(void *pvParameters)
 		x_acc = (float)((int8_t)Buffer_Hx[0] - XOffset)*Sensitivity_2G;
 		y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
 		z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
-
+/*
     	Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
 	    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
     	Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
+*/
+
+  		L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
+		L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
+		L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
 
 		x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
 		y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
