@@ -293,8 +293,8 @@ void Balance(void *pvParameters)
 //	int16_t gyroX, gyroY, gyroZ;
 
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-    Buffer_GYx[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-    Buffer_GZx[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
  /*
   	L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
@@ -331,9 +331,9 @@ void Balance(void *pvParameters)
 		y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
 		z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 
-  	  Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-  	  Buffer_GYx[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
- 	   Buffer_GZx[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
   		/*
   		L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
@@ -353,16 +353,14 @@ void Balance(void *pvParameters)
 
 		qprintf(xQueueUARTSend, "--------------------------------------------------------------------\n\r");
 		qprintf(xQueueUARTSend, "ax	:	%d, ay		:	%d,	az	:	%d\n\r", (int8_t)Buffer_Hx[0], (int8_t)Buffer_Hy[0] , (int8_t)Buffer_Hz[0]);
-		vTaskDelay( 100 ); 
-		/*qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
- 		vTaskDelay( 100 ); */ 
+		vTaskDelay( 500 ); 
+		qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
+ 		vTaskDelay( 500 ); 
 		qprintf(xQueueUARTSend, "gx	:	%d, gy		:	%d,	gz	:	%d\n\r", (int8_t)Buffer_GHx[0], (int8_t)Buffer_GHy[0] , (int8_t)Buffer_GHz[0]);
-		vTaskDelay( 100 ); 
-		/*
+		vTaskDelay( 500 ); 
 		qprintf(xQueueUARTSend, "x_gyro	:	%d, y_gyro	:	%d,	z_gyro	:	%d\n\r", (int)x_gyro, (int)y_gyro, (int)z_gyro);
- 		vTaskDelay( 100 );  
-		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);
-		*/
+ 		vTaskDelay( 500 );  
+		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);		
 	}
 	
 }
