@@ -16,13 +16,23 @@
 #define OUT_Z_H                         0x2D
 #define L3G4200D_ADDR                   (105<<1)
 
-uint8_t i2cdata,a1,a2;
-int16_t gyroX, gyroY, gyroZ;
-
 uint8_t I2C_write(uint8_t devAddr, uint8_t regAddr, uint8_t val);
 uint8_t I2C_readreg(uint8_t devAddr, uint8_t regAddr);
 
 void init_I2C1(void)
+{
+
+    init_I2C1_lowlevel();
+
+    I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
+    I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
+    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x08); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
+    I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x30); //çıkış değeri  2000d/s olacak şekilde ayarla
+    I2C_write(L3G4200D_ADDR, CTRL_REG5, 0x00);
+}
+
+
+void init_I2C1_lowlevel(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
     I2C_InitTypeDef I2C_InitStruct;
@@ -40,7 +50,7 @@ void init_I2C1(void)
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_I2C1);	// SCL pini 
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_I2C1); // SCL pini 
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_I2C1); // SDA pini
 
     I2C_InitStruct.I2C_ClockSpeed = 100000;    //i2c hızı normal modda                
@@ -53,7 +63,6 @@ void init_I2C1(void)
 
     I2C_Cmd(I2C1, ENABLE);
 }
-
 
 uint8_t I2C_write(uint8_t devAddr, uint8_t regAddr, uint8_t val)
 {
@@ -105,48 +114,17 @@ uint8_t I2C_readreg(uint8_t devAddr, uint8_t regAddr)
 
         while (I2C_GetFlagStatus(I2C1, I2C_FLAG_ADDR ) == RESET);
 
-    I2C_AcknowledgeConfig(I2C1, DISABLE);
+        I2C_AcknowledgeConfig(I2C1, DISABLE);
 
-    while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED ));
+        while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED ));
 
-    reg = I2C_ReceiveData(I2C1);
+        reg = I2C_ReceiveData(I2C1);
 
         I2C_GenerateSTOP(I2C1, ENABLE);
 
         return reg;
 }
 
-void sensor_ayarla()
-{
-    I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
-    I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
-    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x08); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
-    I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x30); //çıkış değeri  2000d/s olacak şekilde ayarla
-    I2C_write(L3G4200D_ADDR, CTRL_REG5, 0x00);
-}
 
-/*int main(void)
-{
 
-    SystemInit();
-    init_I2C1();
-    sensor_ayarla();
 
-    while (1){
-
-    if((I2C_readreg(L3G4200D_ADDR,STATUS_REG)&0x08)==0x08) // eğer yeni data kullanılmaya hazırsa dataları oku
-    {
-        a1=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
-        a2=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-        gyroX=((a2<<8) | a1);
-
-        a1=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
-        a2=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-        gyroY=((a2<<8) | a1);
-
-        a1=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
-        a2=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
-        gyroZ=((a2<<8) | a1);
-    }
-    }
-}*/
