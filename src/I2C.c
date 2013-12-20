@@ -16,6 +16,7 @@
 #define OUT_Z_H                         0x2D
 #define L3G4200D_ADDR                   (105<<1)
 
+
 uint8_t I2C_write(uint8_t devAddr, uint8_t regAddr, uint8_t val);
 uint8_t I2C_readreg(uint8_t devAddr, uint8_t regAddr);
 
@@ -23,6 +24,7 @@ void init_I2C1(void)
 {
 
     init_I2C1_lowlevel();
+
 
     I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
     I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
@@ -53,12 +55,13 @@ void init_I2C1_lowlevel(void)
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_I2C1); // SCL pini 
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_I2C1); // SDA pini
 
-    I2C_InitStruct.I2C_ClockSpeed = 100000;    //i2c hızı normal modda                
-    I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;
-    I2C_InitStruct.I2C_DutyCycle = I2C_DutyCycle_2;
-    I2C_InitStruct.I2C_OwnAddress1 = 0x00;//0x00;
-    I2C_InitStruct.I2C_Ack = I2C_Ack_Enable;
-    I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+	/* detail????????????? */
+    I2C_InitStruct.I2C_ClockSpeed = 100000;    	//?????????????????????????              
+    I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;		//??????????????????
+    I2C_InitStruct.I2C_DutyCycle = I2C_DutyCycle_2;	//???????????????
+    I2C_InitStruct.I2C_OwnAddress1 = 0x00;	//???????????????????????
+    I2C_InitStruct.I2C_Ack = I2C_Ack_Enable;	//?????????????????????????????????????
+    I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;	//??????????????????????
     I2C_Init(I2C1, &I2C_InitStruct);
 
     I2C_Cmd(I2C1, ENABLE);
