@@ -172,13 +172,13 @@ int main(void)
 	
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
-    	xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
-    	xQueueShell2PWM = xQueueCreate(1, 24);
+   	xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
+   	xQueueShell2PWM = xQueueCreate(1, 24);
 
 	/* initialize hardware... */
 	prvSetupHardware();
 	init_I2C1();
-	sensor_ayarla();
+	//sensor_ayarla();
 
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
@@ -249,27 +249,35 @@ static void UsartReciveTask(void *pvParameters)
 
 void Balance(void *pvParameters)
 {
+	const portTickType ms500 = 500;  	
+
 	uint8_t Buffer_Hx[1];
 	uint8_t Buffer_Hy[1];
 	uint8_t Buffer_Hz[1];
 
-	__IO int8_t XOffset;
-	__IO int8_t YOffset;
-	__IO int8_t ZOffset;
+	uint8_t Buffer_Lx[1];
+	uint8_t Buffer_Ly[1];
+	uint8_t Buffer_Lz[1];	
+
+	__IO int16_t XOffset;
+	__IO int16_t YOffset;
+	__IO int16_t ZOffset;
 
 	float x_acc;
 	float y_acc;
 	float z_acc;
 
- 	const portTickType xDelay = 6000; 
-
 	uint8_t Buffer_GHx[1];
 	uint8_t Buffer_GHy[1];
 	uint8_t Buffer_GHz[1];
 
-	__IO int8_t GXOffset;
-	__IO int8_t GYOffset;
-	__IO int8_t GZOffset;
+	uint8_t Buffer_GLx[1];
+	uint8_t Buffer_GLy[1];
+	uint8_t Buffer_GLz[1];
+
+	__IO int16_t GXOffset;
+	__IO int16_t GYOffset;
+	__IO int16_t GZOffset;
 
 	float x_gyro;
 	float y_gyro;
@@ -281,49 +289,55 @@ void Balance(void *pvParameters)
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
 
-  	XOffset = (int8_t)Buffer_Hx[0];
- 	YOffset = (int8_t)Buffer_Hy[0];
- 	ZOffset = (int8_t)Buffer_Hz[0];
+	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);	
 
-	x_acc = (float)((int8_t)Buffer_Hx[0] - XOffset)*Sensitivity_2G;
-	y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
-	z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
-	
+  	XOffset = (int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]);
+ 	YOffset = (int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]);
+ 	ZOffset = (int16_t)(Buffer_Hz[0] << 8 | Buffer_Lz[0]);
+
+	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
+	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
+	z_acc = (float)((int16_t)(Buffer_Hz[0] << 8 | Buffer_Lz[0]) - ZOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
+
 	/* reset gyro offset */	
-	uint8_t i2cdata,a1,a2;
-	int16_t gyroX, gyroY, gyroZ;
 
-	//a1=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
-        gyroX=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-        //gyroX=((a2<<8) | a1);
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
-        //a1=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
-        gyroY=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-        //gyroY=((a2<<8) | a1);
+    Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
+    Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
-        //a1=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
-        gyroZ=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
-        //gyroZ=((a2<<8) | a1);
-	
-	GXOffset = (int8_t)gyroX;
- 	GYOffset = (int8_t)gyroY;
- 	GZOffset = (int8_t)gyroZ;
+  	GXOffset = (int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]);
+ 	GYOffset = (int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]);
+ 	GZOffset = (int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]);
 
- /* 	L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]) - GZOffset) * Sensitivity_250 / 1000;
+
+/*
+  	L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
 	L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
 	L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
 
+	L3G4200D_Read(Buffer_GLx, L3G4200D_OUT_X_L_REG_ADDR, 1);
+	L3G4200D_Read(Buffer_GLy, L3G4200D_OUT_Y_L_REG_ADDR, 1);
+	L3G4200D_Read(Buffer_GLz, L3G4200D_OUT_Z_L_REG_ADDR, 1);	
 
-  	GXOffset = (int8_t)Buffer_GHx[0];
- 	GYOffset = (int8_t)Buffer_GHy[0];
- 	GZOffset = (int8_t)Buffer_GHz[0];
+  	GXOffset = (int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]);
+ 	GYOffset = (int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]);
+ 	GZOffset = (int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]);
 
-	x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
-	y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
-	z_gyro = (float)((int8_t)Buffer_GHz[0] - GZOffset)*Sensitivity_250;*/
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]) - GZOffset) * Sensitivity_250 / 1000;
 
-
-  	float angle_x;
+*/
+ 	float angle_x;
   	float angle_y;
   	float angle_z;
 
@@ -333,47 +347,62 @@ void Balance(void *pvParameters)
 	angle_y = 0;
 	angle_z = 0;
 
+	int16_t x_1, y_1;
+	uint8_t x_2, y_2;
+
+	int16_t gx_1, gy_1, gz_1;
+	uint8_t gx_2, gy_2, gz_2;
+
 
 	for( ;; )
 	{
-	  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
-		LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
+  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Hz, LIS3DSH_OUT_Z_H_REG_ADDR, 1);
 
-		x_acc = (float)((int8_t)Buffer_Hx[0] - XOffset)*Sensitivity_2G;
-		y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
-		z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
-
-	        gyroX=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-	        gyroY=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-         	gyroZ=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
-
-  		/*L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
-		L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
-		L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
-
-		x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
-		y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
-		z_gyro = (float)((int8_t)Buffer_GHz[0] - GZOffset)*Sensitivity_250;*/
-		
+	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+	LIS3DSH_Read(Buffer_Lz, LIS3DSH_OUT_Z_L_REG_ADDR, 1);	
 
 
-		angle_x = (0.966)*(angle_x + x_gyro*0.0262) + (0.034)*(x_acc);  		
-		angle_y = (0.966)*(angle_y + y_gyro*0.0262) + (0.034)*(y_acc); 
-		angle_z = (0.966)*(angle_z + z_gyro*0.0262) + (0.034)*(z_acc); 
+	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
+	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
+	z_acc = (float)((int16_t)(Buffer_Hz[0] << 8 | Buffer_Lz[0]) - ZOffset) * Sensitivity_2G / 1000 * 180 / 3.14159;
 
-		qprintf(xQueueUARTSend, "--------------------------------------------------------------------\n\r");
-		qprintf(xQueueUARTSend, "ax	:	%d, ay		:	%d,	az	:	%d\n\r", (int8_t)Buffer_Hx[0], (int8_t)Buffer_Hy[0] , (int8_t)Buffer_Hz[0]);
-		vTaskDelay( 100 ); 
-		/*qprintf(xQueueUARTSend, "x_acc	:	%d, y_acc	:	%d,	z_acc	:	%d\n\r", (int)x_acc, (int)y_acc, (int)y_acc);
- 		vTaskDelay( 100 ); */ 
-		/*qprintf(xQueueUARTSend, "gx	:	%d, gy		:	%d,	gz	:	%d\n\r", (int8_t)Buffer_GHx[0], (int8_t)Buffer_GHy[0] , (int8_t)Buffer_GHz[0]);*/
-		qprintf(xQueueUARTSend, "gx	:	%d, gy		:	%d,	gz	:	%d\n\r", (int8_t)gyroX, (int8_t)gyroY , (int8_t)gyroZ);
-		vTaskDelay( 100 ); 
-		/*qprintf(xQueueUARTSend, "x_gyro	:	%d, y_gyro	:	%d,	z_gyro	:	%d\n\r", (int)x_gyro, (int)y_gyro, (int)z_gyro);
- 		vTaskDelay( 100 );  */
-		qprintf(xQueueUARTSend, "angle_x	:	%d, angle_y	:	%d,	angle_z	:	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);
+	x_1 = (int16_t)x_acc;
+	x_2 = (x_acc - x_1) * 1000;
+	y_1 = (int16_t)y_acc;
+	y_2 = (y_acc - y_1) * 1000;
 
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
+
+    Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
+    Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
+
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]) - GZOffset) * Sensitivity_250 / 1000;
+
+	gx_1 = (int16_t)x_gyro;
+	gx_2 = (x_gyro - gx_1) * 1000;
+	gy_1 = (int16_t)y_gyro;
+	gy_2 = (y_gyro - gy_1) * 1000;
+	gz_1 = (int16_t)z_gyro;
+	gz_2 = (z_gyro - gz_1) * 1000;		
+
+
+		angle_x = (0.966)*(angle_x + x_gyro*0.15) + (0.034)*(x_acc);  		
+		angle_y = (0.966)*(angle_y + y_gyro*0.15) + (0.034)*(y_acc); 
+		angle_z = (0.966)*(angle_z + z_gyro*0.15) + (0.034)*(z_acc); 
+
+//		qprintf(xQueueUARTSend, "gx :	%d.%d	,gy :	%d.%d	, gz :	%d.%d\n\r", gx_1, gx_2, gy_1, gy_2, gz_1, gz_2);
+//		vTaskDelay(ms500);
+
+		qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d	, angle_z :	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);	
+	
 	}
 	
 }
