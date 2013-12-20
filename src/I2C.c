@@ -26,8 +26,8 @@ void init_I2C1(void)
 
     I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
     I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
-    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x08); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
-    I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x30); //çıkış değeri  2000d/s olacak şekilde ayarla
+    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x00); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
+    I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x00); //250 DPS
     I2C_write(L3G4200D_ADDR, CTRL_REG5, 0x00);
 }
 

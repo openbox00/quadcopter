@@ -290,7 +290,6 @@ void Balance(void *pvParameters)
 	z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 	
 	/* reset gyro offset */	
-//	int16_t gyroX, gyroY, gyroZ;
 
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
     Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
@@ -331,15 +330,9 @@ void Balance(void *pvParameters)
 		y_acc = (float)((int8_t)Buffer_Hy[0] - YOffset)*Sensitivity_2G;
 		z_acc = (float)((int8_t)Buffer_Hz[0] - ZOffset)*Sensitivity_2G;
 
-    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
-
-  		/*
-  		L3G4200D_Read(Buffer_GHx, L3G4200D_OUT_X_H_REG_ADDR, 1);
-		L3G4200D_Read(Buffer_GHy, L3G4200D_OUT_Y_H_REG_ADDR, 1);
-		L3G4200D_Read(Buffer_GHz, L3G4200D_OUT_Z_H_REG_ADDR, 1);
-		*/
+    	Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+	    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    	Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
 		x_gyro = (float)((int8_t)Buffer_GHx[0] - GXOffset)*Sensitivity_250;
 		y_gyro = (float)((int8_t)Buffer_GHy[0] - GYOffset)*Sensitivity_250;
