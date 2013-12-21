@@ -117,7 +117,7 @@ static void pwmctrl(void *pvParameters)
   const portTickType xDelay = 6000; 
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( xDelay );  //6S
+  vTaskDelay( 6000 );  //6S
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 
   while(1)  // Do not exit
@@ -128,16 +128,16 @@ static void pwmctrl(void *pvParameters)
 	
   //qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
 	
-   pwm_speed = (pwm_speed_int *1000) / 100;
+   //pwm_speed = (pwm_speed_int *1000) / 100;
 
-   if (pwm_speed >1000) {
-	pwm_speed = 1000;
-	}else if (pwm_speed <100){
-	pwm_speed = 100;
+   if (pwm_speed_int >1000) {
+	pwm_speed_int = 1000;
+	}else if (pwm_speed_int <100){
+	pwm_speed_int = 100;
 	}else{
-	pwm_speed = pwm_speed;
+	pwm_speed_int = pwm_speed_int;
 	}
-   Motor_Control(pwm_speed, pwm_speed, pwm_speed, pwm_speed);
+   Motor_Control(pwm_speed_int, pwm_speed_int, pwm_speed_int, pwm_speed_int);
   }
 } 
 
@@ -155,16 +155,16 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
+	PWM_Motor1 = Motor1 ;	// 12 	18 + 2.4=20.4
 	PWM_Motor2 = Motor2;	// 13	18  	
-	PWM_Motor3 = Motor3 + 5;	// 14	18 - 0.2 = 17.8
+	PWM_Motor3 = Motor3 + 2;	// 14	18 - 0.2 = 17.8
 	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
 }
 
 
 void vTimerCallback( xTimerHandle pxTimer ){
-	Motor_Control(230, 230, 230, 230);
-	qprintf(xQueueUARTSend, "20 sec idle time pass ... trun off motor\n\r");
+	Motor_Control(100, 100, 100, 100);
+	qprintf(xQueueUARTSend, "30 sec idle time pass ... trun off motor\n\r");
 }
 /*********************************************************************************************************/
 
@@ -179,7 +179,7 @@ int main(void)
 { 
 	int timerID = 1;
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerCallback);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerCallback);
 
 
 	/*a queue for tansfer the senddate to USART task*/
