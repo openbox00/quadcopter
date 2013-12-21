@@ -15,10 +15,10 @@ static uint8_t L3G4200D_SendByte(uint8_t byte);
 
 void L3G4200D_Init(void)
 {
-	uint8_t ctrl = 0x00;	
+  uint8_t ctrl = 0x00;  
   
-	/* Configure the low level interface ---------------------------------------*/
-	L3G4200D_LowLevel_Init();
+  /* Configure the low level interface ---------------------------------------*/
+  L3G4200D_LowLevel_Init();
   
   ctrl = 0x0F; //100Hz
   L3G4200D_Write(&ctrl, L3G4200D_CTRL_REG1_ADDR, 1);
@@ -104,8 +104,8 @@ static void L3G4200D_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;	//GPIO_OType_OD
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;	//GPIO_PuPd_UP
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;  //GPIO_OType_OD
+  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN; //GPIO_PuPd_UP
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 
@@ -157,3 +157,4 @@ static uint8_t L3G4200D_SendByte(uint8_t byte)
 
 
 
+s

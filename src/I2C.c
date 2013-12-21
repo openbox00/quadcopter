@@ -14,7 +14,8 @@
 #define OUT_Y_H                         0x2B
 #define OUT_Z_L                         0x2C
 #define OUT_Z_H                         0x2D
-#define L3G4200D_ADDR                   (105<<1)  //???????
+#define L3G4200D_ADDR                   (105<<1)
+
 
 uint8_t I2C_write(uint8_t devAddr, uint8_t regAddr, uint8_t val);
 uint8_t I2C_readreg(uint8_t devAddr, uint8_t regAddr);
@@ -24,9 +25,10 @@ void init_I2C1(void)
 
     init_I2C1_lowlevel();
 
-    I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z enable 100Hz 
+
+    I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
     I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
-    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x00); 
+    I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x00); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
     I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x00); //250 DPS
     I2C_write(L3G4200D_ADDR, CTRL_REG5, 0x00);
 }

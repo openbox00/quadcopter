@@ -2,6 +2,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_i2c.h"
 
+#define WHOAMI							0x0f
 #define CTRL_REG1                       0x20
 #define CTRL_REG2                       0x21
 #define CTRL_REG3                       0x22
