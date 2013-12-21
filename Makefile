@@ -30,6 +30,7 @@ SOURCES += src/stm32f4_discovery_lis3dsh.c
 SOURCES += src/stm32f4_discovery_l3g4200d.c
 SOURCES += src/hw_config.c
 
+SOURCES += FreeRTOS/Source/timers.c
 SOURCES += FreeRTOS/Source/tasks.c
 SOURCES += FreeRTOS/Source/queue.c
 SOURCES += FreeRTOS/Source/list.c

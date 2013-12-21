@@ -4,6 +4,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "timers.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -65,7 +66,8 @@ xQueueHandle xQueueUARTSend;
 xQueueHandle xQueueUARTRecvie;
 xQueueHandle xQueueShell2PWM;
 
-
+/* software Timers */
+xTimerHandle xTimerNoSignal;
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -159,8 +161,12 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	PWM_Motor4 = Motor4+11;	// 15	18 + 1 = 19
 }
 
+
+void vTimerCallback( xTimerHandle pxTimer ){
+	Motor_Control(0, 0, 0, 0);
+}
 /*********************************************************************************************************/
-/* Private functions ---------------------------------------------------------*/
+
 
 
 /**
@@ -170,7 +176,10 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
   */
 int main(void)
 { 
-	
+	int timerID = 1;
+	/*A Timer used to count how long there is no signal come in*/
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerCallback);
+
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
    	xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
@@ -235,15 +244,19 @@ static void UsartReciveTask(void *pvParameters)
 	uint8_t curr_char;	
 
 	while(1) {
+
+		while(xTimerStart(xTimerNoSignal, 0) != pdPASS);
 		//Wait for character
 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
            if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
 		 		USART_ReceiveData(USART2); // Clear Error
+		 		while(xTimerStop(xTimerNoSignal, 0) != pdPASS);
 		 }
 
 		//Collect the character
 		Data = USART_ReceiveData(USART2);
 		qprintf(xQueueUARTRecvie, "%c", Data); 
+
 	}
 
 }
