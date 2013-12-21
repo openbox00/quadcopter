@@ -157,4 +157,3 @@ static uint8_t L3G4200D_SendByte(uint8_t byte)
 
 
 
-s

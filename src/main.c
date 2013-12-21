@@ -117,7 +117,7 @@ static void pwmctrl(void *pvParameters)
   const portTickType xDelay = 6000; 
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( 6000 );  //6S
+  vTaskDelay( xDelay );  //6S
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 
   while(1)  // Do not exit
@@ -126,7 +126,7 @@ static void pwmctrl(void *pvParameters)
 
   pwm_speed_int = atoi(pwm_speed_char);
 	
-  qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
+  //qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
 	
    pwm_speed = (pwm_speed_int *1000) / 100;
 
@@ -155,15 +155,16 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1+26;	// 12 	18 + 2.4=20.4
+	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
 	PWM_Motor2 = Motor2;	// 13	18  	
-	PWM_Motor3 = Motor3-2;	// 14	18 - 0.2 = 17.8
-	PWM_Motor4 = Motor4+11;	// 15	18 + 1 = 19
+	PWM_Motor3 = Motor3 + 5;	// 14	18 - 0.2 = 17.8
+	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
 }
 
 
 void vTimerCallback( xTimerHandle pxTimer ){
-	Motor_Control(0, 0, 0, 0);
+	Motor_Control(230, 230, 230, 230);
+	qprintf(xQueueUARTSend, "20 sec idle time pass ... trun off motor\n\r");
 }
 /*********************************************************************************************************/
 
@@ -178,7 +179,8 @@ int main(void)
 { 
 	int timerID = 1;
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerCallback);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerCallback);
+
 
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
@@ -187,17 +189,16 @@ int main(void)
 
 	/* initialize hardware... */
 	prvSetupHardware();
-	init_I2C1();
+	//init_I2C1();
 	//L3G4200D_Init();
-
+	xTimerStart(xTimerNoSignal, 0);
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY+5, NULL );
+	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(UsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(UsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-
-	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
+	//xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -244,15 +245,15 @@ static void UsartReciveTask(void *pvParameters)
 	uint8_t curr_char;	
 
 	while(1) {
-
-		while(xTimerStart(xTimerNoSignal, 0) != pdPASS);
+		
 		//Wait for character
 		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
            if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
 		 		USART_ReceiveData(USART2); // Clear Error
-		 		while(xTimerStop(xTimerNoSignal, 0) != pdPASS);
+		 		
 		 }
-
+		//xTimerStop(xTimerNoSignal, 10);
+		xTimerReset(xTimerNoSignal, 10);
 		//Collect the character
 		Data = USART_ReceiveData(USART2);
 		qprintf(xQueueUARTRecvie, "%c", Data); 
@@ -396,7 +397,7 @@ void Balance(void *pvParameters)
 		angle_z = (0.966)*(angle_z + z_gyro*0.15) + (0.034)*(z_acc); 
 
 
-		qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d	, angle_z :	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);	
+		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d	, angle_z :	%d\n\r", (int)angle_x, (int)angle_y, (int)angle_y);	
 
 	}
 	
