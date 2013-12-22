@@ -117,26 +117,26 @@ static void pwmctrl(void *pvParameters)
 	
   char direction;
 	
-  int pwm_speed_w;
-  int pwm_speed_a;
-  int pwm_speed_s;
-  int pwm_speed_d;
+  int pwm_speed_w = 0;
+  int pwm_speed_a = 0;
+  int pwm_speed_s = 0;
+  int pwm_speed_d = 0;
 
 
   const portTickType xDelay = 6000; 
 
   Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( 6000 );  //6S
+  vTaskDelay( xDelay );  //6S
   Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 
   while(1)  // Do not exit
   {
 
-  while (!xQueueReceive(xQueuePWMdirection , &pwm_direction, portMAX_DELAY));
+  while (!xQueueReceive(xQueuePWMdirection , pwm_direction, portMAX_DELAY));
 
   direction = pwm_direction[0];
 
-  while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
+  while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
 
   pwm_speed_int = atoi(pwm_speed_char);	
 
@@ -404,6 +404,7 @@ static void UsartReciveTask(void *pvParameters)
 void Balance(void *pvParameters)
 {
 	const portTickType ms500 = 500;  	
+	const portTickType sec1 = 1000; 	
 
 	/*inital Offset value of Gryo. and Acce.*/
 
@@ -452,7 +453,8 @@ void Balance(void *pvParameters)
 	while(1){
 		Pitch = (int)angle_y;
 		Roll = (int)angle_x;
-		qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\n\r", Pitch, Roll);
+		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\n\r", Pitch, Roll);
+		//vTaskDelay(sec1);
 
 	}
 }
