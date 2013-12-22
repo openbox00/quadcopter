@@ -65,6 +65,7 @@ static void UsartReciveTask(void *pvParameters);
 xQueueHandle xQueueUARTSend;
 xQueueHandle xQueueUARTRecvie;
 xQueueHandle xQueueShell2PWM;
+xQueueHandle xQueuePWMdirection;
 
 /* software Timers */
 xTimerHandle xTimerNoSignal;
@@ -110,9 +111,17 @@ static void pwmctrl(void *pvParameters)
 {
   char pwm_speed_char[4];
 
-  int pwm_speed_int = 100;
+  char pwm_direction[4];
 
-  int pwm_speed;
+  int pwm_speed_int = 100;
+	
+  char direction;
+	
+  int pwm_speed_w;
+  int pwm_speed_a;
+  int pwm_speed_s;
+  int pwm_speed_d;
+
 
   const portTickType xDelay = 6000; 
 
@@ -122,22 +131,54 @@ static void pwmctrl(void *pvParameters)
 
   while(1)  // Do not exit
   {
+
+  while (!xQueueReceive(xQueuePWMdirection , &pwm_direction, portMAX_DELAY));
+
+  direction = pwm_direction[0];
+
   while (!xQueueReceive(xQueueShell2PWM , &pwm_speed_char, portMAX_DELAY));
 
-  pwm_speed_int = atoi(pwm_speed_char);
-	
-  //qprintf(xQueueUARTSend, "%d\n", pwm_speed_int);	
-	
-   //pwm_speed = (pwm_speed_int *1000) / 100;
+  pwm_speed_int = atoi(pwm_speed_char);	
 
-   if (pwm_speed_int >1000) {
-	pwm_speed_int = 1000;
-	}else if (pwm_speed_int <100){
-	pwm_speed_int = 100;
+  	if (pwm_speed_int >350) {
+		pwm_speed_int = 350;
+	}else if (pwm_speed_int < 0){
+		pwm_speed_int = 0;
 	}else{
-	pwm_speed_int = pwm_speed_int;
+		pwm_speed_int = pwm_speed_int;
 	}
-   Motor_Control(pwm_speed_int, pwm_speed_int, pwm_speed_int, pwm_speed_int);
+
+	if (direction == 'w'){
+		pwm_speed_w = pwm_speed_w + pwm_speed_int; 
+		pwm_speed_a = pwm_speed_a; 
+		pwm_speed_s = pwm_speed_s;
+		pwm_speed_d	= pwm_speed_d;
+	}else if (direction == 'a'){
+		pwm_speed_w = pwm_speed_w; 
+		pwm_speed_a = pwm_speed_a + pwm_speed_int; 
+		pwm_speed_s = pwm_speed_s;
+		pwm_speed_d	= pwm_speed_d;
+	}else if (direction == 's'){
+		pwm_speed_w = pwm_speed_w; 
+		pwm_speed_a = pwm_speed_a; 
+		pwm_speed_s = pwm_speed_s + pwm_speed_int;
+		pwm_speed_d	= pwm_speed_d;
+	}else if (direction == 'd'){
+		pwm_speed_w = pwm_speed_w; 
+		pwm_speed_a = pwm_speed_a; 
+		pwm_speed_s = pwm_speed_s;
+		pwm_speed_d	= pwm_speed_d + pwm_speed_int;
+	}else{	
+		pwm_speed_w = pwm_speed_int;
+		pwm_speed_a = pwm_speed_int;
+		pwm_speed_s = pwm_speed_int;
+		pwm_speed_d = pwm_speed_int;
+	}
+
+	qprintf(xQueueUARTSend, "pwm_speed_w: %d	,pwm_speed_a: %d	,pwm_speed_s: %d	,pwm_speed_d: %d\n\r",
+							pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);	
+
+ 	Motor_Control(pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);
   }
 } 
 
@@ -280,7 +321,8 @@ int main(void)
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
    	xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
-   	xQueueShell2PWM = xQueueCreate(1, 24);
+   	xQueueShell2PWM = xQueueCreate(1, sizeof(int));
+   	xQueuePWMdirection = xQueueCreate(1, sizeof(int));
 
 	/* initialize hardware... */
 	prvSetupHardware();
