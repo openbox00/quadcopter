@@ -55,11 +55,11 @@
 #define PWM_Motor4 TIM4->CCR4   
 
 /* Task functions declarations */
-static void pwmctrl(void *pvParameters);
-static void Balance(void *pvParameters);
+static void vPWMctrlTask(void *pvParameters);
+static void vBalanceTask(void *pvParameters);
 
-static void UsartSendTask(void *pvParameters);
-static void UsartReciveTask(void *pvParameters);
+static void vUsartSendTask(void *pvParameters);
+static void vUsartReciveTask(void *pvParameters);
 
 /* semaphores, queues declarations */
 xQueueHandle xQueueUARTSend;
@@ -107,7 +107,7 @@ int receive_byte_noblock(char *ch)
 
 /* Private functions ---------------------------------------------------------*/
 
-static void pwmctrl(void *pvParameters)
+static void vPWMctrlTask(void *pvParameters)
 {
   char pwm_speed_char[4];
 
@@ -295,10 +295,7 @@ void vTimerSample(xTimerHandle pxTimer){
 	angle_x = (0.93) * (angle_x + y_gyro * 0.01) - (0.07) * (x_acc);  		
 	angle_y = (0.93) * (angle_y + x_gyro * 0.01) + (0.07) * (y_acc); 
 	//angle_z = (0.966) * (angle_z + z_gyro * 0.001) + (0.034) * (z_acc); 
-
-	//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
-	//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
-	//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);		
+	
 }
 /*********************************************************************************************************/
 
@@ -315,6 +312,7 @@ int main(void)
 	int timerID1 = 2;
 	/*A Timer used to count how long there is no signal come in*/
 	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 10 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
 
@@ -332,11 +330,11 @@ int main(void)
 
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	xTaskCreate(pwmctrl, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
-	xTaskCreate(UsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	xTaskCreate(UsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
-	xTaskCreate(Balance, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -350,7 +348,7 @@ int main(void)
 /* Task functions ------------------------------------------------- */
 
 //Task For Sending Data Via USART
-static void UsartSendTask(void *pvParameters)
+static void vUsartSendTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
@@ -376,7 +374,7 @@ static void UsartSendTask(void *pvParameters)
 }
 
 //Task For Sending Data Via USART
-static void UsartReciveTask(void *pvParameters)
+static void vUsartReciveTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
@@ -394,14 +392,15 @@ static void UsartReciveTask(void *pvParameters)
 		xTimerReset(xTimerNoSignal, 10);
 		//Collect the character
 		Data = USART_ReceiveData(USART2);
-		qprintf(xQueueUARTRecvie, "%c", Data); 
+		while (!xQueueSendToBack(xQueueUARTRecvie, &Data, portMAX_DELAY));
+		//qprintf(xQueueUARTRecvie, "%c", Data); 
 
 	}
 
 }
 
 
-void Balance(void *pvParameters)
+void vBalanceTask(void *pvParameters)
 {
 	const portTickType ms500 = 500;  	
 	const portTickType sec1 = 1000; 	
@@ -453,7 +452,12 @@ void Balance(void *pvParameters)
 	while(1){
 		Pitch = (int)angle_y;
 		Roll = (int)angle_x;
-		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\n\r", Pitch, Roll);
+		
+		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
+		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
+		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
+
+		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
 		//vTaskDelay(sec1);
 
 	}
