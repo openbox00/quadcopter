@@ -9,7 +9,7 @@
 #define MAX_CMDNAME 3
 #define MAX_CMDHELP 1
 #define HISTORY_COUNT 1
-#define CMDBUF_SIZE 10
+#define CMDBUF_SIZE 12
 
 int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
@@ -33,6 +33,8 @@ int strcmp(const char *a, const char *b)
 extern xQueueHandle xQueueUARTSend;
 extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
+extern xQueueHandle xQueuePWMdirection;
+
 extern void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4);
 
 char next_line[3] = {'\n','\r','\0'};
@@ -62,10 +64,28 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 
 void pwm(int argc, char* argv[])
 {
-	
-	qprintf(xQueueUARTSend, "%s\n", argv[1]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);
-	//qprintf(xQueueUARTSend, "finish\n");
+	if (*argv[2] == 'w'){
+	qprintf(xQueueUARTSend, "w = %s %s\n", argv[1], argv[2]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+	qprintf(xQueuePWMdirection, "%s", argv[2]);	
+	}
+	else if (*argv[2] == 'a'){
+	qprintf(xQueueUARTSend, "a = %s %s\n", argv[1], argv[2]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+	qprintf(xQueuePWMdirection, "%s", argv[2]);	
+	}else if (*argv[2] == 's'){
+	qprintf(xQueueUARTSend, "s = %s %s\n", argv[1], argv[2]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+	qprintf(xQueuePWMdirection, "%s", argv[2]);	
+	}else if (*argv[2] == 'd'){
+	qprintf(xQueueUARTSend, "d = %s %s\n", argv[1], argv[2]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+	qprintf(xQueuePWMdirection, "%s", argv[2]);	
+	}else{
+	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+	qprintf(xQueuePWMdirection, "%s", '0');	
+	}
 }
 
 /* ref tim37021 */
