@@ -83,11 +83,17 @@ typedef struct {
 
 
 typedef struct {
-	float	PitchP;
-	float	PitchD;
+	float PitchP;
+	float PitchD;
 
-	float	RollP;
-	float	RollD;
+	float RollP;
+	float RollD;
+
+	float Pitch_desire;
+	float Roll_desire;
+
+	float Pitch_err;
+	float Roll_err;
 } PID;
 
 char receive_byte()
@@ -460,35 +466,53 @@ void vBalanceTask(void *pvParameters)
 	xTimerStart(xTimerSampleRate, 0);	
 
 	/*PID*/
-	float Pitch, Roll;
+	float Pitch, Roll, Pitch_v, Roll_v;
+	u16 Motor1, Motor2, Motor3, Motor4;	
 
 	PID argv;
 
+	argv.PitchP = 10;	
+	argv.PitchD = 10;
+	argv.RollP  = 10;
+	argv.RollD  = 10;
+
+	argv.Pitch_desire = 0;  //Desire angle of Pitch
+	argv.Roll_desire = 0;   //Desire angle of Roll
+	
 	while(1){
-		Pitch = angle_y;
-		Roll = angle_x;
+		
+		Pitch = angle_y;    //pitch degree
+		Roll = angle_x;     //roll degree
+		Pitch_v = x_gyro;   //pitch velocity
+		Roll_v = y_gyro;    //Roll velocity
 
-		Pitch = Pitch * argv.PitchP + y_gyro * argv.PitchD;
-		Roll = Roll * argv.RollP +  x_gyro * argv.RollD;	
+		argv.Pitch_err = argv.Pitch_desire - Pitch;
+		argv.Roll_err  = argv.Roll_desire - Roll;
 
-		pwm_speed_w = pwm_speed_w + Pitch;
-		pwm_speed_a = pwm_speed_a - Roll;
-		pwm_speed_s = pwm_speed_s - Pitch;
-		pwm_speed_d = pwm_speed_d + Roll;
+		if(argv.Pitch_err < 0){
+			Motor4 = PWM_Motor4 - ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );
+			Motor2 = PWM_Motor2 + ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );			
+		}else if(argv.Pitch_err > 0){
+			Motor4 = PWM_Motor4 + ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+			Motor2 = PWM_Motor2 - ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+		}
 
-		Motor_Control(	pwm_speed_w,
-						pwm_speed_a,
-						pwm_speed_s,
-						pwm_speed_d);
+		if(argv.Roll_err < 0){
+			Motor3 = PWM_Motor3 - ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );
+			Motor1 = PWM_Motor1 + ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );			
+		}else if(argv.Roll_err > 0){
+			Motor3 = PWM_Motor3 + ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+			Motor1 = PWM_Motor1 - ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+		}
 
-
+		Motor_Control(Motor1, Motor2, Motor3, Motor4);
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
 
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
 		//vTaskDelay(sec1);
-
+		qprintf(xQueueUARTSend, "LD5: %d, LD4: %d, LD6: %d, LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
 	}
 }
 
