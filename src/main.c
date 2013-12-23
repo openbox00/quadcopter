@@ -34,7 +34,7 @@
 #define PWM_MOTOR_INIT_MIN 100
 #define PWM_MOTOR_INIT_MAX 1000
 
-#define PWM_MOTOR_MIN 100
+#define PWM_MOTOR_MIN 110
 #define PWM_MOTOR_MAX 350
 
 /*acc sensitivity*/
@@ -64,6 +64,8 @@ static void vBalanceTask(void *pvParameters);
 static void vUsartSendTask(void *pvParameters);
 static void vUsartReciveTask(void *pvParameters);
 
+int pwm_flag;
+
 /* semaphores, queues declarations */
 xQueueHandle xQueueUARTSend;
 xQueueHandle xQueueUARTRecvie;
@@ -87,6 +89,7 @@ typedef struct {
         char ch;
 } serial_ch_msg;
 
+int throttle[4];
 
 typedef struct {
 	float PitchP; //Pitch Proportional Gain Coefficient
@@ -192,11 +195,15 @@ static void vPWMctrlTask(void *pvParameters)
 		pwm_speed_d = pwm_speed_int;
 	}
 
-	
+	throttle[0] = pwm_speed_a; //PWM_Motor1 = LED4
+	throttle[1] = pwm_speed_w; //PWM_Motor2 = LED3
+	throttle[2] = pwm_speed_d; //PWM_Motor3 = LED5 
+	throttle[3] = pwm_speed_s; //PWM_Motor4 = LED6
+
 	qprintf(xQueueUARTSend, "set w: %d , a: %d , s: %d , d: %d\n\r",
 							pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);	
 
- 	Motor_Control(pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);
+ 	//Motor_Control(pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);
  	qprintf(xQueueUARTSend, "LD5: %d,LD4: %d,LD6: %d,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
  	
   }
@@ -484,11 +491,15 @@ void vBalanceTask(void *pvParameters)
 
 	u16 Motor1, Motor2, Motor3, Motor4;	
 
+	//u16 Motor1_save, Motor2_save, Motor3_save, Motor4_save;	
+
+	pwm_flag = 0;
+
 	PID argv;
 
-	argv.PitchP = 0.4;	
+	argv.PitchP = 0.2;	
 	argv.PitchD = 0.03;
-	argv.RollP  = 0.4;
+	argv.RollP  = 0.2;
 	argv.RollD  = 0.03;
 
 	argv.Pitch_desire = 0;  //Desire angle of Pitch
@@ -496,7 +507,7 @@ void vBalanceTask(void *pvParameters)
 
 	while(1){
 
-		//qprintf(xQueueUARTSend, "LD5: %d\t,LD4: %d\t,LD6: %d\t,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+		//qprintf(xQueueUARTSend, "th5: %d\t,th4: %d\t,th6: %d\t,th3: %d\r\n", throttle[0], throttle[1], throttle[2], throttle[3]);
 		argv.Pitch = angle_y;    //pitch degree
 		argv.Roll = angle_x;     //roll degree
 		argv.Pitch_v = x_gyro;   //pitch velocity
@@ -505,6 +516,43 @@ void vBalanceTask(void *pvParameters)
 		argv.Pitch_err = argv.Pitch_desire - argv.Pitch;
 		argv.Roll_err  = argv.Roll_desire - argv.Roll;
 
+	if (throttle[0] != 0 || throttle[1] !=0 || throttle[2] !=0 || throttle[3] != 0)
+	{
+		PWM_Motor1 = throttle[0];
+		PWM_Motor2 = throttle[1];
+		PWM_Motor3 = throttle[2];
+		PWM_Motor4 = throttle[3];
+		throttle[0] = 0;
+		throttle[1] = 0;
+		throttle[2] = 0;
+		throttle[3] = 0;
+
+		pwm_flag = 1;
+	}
+
+
+
+
+	if(pwm_flag == 0){
+		vTaskDelay(ms10);
+	}else{
+/*		
+		if(argv.Pitch_err <= 0){
+			Motor4 = throttle[3] - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD6
+			Motor2 = throttle[1] + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD3			
+		}else if(argv.Pitch_err > 0){
+			Motor4 = throttle[3] + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD6
+			Motor2 = throttle[1] - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD3
+		}
+
+		if(argv.Roll_err <= 0){
+			Motor3 = throttle[2] - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD5
+			Motor1 = throttle[0] + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD4			
+		}else if(argv.Roll_err > 0){
+			Motor3 = throttle[2] + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD5
+			Motor1 = throttle[0] - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD4
+		}
+*/
 		if(argv.Pitch_err <= 0){
 			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD6
 			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD3			
@@ -521,7 +569,14 @@ void vBalanceTask(void *pvParameters)
 			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD4
 		}
 
+
+
+
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
+	}
+
+
+
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
