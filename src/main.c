@@ -82,6 +82,14 @@ typedef struct {
 } serial_ch_msg;
 
 
+typedef struct {
+	float	PitchP;
+	float	PitchD;
+
+	float	RollP;
+	float	RollD;
+} PID;
+
 char receive_byte()
 {
         serial_ch_msg msg;
@@ -196,7 +204,7 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1 ;	// 12 	18 + 2.4=20.4
+	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
 	PWM_Motor2 = Motor2;	// 13	18  	
 	PWM_Motor3 = Motor3 + 2;	// 14	18 - 0.2 = 17.8
 	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
@@ -444,15 +452,36 @@ void vBalanceTask(void *pvParameters)
 	angle_y = 0;
 	// angle_z = 0;
 
+	int pwm_speed_w = 0;
+	int pwm_speed_a = 0;
+	int pwm_speed_s = 0;
+	int pwm_speed_d = 0;
+
 	xTimerStart(xTimerSampleRate, 0);	
 
 	/*PID*/
-	int Pitch, Roll;
+	float Pitch, Roll;
+
+	PID argv;
 
 	while(1){
-		Pitch = (int)angle_y;
-		Roll = (int)angle_x;
-		
+		Pitch = angle_y;
+		Roll = angle_x;
+
+		Pitch = Pitch * argv.PitchP + y_gyro * argv.PitchD;
+		Roll = Roll * argv.RollP +  x_gyro * argv.RollD;	
+
+		pwm_speed_w = pwm_speed_w + Pitch;
+		pwm_speed_a = pwm_speed_a - Roll;
+		pwm_speed_s = pwm_speed_s - Pitch;
+		pwm_speed_d = pwm_speed_d + Roll;
+
+		Motor_Control(	pwm_speed_w,
+						pwm_speed_a,
+						pwm_speed_s,
+						pwm_speed_d);
+
+
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
