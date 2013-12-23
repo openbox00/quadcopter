@@ -31,8 +31,11 @@
 #define queueSIZE	6
 
 /*brushless motor PWM max and min duty cycle*/
+#define PWM_MOTOR_INIT_MIN 100
+#define PWM_MOTOR_INIT_MAX 1000
+
 #define PWM_MOTOR_MIN 100
-#define PWM_MOTOR_MAX 1000
+#define PWM_MOTOR_MAX 350
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -71,6 +74,9 @@ xQueueHandle xQueuePWMdirection;
 xTimerHandle xTimerNoSignal;
 xTimerHandle xTimerSampleRate;
 
+/*Task Handler */
+xTaskHandle xBalanceHandle;
+
 /* Private variables ---------------------------------------------------------*/
 /* Queue structure used for passing messages. */
 typedef struct {
@@ -83,17 +89,20 @@ typedef struct {
 
 
 typedef struct {
-	float PitchP;
-	float PitchD;
+	float PitchP; //Pitch Proportional Gain Coefficient
+	float PitchD; //Pitch Derivative Gain Coefficient
 
-	float RollP;
-	float RollD;
+	float RollP;  //Roll Proportional Gain Coefficient
+	float RollD;  //Roll Pitch Derivative Gain Coefficient
 
-	float Pitch_desire;
-	float Roll_desire;
+	float Pitch_desire; //Desired Pich angle
+	float Roll_desire;  //Desired Roll angle
 
-	float Pitch_err;
-	float Roll_err;
+	float Pitch_err;  //Pitch error
+	float Roll_err;   //Roll error
+
+	float Pitch, Roll;  	//present Pitch and Roll
+	float Pitch_v, Roll_v;  //present Pitch and Roll velosity
 } PID;
 
 char receive_byte()
@@ -135,13 +144,6 @@ static void vPWMctrlTask(void *pvParameters)
   int pwm_speed_a = 0;
   int pwm_speed_s = 0;
   int pwm_speed_d = 0;
-
-
-  const portTickType xDelay = 6000; 
-
-  Motor_Control(PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX, PWM_MOTOR_MAX);
-  vTaskDelay( xDelay );  //6S
-  Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 
   while(1)  // Do not exit
   {
@@ -313,8 +315,6 @@ void vTimerSample(xTimerHandle pxTimer){
 }
 /*********************************************************************************************************/
 
-
-
 /**
   * @brief  Main program.
   * @param  None
@@ -348,7 +348,7 @@ int main(void)
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
-	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, xBalanceHandle);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -419,6 +419,17 @@ void vBalanceTask(void *pvParameters)
 	const portTickType ms500 = 500;  	
 	const portTickType sec1 = 1000; 	
 
+	const portTickType xDelay = 6000; 
+   	PWM_Motor1 = PWM_MOTOR_INIT_MAX;
+   	PWM_Motor2 = PWM_MOTOR_INIT_MAX;
+	PWM_Motor3 = PWM_MOTOR_INIT_MAX;
+   	PWM_Motor4 = PWM_MOTOR_INIT_MAX;   	
+  	vTaskDelay( xDelay );  //6S
+  	PWM_Motor1 = PWM_MOTOR_INIT_MIN;
+   	PWM_Motor2 = PWM_MOTOR_INIT_MIN;
+	PWM_Motor3 = PWM_MOTOR_INIT_MIN;
+   	PWM_Motor4 = PWM_MOTOR_INIT_MIN;   	
+
 	/*inital Offset value of Gryo. and Acce.*/
 
   	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
@@ -466,43 +477,44 @@ void vBalanceTask(void *pvParameters)
 	xTimerStart(xTimerSampleRate, 0);	
 
 	/*PID*/
-	float Pitch, Roll, Pitch_v, Roll_v;
+
 	u16 Motor1, Motor2, Motor3, Motor4;	
 
 	PID argv;
 
-	argv.PitchP = 10;	
-	argv.PitchD = 10;
-	argv.RollP  = 10;
-	argv.RollD  = 10;
+	argv.PitchP = 4;	
+	argv.PitchD = 0;
+	argv.RollP  = 4;
+	argv.RollD  = 0;
 
 	argv.Pitch_desire = 0;  //Desire angle of Pitch
 	argv.Roll_desire = 0;   //Desire angle of Roll
-	
+
 	while(1){
-		
-		Pitch = angle_y;    //pitch degree
-		Roll = angle_x;     //roll degree
-		Pitch_v = x_gyro;   //pitch velocity
-		Roll_v = y_gyro;    //Roll velocity
 
-		argv.Pitch_err = argv.Pitch_desire - Pitch;
-		argv.Roll_err  = argv.Roll_desire - Roll;
+		qprintf(xQueueUARTSend, "LD5: %d\t,LD4: %d\t,LD6: %d\t,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+		argv.Pitch = angle_y;    //pitch degree
+		argv.Roll = angle_x;     //roll degree
+		argv.Pitch_v = x_gyro;   //pitch velocity
+		argv.Roll_v = y_gyro;    //Roll velocity
 
-		if(argv.Pitch_err < 0){
-			Motor4 = PWM_Motor4 - ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );
-			Motor2 = PWM_Motor2 + ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );			
+		argv.Pitch_err = argv.Pitch_desire - argv.Pitch;
+		argv.Roll_err  = argv.Roll_desire - argv.Roll;
+
+		if(argv.Pitch_err <= 0){
+			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD6
+			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD3			
 		}else if(argv.Pitch_err > 0){
-			Motor4 = PWM_Motor4 + ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
-			Motor2 = PWM_Motor2 - ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+			Motor4 = PWM_Motor4 + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD6
+			Motor2 = PWM_Motor2 - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD3
 		}
 
-		if(argv.Roll_err < 0){
-			Motor3 = PWM_Motor3 - ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );
-			Motor1 = PWM_Motor1 + ( argv.PitchD * Roll_v - argv.PitchP * argv.Pitch_err );			
+		if(argv.Roll_err <= 0){
+			Motor3 = PWM_Motor3 - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD5
+			Motor1 = PWM_Motor1 + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD4			
 		}else if(argv.Roll_err > 0){
-			Motor3 = PWM_Motor3 + ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
-			Motor1 = PWM_Motor1 - ( argv.PitchD * Roll_v + argv.PitchP * argv.Pitch_err );
+			Motor3 = PWM_Motor3 + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD5
+			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD4
 		}
 
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
@@ -511,8 +523,8 @@ void vBalanceTask(void *pvParameters)
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
 
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
-		//vTaskDelay(sec1);
-		qprintf(xQueueUARTSend, "LD5: %d, LD4: %d, LD6: %d, LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+		//vTaskDelay(sec1);	
+		
 	}
 }
 
