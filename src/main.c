@@ -132,6 +132,7 @@ int receive_byte_noblock(char *ch)
 
 static void vPWMctrlTask(void *pvParameters)
 {
+
   char pwm_speed_char[4];
 
   char pwm_direction[4];
@@ -191,10 +192,13 @@ static void vPWMctrlTask(void *pvParameters)
 		pwm_speed_d = pwm_speed_int;
 	}
 
-	qprintf(xQueueUARTSend, "pwm_speed_w: %d	,pwm_speed_a: %d	,pwm_speed_s: %d	,pwm_speed_d: %d\n\r",
+	
+	qprintf(xQueueUARTSend, "set w: %d , a: %d , s: %d , d: %d\n\r",
 							pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);	
 
  	Motor_Control(pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);
+ 	qprintf(xQueueUARTSend, "LD5: %d,LD4: %d,LD6: %d,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+ 	
   }
 } 
 
@@ -214,7 +218,7 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 								
 	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
 	PWM_Motor2 = Motor2;	// 13	18  	
-	PWM_Motor3 = Motor3 + 2;	// 14	18 - 0.2 = 17.8
+	PWM_Motor3 = Motor3;// + 2;	// 14	18 - 0.2 = 17.8
 	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
 }
 
@@ -416,7 +420,7 @@ static void vUsartReciveTask(void *pvParameters)
 
 void vBalanceTask(void *pvParameters)
 {
-	const portTickType ms500 = 500;  	
+	const portTickType ms10 = 10;  	
 	const portTickType sec1 = 1000; 	
 
 	const portTickType xDelay = 6000; 
@@ -482,17 +486,17 @@ void vBalanceTask(void *pvParameters)
 
 	PID argv;
 
-	argv.PitchP = 4;	
-	argv.PitchD = 0;
-	argv.RollP  = 4;
-	argv.RollD  = 0;
+	argv.PitchP = 0.4;	
+	argv.PitchD = 0.03;
+	argv.RollP  = 0.4;
+	argv.RollD  = 0.03;
 
 	argv.Pitch_desire = 0;  //Desire angle of Pitch
 	argv.Roll_desire = 0;   //Desire angle of Roll
 
 	while(1){
 
-		qprintf(xQueueUARTSend, "LD5: %d\t,LD4: %d\t,LD6: %d\t,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+		//qprintf(xQueueUARTSend, "LD5: %d\t,LD4: %d\t,LD6: %d\t,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
 		argv.Pitch = angle_y;    //pitch degree
 		argv.Roll = angle_x;     //roll degree
 		argv.Pitch_v = x_gyro;   //pitch velocity
@@ -521,10 +525,9 @@ void vBalanceTask(void *pvParameters)
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
-
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
-		//vTaskDelay(sec1);	
 		
+		vTaskDelay(ms10); //Setting rate is 100Hz	
 	}
 }
 
