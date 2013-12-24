@@ -34,6 +34,7 @@
 #define PWM_MOTOR_INIT_MIN 100
 #define PWM_MOTOR_INIT_MAX 1000
 
+
 #define PWM_MOTOR_MIN 120
 #define PWM_MOTOR_MAX 300
 
@@ -225,7 +226,7 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 								
 	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
 	PWM_Motor2 = Motor2;	// 13	18  	
-	PWM_Motor3 = Motor3;// + 2;	// 14	18 - 0.2 = 17.8
+	PWM_Motor3 = Motor3;	// + 2;	// 14	18 - 0.2 = 17.8
 	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
 }
 
@@ -493,8 +494,6 @@ void vBalanceTask(void *pvParameters)
 
 	u16 Motor1, Motor2, Motor3, Motor4;	
 
-	//u16 Motor1_save, Motor2_save, Motor3_save, Motor4_save;	
-
 	pwm_flag = 0;
 
 	PID argv;
@@ -533,8 +532,6 @@ void vBalanceTask(void *pvParameters)
 	}
 
 
-
-
 	if(pwm_flag == 0){
 		vTaskDelay(ms10);
 	}else{
@@ -565,8 +562,6 @@ void vBalanceTask(void *pvParameters)
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
 	}
 	
-
-
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
