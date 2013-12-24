@@ -34,7 +34,7 @@
 #define PWM_MOTOR_INIT_MIN 100
 #define PWM_MOTOR_INIT_MAX 1000
 
-#define PWM_MOTOR_MIN 110
+#define PWM_MOTOR_MIN 150
 #define PWM_MOTOR_MAX 350
 
 /*acc sensitivity*/
@@ -427,7 +427,8 @@ static void vUsartReciveTask(void *pvParameters)
 
 void vBalanceTask(void *pvParameters)
 {
-	const portTickType ms10 = 10;  	
+	const portTickType ms100 = 100;  	
+	const portTickType ms10 = 10;  
 	const portTickType sec1 = 1000; 	
 
 	const portTickType xDelay = 6000; 
@@ -497,9 +498,9 @@ void vBalanceTask(void *pvParameters)
 
 	PID argv;
 
-	argv.PitchP = 0.2;	
+	argv.PitchP = 0.5;	
 	argv.PitchD = 0.03;
-	argv.RollP  = 0.2;
+	argv.RollP  = 0.5;
 	argv.RollD  = 0.03;
 
 	argv.Pitch_desire = 0;  //Desire angle of Pitch
@@ -554,19 +555,19 @@ void vBalanceTask(void *pvParameters)
 		}
 */
 		if(argv.Pitch_err <= 0){
-			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD6
-			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD3			
+			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED6 //15
+			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED3	//13		
 		}else if(argv.Pitch_err > 0){
-			Motor4 = PWM_Motor4 + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD6
-			Motor2 = PWM_Motor2 - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD3
+			Motor4 = PWM_Motor4 + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LED6 //15
+			Motor2 = PWM_Motor2 - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LED3  //13
 		}
 
 		if(argv.Roll_err <= 0){
-			Motor3 = PWM_Motor3 - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD5
-			Motor1 = PWM_Motor1 + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD4			
+			Motor3 = PWM_Motor3 - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LED5  // 14
+			Motor1 = PWM_Motor1 + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LED4	  //12		
 		}else if(argv.Roll_err > 0){
-			Motor3 = PWM_Motor3 + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD5
-			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD4
+			Motor3 = PWM_Motor3 + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LED5   //14
+			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LED4    //12
 		}
 
 
@@ -582,7 +583,7 @@ void vBalanceTask(void *pvParameters)
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
 		
-		vTaskDelay(ms10); //Setting rate is 100Hz	
+		vTaskDelay(ms100); //Setting rate is 100Hz	
 	}
 }
 

@@ -30,6 +30,8 @@ int strcmp(const char *a, const char *b)
 
 #define PWM_MOTOR_MIN 100
 
+extern int pwm_flag;
+
 extern xQueueHandle xQueueUARTSend;
 extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
@@ -154,7 +156,8 @@ void check_keyword()
 	}
 
 	if (i == CMD_COUNT) {
- 		 Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+		pwm_flag = 0;
+ 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 
 }
