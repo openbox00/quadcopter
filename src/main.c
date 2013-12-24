@@ -34,8 +34,8 @@
 #define PWM_MOTOR_INIT_MIN 100
 #define PWM_MOTOR_INIT_MAX 1000
 
-#define PWM_MOTOR_MIN 150
-#define PWM_MOTOR_MAX 350
+#define PWM_MOTOR_MIN 120
+#define PWM_MOTOR_MAX 300
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -160,8 +160,8 @@ static void vPWMctrlTask(void *pvParameters)
 
   pwm_speed_int = atoi(pwm_speed_char);	
 
-  	if (pwm_speed_int >350) {
-		pwm_speed_int = 350;
+  	if (pwm_speed_int >300) {
+		pwm_speed_int = 300;
 	}else if (pwm_speed_int < 0){
 		pwm_speed_int = 0;
 	}else{
@@ -231,7 +231,8 @@ void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4)
 
 
 void vTimerSystemIdle( xTimerHandle pxTimer ){
-	Motor_Control(100, 100, 100, 100);
+	pwm_flag = 0;
+	Motor_Control(120, 120, 120, 120);
 	qprintf(xQueueUARTSend, "30 sec idle time pass ... trun off motor\n\r");
 }
 
@@ -498,9 +499,9 @@ void vBalanceTask(void *pvParameters)
 
 	PID argv;
 
-	argv.PitchP = 0.5;	
+	argv.PitchP = 1;	
 	argv.PitchD = 0.03;
-	argv.RollP  = 0.5;
+	argv.RollP  = 1;
 	argv.RollD  = 0.03;
 
 	argv.Pitch_desire = 0;  //Desire angle of Pitch
@@ -537,24 +538,9 @@ void vBalanceTask(void *pvParameters)
 	if(pwm_flag == 0){
 		vTaskDelay(ms10);
 	}else{
-/*		
+#if 0
 		if(argv.Pitch_err <= 0){
-			Motor4 = throttle[3] - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD6
-			Motor2 = throttle[1] + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LD3			
-		}else if(argv.Pitch_err > 0){
-			Motor4 = throttle[3] + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD6
-			Motor2 = throttle[1] - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LD3
-		}
 
-		if(argv.Roll_err <= 0){
-			Motor3 = throttle[2] - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD5
-			Motor1 = throttle[0] + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LD4			
-		}else if(argv.Roll_err > 0){
-			Motor3 = throttle[2] + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD5
-			Motor1 = throttle[0] - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LD4
-		}
-*/
-		if(argv.Pitch_err <= 0){
 			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED6 //15
 			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED3	//13		
 		}else if(argv.Pitch_err > 0){
@@ -570,20 +556,23 @@ void vBalanceTask(void *pvParameters)
 			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LED4    //12
 		}
 
-
-
-
+#endif
+		Motor1 = PWM_Motor1 + (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD4	
+		Motor2 = PWM_Motor2 + (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD3			
+		Motor3 = PWM_Motor3 - (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD5
+		Motor4 = PWM_Motor4 - (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD6
+		
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
 	}
-
+	
 
 
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
-		
-		vTaskDelay(ms100); //Setting rate is 100Hz	
+		qprintf(xQueueUARTSend, "Motor1(P12): %d	,Motor2(P13): %d	,Motor3(P14):	%d	,Motor4(P15):	%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
+		//vTaskDelay(ms100); //Setting rate is 100Hz	
 	}
 }
 

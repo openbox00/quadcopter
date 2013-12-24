@@ -157,7 +157,7 @@ void check_keyword()
 
 	if (i == CMD_COUNT) {
 		pwm_flag = 0;
- 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+ 		Motor_Control(120, 120, 120, 120);
 	}
 
 }
