@@ -145,10 +145,10 @@ static void vPWMctrlTask(void *pvParameters)
 	
   char direction;
 	
-  int pwm_speed_w = 0;
-  int pwm_speed_a = 0;
-  int pwm_speed_s = 0;
-  int pwm_speed_d = 0;
+  int pwm_speed_1 = 0;
+  int pwm_speed_2 = 0;
+  int pwm_speed_3 = 0;
+  int pwm_speed_4 = 0;
 
   while(1)  // Do not exit
   {
@@ -169,43 +169,43 @@ static void vPWMctrlTask(void *pvParameters)
 		pwm_speed_int = pwm_speed_int;
 	}
 
-	if (direction == 'w'){
-		pwm_speed_w = pwm_speed_w + pwm_speed_int; 
-		pwm_speed_a = pwm_speed_a; 
-		pwm_speed_s = pwm_speed_s;
-		pwm_speed_d	= pwm_speed_d;
-	}else if (direction == 'a'){
-		pwm_speed_w = pwm_speed_w; 
-		pwm_speed_a = pwm_speed_a + pwm_speed_int; 
-		pwm_speed_s = pwm_speed_s;
-		pwm_speed_d	= pwm_speed_d;
-	}else if (direction == 's'){
-		pwm_speed_w = pwm_speed_w; 
-		pwm_speed_a = pwm_speed_a; 
-		pwm_speed_s = pwm_speed_s + pwm_speed_int;
-		pwm_speed_d	= pwm_speed_d;
-	}else if (direction == 'd'){
-		pwm_speed_w = pwm_speed_w; 
-		pwm_speed_a = pwm_speed_a; 
-		pwm_speed_s = pwm_speed_s;
-		pwm_speed_d	= pwm_speed_d + pwm_speed_int;
+	if (direction == '1'){
+		pwm_speed_1 = pwm_speed_1 + pwm_speed_int; 
+		pwm_speed_2 = pwm_speed_2; 
+		pwm_speed_3 = pwm_speed_3;
+		pwm_speed_4	= pwm_speed_4;
+	}else if (direction == '2'){
+		pwm_speed_1 = pwm_speed_1; 
+		pwm_speed_2 = pwm_speed_2 + pwm_speed_int; 
+		pwm_speed_3 = pwm_speed_3;
+		pwm_speed_4	= pwm_speed_4;
+	}else if (direction == '3'){
+		pwm_speed_1 = pwm_speed_1; 
+		pwm_speed_2 = pwm_speed_2; 
+		pwm_speed_3 = pwm_speed_3 + pwm_speed_int;
+		pwm_speed_4	= pwm_speed_4;
+	}else if (direction == '4'){
+		pwm_speed_1 = pwm_speed_1; 
+		pwm_speed_2 = pwm_speed_2; 
+		pwm_speed_3 = pwm_speed_3;
+		pwm_speed_4	= pwm_speed_4 + pwm_speed_int;
 	}else{	
-		pwm_speed_w = pwm_speed_int;
-		pwm_speed_a = pwm_speed_int;
-		pwm_speed_s = pwm_speed_int;
-		pwm_speed_d = pwm_speed_int;
+		pwm_speed_1 = pwm_speed_int;
+		pwm_speed_2 = pwm_speed_int;
+		pwm_speed_3 = pwm_speed_int;
+		pwm_speed_4 = pwm_speed_int;
 	}
 
-	throttle[0] = pwm_speed_a; //PWM_Motor1 = LED4
-	throttle[1] = pwm_speed_w; //PWM_Motor2 = LED3
-	throttle[2] = pwm_speed_d; //PWM_Motor3 = LED5 
-	throttle[3] = pwm_speed_s; //PWM_Motor4 = LED6
+	throttle[0] = pwm_speed_1; //PWM_Motor1 
+	throttle[1] = pwm_speed_2; //PWM_Motor2 
+	throttle[2] = pwm_speed_3; //PWM_Motor3  
+	throttle[3] = pwm_speed_4; //PWM_Motor4 
 
-	qprintf(xQueueUARTSend, "set w: %d , a: %d , s: %d , d: %d\n\r",
-							pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);	
+	qprintf(xQueueUARTSend, "set 1: %d	,set 2: %d	,set 3: %d	,set d: %d\n\r",
+							pwm_speed_1, pwm_speed_2, pwm_speed_3, pwm_speed_4);	
 
  	//Motor_Control(pwm_speed_w, pwm_speed_a, pwm_speed_s, pwm_speed_d);
- 	qprintf(xQueueUARTSend, "LD5: %d,LD4: %d,LD6: %d,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
+ 	//qprintf(xQueueUARTSend, "LD5: %d,LD4: %d,LD6: %d,LD3: %d\r\n", PWM_Motor3, PWM_Motor1, PWM_Motor4, PWM_Motor2);
  	
   }
 } 
