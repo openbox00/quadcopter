@@ -507,8 +507,6 @@ void vBalanceTask(void *pvParameters)
 	argv.Roll_desire = 0;   //Desire angle of Roll
 
 	while(1){
-
-		//qprintf(xQueueUARTSend, "th5: %d\t,th4: %d\t,th6: %d\t,th3: %d\r\n", throttle[0], throttle[1], throttle[2], throttle[3]);
 		argv.Pitch = angle_y;    //pitch degree
 		argv.Roll = angle_x;     //roll degree
 		argv.Pitch_v = x_gyro;   //pitch velocity
@@ -546,10 +544,6 @@ void vBalanceTask(void *pvParameters)
 		Motor_Control(Motor1 , Motor2, Motor3, Motor4);
 	}
 	
-		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
-		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
-		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
-		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
 		qprintf(xQueueUARTSend, "Motor1(P12): %d	,Motor2(P13): %d	,Motor3(P14):	%d	,Motor4(P15):	%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);
 			
 		//vTaskDelay(ms100); //Setting rate is 100Hz	
