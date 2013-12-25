@@ -279,6 +279,10 @@ float angle_z;
 // int16_t gx_1, gy_1, gz_1;
 // uint8_t gx_2, gy_2, gz_2;
 
+u16 Motor1, Motor2, Motor3, Motor4;        
+
+PID argv;
+
 void vTimerSample(xTimerHandle pxTimer){
  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
@@ -325,6 +329,41 @@ void vTimerSample(xTimerHandle pxTimer){
 	angle_y = (0.93) * (angle_y + x_gyro * 0.01) + (0.07) * (y_acc); 
 	//angle_z = (0.966) * (angle_z + z_gyro * 0.001) + (0.034) * (z_acc); 
 	
+
+	argv.Pitch = angle_y;    //pitch degree
+	argv.Roll = angle_x;     //roll degree
+	argv.Pitch_v = x_gyro;   //pitch velocity
+	argv.Roll_v = y_gyro;    //Roll velocity
+
+	argv.Pitch_err = argv.Pitch_desire - argv.Pitch;
+	argv.Roll_err  = argv.Roll_desire - argv.Roll;
+
+	if (throttle[0] != 0 || throttle[1] !=0 || throttle[2] !=0 || throttle[3] != 0)
+	{
+		PWM_Motor1 = throttle[0];
+		PWM_Motor2 = throttle[1];
+		PWM_Motor3 = throttle[2];
+		PWM_Motor4 = throttle[3];
+		throttle[0] = 0;
+		throttle[1] = 0;
+		throttle[2] = 0;
+		throttle[3] = 0;
+
+		pwm_flag = 1;
+	}
+
+
+	if(pwm_flag == 0){
+
+	}else{
+
+		Motor1 = PWM_Motor1 + (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD4	
+		Motor2 = PWM_Motor2 + (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD3			
+		Motor3 = PWM_Motor3 - (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD5
+		Motor4 = PWM_Motor4 - (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD6
+		
+		Motor_Control(Motor1, Motor2, Motor3, Motor4);
+	}
 }
 /*********************************************************************************************************/
 
@@ -483,92 +522,33 @@ void vBalanceTask(void *pvParameters)
 	angle_y = 0;
 	// angle_z = 0;
 
-	int pwm_speed_w = 0;
-	int pwm_speed_a = 0;
-	int pwm_speed_s = 0;
-	int pwm_speed_d = 0;
-
-	xTimerStart(xTimerSampleRate, 0);	
-
-	/*PID*/
-
-	u16 Motor1, Motor2, Motor3, Motor4;	
 
 	pwm_flag = 0;
 
-	PID argv;
+    argv.PitchP = 0.4;        
+    argv.PitchD = 0.003;
+    argv.RollP = 0.4;
+    argv.RollD = 0.003;
 
-	argv.PitchP = 1;	
-	argv.PitchD = 0.03;
-	argv.RollP  = 1;
-	argv.RollD  = 0.03;
+    argv.Pitch_desire = 0; //Desire angle of Pitch
+    argv.Roll_desire = 0; //Desire angle of Roll
 
-	argv.Pitch_desire = 0;  //Desire angle of Pitch
-	argv.Roll_desire = 0;   //Desire angle of Roll
+	xTimerStart(xTimerSampleRate, 0);	
+
+
 
 	while(1){
 
-		//qprintf(xQueueUARTSend, "th5: %d\t,th4: %d\t,th6: %d\t,th3: %d\r\n", throttle[0], throttle[1], throttle[2], throttle[3]);
-		argv.Pitch = angle_y;    //pitch degree
-		argv.Roll = angle_x;     //roll degree
-		argv.Pitch_v = x_gyro;   //pitch velocity
-		argv.Roll_v = y_gyro;    //Roll velocity
-
-		argv.Pitch_err = argv.Pitch_desire - argv.Pitch;
-		argv.Roll_err  = argv.Roll_desire - argv.Roll;
-
-	if (throttle[0] != 0 || throttle[1] !=0 || throttle[2] !=0 || throttle[3] != 0)
-	{
-		PWM_Motor1 = throttle[0];
-		PWM_Motor2 = throttle[1];
-		PWM_Motor3 = throttle[2];
-		PWM_Motor4 = throttle[3];
-		throttle[0] = 0;
-		throttle[1] = 0;
-		throttle[2] = 0;
-		throttle[3] = 0;
-
-		pwm_flag = 1;
-	}
-
-
-	if(pwm_flag == 0){
-		vTaskDelay(ms10);
-	}else{
-#if 0
-		if(argv.Pitch_err <= 0){
-
-			Motor4 = PWM_Motor4 - (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED6 //15
-			Motor2 = PWM_Motor2 + (int)( argv.PitchD * argv.Pitch_v - argv.PitchP * argv.Pitch_err ); //LED3	//13		
-		}else if(argv.Pitch_err > 0){
-			Motor4 = PWM_Motor4 + (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LED6 //15
-			Motor2 = PWM_Motor2 - (int)( argv.PitchD * argv.Pitch_v + argv.PitchP * argv.Pitch_err ); //LED3  //13
-		}
-
-		if(argv.Roll_err <= 0){
-			Motor3 = PWM_Motor3 - (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LED5  // 14
-			Motor1 = PWM_Motor1 + (int)( argv.RollD * argv.Roll_v - argv.RollP * argv.Roll_err ); //LED4	  //12		
-		}else if(argv.Roll_err > 0){
-			Motor3 = PWM_Motor3 + (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LED5   //14
-			Motor1 = PWM_Motor1 - (int)( argv.RollD * argv.Roll_v + argv.RollP * argv.Roll_err ); //LED4    //12
-		}
-
-#endif
-		Motor1 = PWM_Motor1 + (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD4	
-		Motor2 = PWM_Motor2 + (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD3			
-		Motor3 = PWM_Motor3 - (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD5
-		Motor4 = PWM_Motor4 - (int)( argv.PitchP * argv.Pitch_err + argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  + argv.RollD  * argv.Roll_v); 	//LD6
-		
-		Motor_Control(Motor1, Motor2, Motor3, Motor4);
-	}
-	
+		qprintf(xQueueUARTSend, "Motor1(P12): %d	,Motor2(P13): %d	,Motor3(P14):	%d	,Motor4(P15):	%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
+		//vTaskDelay(ms100);
 		//qprintf(xQueueUARTSend, "x_acc :	%d	, y_acc :	%d \n\r", (int)x_acc, (int)y_acc);		
 		//qprintf(xQueueUARTSend, "x_gyro :	%d	, y_gyro :	%d \n\r", (int)x_gyro, (int)y_gyro);		
 		//qprintf(xQueueUARTSend, "angle_x :	%d	, angle_y :	%d \n\r", (int)angle_x, (int)angle_y);	
 		//qprintf(xQueueUARTSend, "Pitch: %d, Roll: %d\r\n", Pitch, Roll);
-		qprintf(xQueueUARTSend, "Motor1(P12): %d	,Motor2(P13): %d	,Motor3(P14):	%d	,Motor4(P15):	%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
 		//vTaskDelay(ms100); //Setting rate is 100Hz	
 	}
+
+
 }
 
 /*-----------------------------------------------------------*/
