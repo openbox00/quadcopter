@@ -37,7 +37,7 @@ extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
 extern xQueueHandle xQueuePWMdirection;
 
-extern void Motor_Control(u16 Motor1, u16 Motor2, u16 Motor3, u16 Motor4);
+extern void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4);
 
 char next_line[3] = {'\n','\r','\0'};
 char cmd[HISTORY_COUNT][CMDBUF_SIZE];
