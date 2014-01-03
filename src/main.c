@@ -1,3 +1,8 @@
+/* 20140102 
+ * wifi ok, pwm ok,  
+ * pid not ok, 
+*/
+
 #include "stm32f4xx.h"
 
 /* FreeRTOS includes */
@@ -31,11 +36,11 @@
 #define queueSIZE	6
 
 /*brushless motor PWM max and min duty cycle*/
-#define PWM_MOTOR_INIT_MIN 100
-#define PWM_MOTOR_INIT_MAX 1000
+#define PWM_MOTOR_INIT_MIN 800
+#define PWM_MOTOR_INIT_MAX 2000
 
-#define PWM_MOTOR_MIN 120
-#define PWM_MOTOR_MAX 300
+#define PWM_MOTOR_MIN 800
+#define PWM_MOTOR_MAX 1800
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -55,6 +60,8 @@
 #define PWM_Motor2 TIM4->CCR2   
 #define PWM_Motor3 TIM4->CCR3   
 #define PWM_Motor4 TIM4->CCR4   
+
+ 
 
 /* Task functions declarations */
 static void vPWMctrlTask(void *pvParameters);
@@ -89,7 +96,7 @@ typedef struct {
         char ch;
 } serial_ch_msg;
 
-unsigned int throttle[4];
+unsigned int thrust[4];
 
 typedef struct {
 	float PitchP; //Pitch Proportional Gain Coefficient
@@ -97,6 +104,8 @@ typedef struct {
 
 	float RollP;  //Roll Proportional Gain Coefficient
 	float RollD;  //Roll Pitch Derivative Gain Coefficient
+
+	float YawD;
 
 	float Pitch_desire; //Desired Pich angle
 	float Roll_desire;  //Desired Roll angle
@@ -130,9 +139,7 @@ int receive_byte_noblock(char *ch)
 }
 
 /* Private function prototypes -----------------------------------------------*/
-
 /* Private functions ---------------------------------------------------------*/
-
 static void vPWMctrlTask(void *pvParameters)
 {
 
@@ -160,8 +167,8 @@ static void vPWMctrlTask(void *pvParameters)
 
   pwm_speed_int = atoi(pwm_speed_char);	
 
-  	if (pwm_speed_int >300) {
-		pwm_speed_int = 300;
+  	if (pwm_speed_int > PWM_MOTOR_MAX) {
+		pwm_speed_int = PWM_MOTOR_MAX;
 	}else if (pwm_speed_int < 0){
 		pwm_speed_int = 0;
 	}else{
@@ -195,22 +202,24 @@ static void vPWMctrlTask(void *pvParameters)
 		pwm_speed_4 = pwm_speed_int;
 	}
 
-	throttle[0] = pwm_speed_1; //PWM_Motor1 = LED4
-	throttle[1] = pwm_speed_2; //PWM_Motor2 = LED3
-	throttle[2] = pwm_speed_3; //PWM_Motor3 = LED5 
-	throttle[3] = pwm_speed_4; //PWM_Motor4 = LED6
+	thrust[0] = pwm_speed_1; //PWM_Motor1 = LED4
+	thrust[1] = pwm_speed_2; //PWM_Motor2 = LED3
+	thrust[2] = pwm_speed_3; //PWM_Motor3 = LED5 
+	thrust[3] = pwm_speed_4; //PWM_Motor4 = LED6
 
-	if (throttle[0] != 0 || throttle[1] !=0 || throttle[2] !=0 || throttle[3] != 0)
+	if (thrust[0] != 0 || thrust[1] !=0 || thrust[2] !=0 || thrust[3] != 0)
 	{
-		PWM_Motor1 = throttle[0] + (unsigned int)14;
-		PWM_Motor2 = throttle[1] + (unsigned int)3;
-		PWM_Motor3 = throttle[2] + (unsigned int)9;
-		PWM_Motor4 = throttle[3];
-		throttle[0] = 0;
-		throttle[1] = 0;
-		throttle[2] = 0;
-		throttle[3] = 0;
+/*
+		PWM_Motor1 = throttle[0];	
+		PWM_Motor2 = throttle[1];		
+		PWM_Motor3 = throttle[2];	
+		PWM_Motor4 = throttle[3];	
 
+		throttle[0] = 0; //PWM_Motor1 = LED4
+		throttle[1] = 0; //PWM_Motor2 = LED3
+		throttle[2] = 0; //PWM_Motor3 = LED5 
+		throttle[3] = 0; //PWM_Motor4 = LED6
+*/		
 		pwm_flag = 1;
 	}
 
@@ -234,16 +243,15 @@ void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1;	// 12 	18 + 2.4=20.4
-	PWM_Motor2 = Motor2;	// 13	18  	
-	PWM_Motor3 = Motor3;	// + 2;	// 14	18 - 0.2 = 17.8
-	PWM_Motor4 = Motor4;	// 15	18 + 1 = 19
+	PWM_Motor1 = Motor1;	
+	PWM_Motor2 = Motor2;		
+	PWM_Motor3 = Motor3;	
+	PWM_Motor4 = Motor4;	
 }
-
 
 void vTimerSystemIdle( xTimerHandle pxTimer ){
 	pwm_flag = 0;
-	Motor_Control(120, 120, 120, 120);
+	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	qprintf(xQueueUARTSend, "30 sec idle time pass ... trun off motor\n\r");
 }
 
@@ -283,45 +291,37 @@ float angle_x;
 float angle_y;
 float angle_z;
 
-int testx;
-int testy;
+int PITCH, ROLL, YAW;
 
-int16_t x_1, y_1;
-uint8_t x_2, y_2;
-
-u16 Motor1, Motor2, Motor3, Motor4;        
+unsigned int Motor1, Motor2, Motor3, Motor4;        
 
 PID argv;
 
-void vTimerSample(xTimerHandle pxTimer){
+void vTimerSample(xTimerHandle pxTimer)
+{
  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
-
 
 	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
 
-
 	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	
-
     Buffer_GHx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_H);
     Buffer_GHy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0] = I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
     Buffer_GLx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_L);
     Buffer_GLy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0] = I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0] ) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0] ) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0] ) - GYOffset) * Sensitivity_250 / 1000;
 
-	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | (Buffer_GLx[0] & 0xF0)) - GXOffset) * Sensitivity_250 / 1000;
-	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | (Buffer_GLy[0] & 0xF0)) - GYOffset) * Sensitivity_250 / 1000;
-
-	angle_x = (0.985f) * (angle_x + y_gyro * 0.0025f) - (0.015f) * (x_acc);  		
-	angle_y = (0.985f) * (angle_y + x_gyro * 0.0025f) + (0.015f) * (y_acc); 
-	//angle_z = (0.966) * (angle_z + z_gyro * 0.001) + (0.034) * (z_acc); 
-
-	testx = angle_x * 10;
-	testy = angle_y * 10;	
+	angle_x = (0.985f) * (angle_x + y_gyro * 0.004f) - (0.015f) * (x_acc);  		
+	angle_y = (0.985f) * (angle_y + x_gyro * 0.004f) + (0.015f) * (y_acc); 
 
 	argv.Pitch = angle_y;    //pitch degree
 	argv.Roll = angle_x;     //roll degree
@@ -330,23 +330,39 @@ void vTimerSample(xTimerHandle pxTimer){
 
 	argv.Pitch_err = argv.Pitch_desire - argv.Pitch;
 	argv.Roll_err  = argv.Roll_desire - argv.Roll;
-}
-/*********************************************************************************************************/
-void vTimerPid(xTimerHandle pxTimer){
+
+	PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
+	ROLL  =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);	
+	YAW   = (int)(argv.YawD * z_gyro);
+
+	
 
 		if(pwm_flag == 0){
 
 		}else{
-			Motor1 = PWM_Motor1 + (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD4	
-			Motor2 = PWM_Motor2 + (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD3			
-			Motor3 = PWM_Motor3 - (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) + (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD5
-			Motor4 = PWM_Motor4 - (int)( argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v	) - (int)( argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v); 	//LD6
 
+			Motor1 = LIMIT(thrust[0] + PITCH - ROLL - YAW); 	//LD4	
+			Motor2 = LIMIT(thrust[1] + PITCH + ROLL + YAW); 	//LD3	
+			Motor3 = LIMIT(thrust[2] - PITCH + ROLL - YAW); 	//LD5
+			Motor4 = LIMIT(thrust[3] - PITCH - ROLL + YAW); 	//LD6
+
+/*
+			Motor1 = PWM_Motor1 + PITCH - ROLL - YAW; 	//LD4	
+			Motor2 = PWM_Motor2 + PITCH + ROLL + YAW; 	//LD3	
+			Motor3 = PWM_Motor3 - PITCH + ROLL - YAW; 	//LD5
+			Motor4 = PWM_Motor4 - PITCH - ROLL + YAW; 	//LD6
+*/
 			Motor_Control(Motor1, Motor2, Motor3, Motor4);
 		}
+
+}
+/*********************************************************************************************************/
+/*
+void vTimerPid(xTimerHandle pxTimer){
+
 }
 
-
+*/
 /* Task functions ------------------------------------------------- */
 
 //Task For Sending Data Via USART
@@ -406,7 +422,7 @@ void vBalanceTask(void *pvParameters)
 {
 
 	const portTickType twosecDelay = 2000; 
-	const portTickType xDelay = 6000; 
+	const portTickType xDelay = 3000; 
 	vTaskDelay( twosecDelay  );
    	PWM_Motor1 = PWM_MOTOR_INIT_MAX;
    	PWM_Motor2 = PWM_MOTOR_INIT_MAX;
@@ -417,7 +433,7 @@ void vBalanceTask(void *pvParameters)
    	PWM_Motor2 = PWM_MOTOR_INIT_MIN;
 	PWM_Motor3 = PWM_MOTOR_INIT_MIN;
    	PWM_Motor4 = PWM_MOTOR_INIT_MIN;   	
-
+	vTaskDelay( xDelay ); 
 	/*inital Offset value of Gryo. and Acce.*/
 
   	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
@@ -433,52 +449,56 @@ void vBalanceTask(void *pvParameters)
 	/* reset gyro offset */	
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
     Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
     Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
     Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
-
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
   	GXOffset = (int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]);
  	GYOffset = (int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]);
+ 	GZOffset = (int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]);
 	int i;
 
 	for(i = 1;i<128;i++){
-    	Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-	    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
-    	Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
-    	Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
+    Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
-  		GXOffset = GXOffset + (int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]);
- 		GYOffset = GYOffset + (int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]);	
+  	GXOffset = (int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]);
+ 	GYOffset = (int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]);
+ 	GZOffset = (int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]);	
 	}
 	
 	GXOffset = GXOffset / 128;
 	GYOffset = GYOffset / 128;
-
+	GZOffset = GZOffset / 128;
 
 	angle_x = 0;
 	angle_y = 0;
 
 	pwm_flag = 0;
 
-    argv.PitchP = 0.4f;  
-    argv.PitchD = 0;
-    argv.RollP = 0.4f;
-    argv.RollD = 0;
+    argv.PitchP = 1; //0.8f 
+    argv.PitchD = 0;//0.15f;
+    argv.RollP = 1;
+    argv.RollD = 0;//0.15f;
+
+	argv.YawD = 0;
 
     argv.Pitch_desire = 0; //Desire angle of Pitch
     argv.Roll_desire = 0; //Desire angle of Roll
 
-	xTimerStart(xTimerSampleRate, 0);
-	
-	xTimerStart(xTimerPidRate, 0);		
+	xTimerStart(xTimerSampleRate, 0);	
 
 	while(1){
 
-
 		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", testx, testy);
+		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
 	}
 }
 
@@ -558,13 +578,11 @@ int main(void)
 { 
 	int timerID = 1;
 	int timerID1 = 2;
-	int timerID2 = 3;
 	/*A Timer used to count how long there is no signal come in*/
 	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
-
-	xTimerPidRate = xTimerCreate("SensorPidRate", 500 / portTICK_RATE_MS, pdTRUE,  (void *) timerID2, vTimerPid);
+//														250HZ
 
 
 	/*a queue for tansfer the senddate to USART task*/

@@ -40,12 +40,13 @@ void prvSetupHardware( void )
 	//prvTIM4_Config();
 
 	/* Configure LIS302 in order to produce data used for TIM4 reconfiguration and LED control */
-	prvMEMS_Config();
+
 
   	RCC_Configuration();
   	GPIO_Configuration();
   	TIM_Configuration();
   	USART_Configuration();
+	prvMEMS_Config();
 	
 }
 
@@ -154,13 +155,13 @@ void TIM_Configuration(void)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
     TIM_OCInitTypeDef TIM_OCInitStruct;
 
-    // Let PWM frequency equal 100Hz.
+    // Let PWM frequency equal 400Hz.
     // Let period equal 1000. Therefore, timer runs from zero to 1000. Gives 0.1Hz resolution.
     // Solving for prescaler gives 240.
     TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
-    TIM_TimeBaseInitStruct.TIM_Period = 3360 - 1;   
-    TIM_TimeBaseInitStruct.TIM_Prescaler = 500 - 1; 
+    TIM_TimeBaseInitStruct.TIM_Period = 2500 - 1;//6720 - 1;//3360 - 1;   
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 84 - 1;//40 - 1;//500 - 1; 
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;    
     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseInitStruct );
     

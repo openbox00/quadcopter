@@ -11,6 +11,8 @@
 #define HISTORY_COUNT 1
 #define CMDBUF_SIZE 12
 
+#define PWM_MOTOR_MIN 800
+
 int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
 {
@@ -27,8 +29,6 @@ int strcmp(const char *a, const char *b)
                 :::
         );
 }
-
-#define PWM_MOTOR_MIN 100
 
 extern int pwm_flag;
 
@@ -60,7 +60,7 @@ typedef struct {
 } hcmd_entry;
 
 const hcmd_entry cmd_data[CMD_COUNT] = {
-	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "P"}
+	[CMD_PWM] = {.cmd = "p", .func = pwm, .description = "P"}
 };
 
 
@@ -157,7 +157,7 @@ void check_keyword()
 
 	if (i == CMD_COUNT) {
 		pwm_flag = 0;
- 		Motor_Control(120, 120, 120, 120);
+ 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 
 }

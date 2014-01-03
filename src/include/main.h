@@ -38,7 +38,9 @@
 /* Exported macro ------------------------------------------------------------*/
 #define ABS(x)                           (x < 0) ? (-x) : x
 #define MAX(a,b)                         (a < b) ? (b) : a
+#define LIMIT(x)						 (x > 65536) ? (65535) : (x < 0) ? 0 : x	
 /* Exported functions ------------------------------------------------------- */
+
 void TimingDelay_Decrement(void);
 void Delay(__IO uint32_t nTime);
 
