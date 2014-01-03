@@ -14,63 +14,45 @@ __IO uint32_t  LIS3DSHTimeout = LIS3DSH_FLAG_TIMEOUT;
 
 static void LIS3DSH_LowLevel_Init(void);
 static uint8_t LIS3DSH_SendByte(uint8_t byte);
-
+static void Delay_1ms( int nCnt_1ms );
 /**
   * @brief  Set LIS3DSH Initialization.
   * @param  LIS3DSH_Config_Struct: pointer to a LIS3DSH_Config_TypeDef structure 
   *         that contains the configuration setting for the LIS3DSH.
   * @retval None
   */
+
+
+
 void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
 {
 	uint8_t ctrl = 0x00;	
-  	uint32_t i=0;		//simple index for software delay
+
   
 	/* Configure the low level interface ---------------------------------------*/
 	LIS3DSH_LowLevel_Init();
   
 	/* Required delay for the MEMS Accelerometer: Turn-on time = 3/Output data Rate
 	                                                            = 3/100 = 30ms */
+
+	Delay_1ms(100);
+
   /* 0x20 */  
-  /* 
-  ctrl=(uint8_t) (LIS3DSH_InitStruct->CR4_Odr|LIS3DSH_InitStruct->CR4_Bdu|
-     LIS3DSH_InitStruct->CR4_Zen|LIS3DSH_InitStruct->CR4_Yen|
-     LIS3DSH_InitStruct->CR4_Xen);
-*/
-  //ctrl = 0x47;  
-  ctrl = 0x77; //100Hz
-  LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
 
+	ctrl = 0x67; //100Hz
+	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
 
-#if 0
-  /* 0x21 */  
-	ctrl=LIS3DSH_InitStruct->SM1_Hysteresis|LIS3DSH_InitStruct->SM1_Pin|LIS3DSH_InitStruct->SM1_Enable;
-	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG1_ADDR, 1);
-	
-  /* 0x22 */  
-	ctrl=LIS3DSH_InitStruct->SM2_Hysteresis|LIS3DSH_InitStruct->SM2_Pin|LIS3DSH_InitStruct->SM2_Enable;
-	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG2_ADDR, 1);
-	
-  /* 0x23 */  
-	ctrl=LIS3DSH_InitStruct->CR3_Dren|LIS3DSH_InitStruct->CR3_Iea|LIS3DSH_InitStruct->CR3_Iel|
-		 LIS3DSH_InitStruct->CR3_Int2En|LIS3DSH_InitStruct->CR3_Int1En|LIS3DSH_InitStruct->CR3_Vfilt|
-		 LIS3DSH_InitStruct->CR3_Strt;
-	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG3_ADDR, 1);
-	
-  /* 0x24 */  
-	ctrl=LIS3DSH_InitStruct->CR5_Bw|LIS3DSH_InitStruct->CR5_Fscale|
-		 LIS3DSH_InitStruct->CR5_St|LIS3DSH_InitStruct->CR5_Sim;
-	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG5_ADDR, 1);
-	
-  /* 0x25 */  
-	ctrl=LIS3DSH_InitStruct->CR6_Boot|LIS3DSH_InitStruct->CR6_FifoEn|
-		 LIS3DSH_InitStruct->CR6_WtmEn|LIS3DSH_InitStruct->CR6_AddInc|
-		 LIS3DSH_InitStruct->CR6_P1Empty|LIS3DSH_InitStruct->CR6_P1Wtm|
-		 LIS3DSH_InitStruct->CR6_P1OverRun|LIS3DSH_InitStruct->CR6_P2Boot;
-	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG6_ADDR, 1);
-#endif
+	Delay_1ms(100);
+
 }
 
+
+void Delay_1ms( int nCnt_1ms )
+{
+    int nCnt;
+    for(; nCnt_1ms != 0; nCnt_1ms--)
+    	for(nCnt = 56580; nCnt != 0; nCnt--);
+}
 
 void LIS3DSH_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite)
 {

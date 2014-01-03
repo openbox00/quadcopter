@@ -12,6 +12,8 @@
 static void L3G4200D_LowLevel_Init(void);
 static uint8_t L3G4200D_SendByte(uint8_t byte);
 
+static void Delay_1ms( int nCnt_1ms );
+
 
 void L3G4200D_Init(void)
 {
@@ -20,8 +22,21 @@ void L3G4200D_Init(void)
   /* Configure the low level interface ---------------------------------------*/
   L3G4200D_LowLevel_Init();
   
-  ctrl = 0x0F; //100Hz
-  L3G4200D_Write(&ctrl, L3G4200D_CTRL_REG1_ADDR, 1);
+	/* Required delay for the MEMS Accelerometer: Turn-on time = 3/Output data Rate
+	                                                            = 3/100 = 30ms */
+	Delay_1ms(100);
+
+  	ctrl = 0x0F; //100Hz
+	L3G4200D_Write(&ctrl, L3G4200D_CTRL_REG1_ADDR, 1);
+
+	Delay_1ms(100);
+}
+
+void Delay_1ms( int nCnt_1ms )
+{
+    int nCnt;
+          for(; nCnt_1ms != 0; nCnt_1ms--)
+                    for(nCnt = 56580; nCnt != 0; nCnt--);
 }
 
 
@@ -44,6 +59,8 @@ void L3G4200D_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite
 
     L3G4200D_CS_HIGH();
 }   // L3G4200D_Write
+
+
 
 /**
   * @brief  Reads a block of data from the L3G4200D.

@@ -1,8 +1,3 @@
-/* 20140102 
- * wifi ok, pwm ok,  
- * pid not ok, 
-*/
-
 #include "stm32f4xx.h"
 
 /* FreeRTOS includes */
@@ -26,12 +21,7 @@
 /* variable parameter function*/
 #include <stdarg.h>
 
-/** @addtogroup STM32F4-Discovery_Demo
-  * @{
-  */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
 #define DELAY 125     /* msec */
 #define queueSIZE	6
 
@@ -39,7 +29,7 @@
 #define PWM_MOTOR_INIT_MIN 800
 #define PWM_MOTOR_INIT_MAX 2000
 
-#define PWM_MOTOR_MIN 800
+#define PWM_MOTOR_MIN 810
 #define PWM_MOTOR_MAX 1800
 
 /*acc sensitivity*/
@@ -60,8 +50,6 @@
 #define PWM_Motor2 TIM4->CCR2   
 #define PWM_Motor3 TIM4->CCR3   
 #define PWM_Motor4 TIM4->CCR4   
-
- 
 
 /* Task functions declarations */
 static void vPWMctrlTask(void *pvParameters);
@@ -139,7 +127,14 @@ int receive_byte_noblock(char *ch)
 }
 
 /* Private function prototypes -----------------------------------------------*/
+
 /* Private functions ---------------------------------------------------------*/
+
+unsigned int PWM_Motor1_tmp = 0;
+unsigned int PWM_Motor2_tmp = 0;
+unsigned int PWM_Motor3_tmp = 0;
+unsigned int PWM_Motor4_tmp = 0;
+
 static void vPWMctrlTask(void *pvParameters)
 {
 
@@ -159,10 +154,6 @@ static void vPWMctrlTask(void *pvParameters)
   while(1)  // Do not exit
   {
 
-  while (!xQueueReceive(xQueuePWMdirection , pwm_direction, portMAX_DELAY));
-
-  direction = pwm_direction[0];
-
   while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
 
   pwm_speed_int = atoi(pwm_speed_char);	
@@ -175,56 +166,29 @@ static void vPWMctrlTask(void *pvParameters)
 		pwm_speed_int = pwm_speed_int;
 	}
 
-	if (direction == '1'){
-		pwm_speed_1 = pwm_speed_1 + pwm_speed_int; 
-		pwm_speed_2 = pwm_speed_2; 
-		pwm_speed_3 = pwm_speed_3;
-		pwm_speed_4	= pwm_speed_4;
-	}else if (direction == '2'){
-		pwm_speed_1 = pwm_speed_1; 
-		pwm_speed_2 = pwm_speed_2 + pwm_speed_int; 
-		pwm_speed_3 = pwm_speed_3;
-		pwm_speed_4	= pwm_speed_4;
-	}else if (direction == '3'){
-		pwm_speed_1 = pwm_speed_1; 
-		pwm_speed_2 = pwm_speed_2; 
-		pwm_speed_3 = pwm_speed_3 + pwm_speed_int;
-		pwm_speed_4	= pwm_speed_4;
-	}else if (direction == '4'){
-		pwm_speed_1 = pwm_speed_1; 
-		pwm_speed_2 = pwm_speed_2; 
-		pwm_speed_3 = pwm_speed_3;
-		pwm_speed_4	= pwm_speed_4 + pwm_speed_int;
-	}else{	
-		pwm_speed_1 = pwm_speed_int;
-		pwm_speed_2 = pwm_speed_int;
-		pwm_speed_3 = pwm_speed_int;
-		pwm_speed_4 = pwm_speed_int;
-	}
-
-	thrust[0] = pwm_speed_1; //PWM_Motor1 = LED4
-	thrust[1] = pwm_speed_2; //PWM_Motor2 = LED3
-	thrust[2] = pwm_speed_3; //PWM_Motor3 = LED5 
-	thrust[3] = pwm_speed_4; //PWM_Motor4 = LED6
+	thrust[0] = pwm_speed_int; //PWM_Motor1 = LED4
+	thrust[1] = pwm_speed_int; //PWM_Motor2 = LED3
+	thrust[2] = pwm_speed_int; //PWM_Motor3 = LED5 
+	thrust[3] = pwm_speed_int; //PWM_Motor4 = LED6
 
 	if (thrust[0] != 0 || thrust[1] !=0 || thrust[2] !=0 || thrust[3] != 0)
 	{
-/*
-		PWM_Motor1 = throttle[0];	
-		PWM_Motor2 = throttle[1];		
-		PWM_Motor3 = throttle[2];	
-		PWM_Motor4 = throttle[3];	
+		PWM_Motor1_tmp = 0;
+		PWM_Motor2_tmp = 0;
+		PWM_Motor3_tmp = 0;
+		PWM_Motor4_tmp = 0;
+		PWM_Motor1_tmp = thrust[0];
+		PWM_Motor2_tmp = thrust[1];
+		PWM_Motor3_tmp = thrust[2];
+		PWM_Motor4_tmp = thrust[3];
 
-		throttle[0] = 0; //PWM_Motor1 = LED4
-		throttle[1] = 0; //PWM_Motor2 = LED3
-		throttle[2] = 0; //PWM_Motor3 = LED5 
-		throttle[3] = 0; //PWM_Motor4 = LED6
-*/		
+		thrust[0] = 0;
+		thrust[1] = 0;
+		thrust[2] = 0;
+		thrust[3] = 0;
+
 		pwm_flag = 1;
 	}
-
-	qprintf(xQueueUARTSend, "1: %d	,2: %d	,3: %d	,4: %d\n\r",
-							pwm_speed_1, pwm_speed_2, pwm_speed_3, pwm_speed_4);	
 
   }
 } 
@@ -243,11 +207,12 @@ void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3
 	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
 	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
 								
-	PWM_Motor1 = Motor1;	
-	PWM_Motor2 = Motor2;		
+	PWM_Motor1 = Motor1;
+	PWM_Motor2 = Motor2;	 	
 	PWM_Motor3 = Motor3;	
 	PWM_Motor4 = Motor4;	
 }
+
 
 void vTimerSystemIdle( xTimerHandle pxTimer ){
 	pwm_flag = 0;
@@ -291,37 +256,46 @@ float angle_x;
 float angle_y;
 float angle_z;
 
+int testx;
+int testy;
+
 int PITCH, ROLL, YAW;
 
-unsigned int Motor1, Motor2, Motor3, Motor4;        
+unsigned int  Motor1, Motor2, Motor3, Motor4;  
 
 PID argv;
+
+
 
 void vTimerSample(xTimerHandle pxTimer)
 {
  	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Hy, LIS3DSH_OUT_Y_H_REG_ADDR, 1);
 
+
 	LIS3DSH_Read(Buffer_Lx, LIS3DSH_OUT_X_L_REG_ADDR, 1);
 	LIS3DSH_Read(Buffer_Ly, LIS3DSH_OUT_Y_L_REG_ADDR, 1);
+
 
 	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	
+
     Buffer_GHx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_H);
     Buffer_GHy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
-    Buffer_GHz[0] = I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
     Buffer_GLx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_L);
     Buffer_GLy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
-    Buffer_GLz[0] = I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
-	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0] ) - GXOffset) * Sensitivity_250 / 1000;
-	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0] ) - GYOffset) * Sensitivity_250 / 1000;
-	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0] ) - GYOffset) * Sensitivity_250 / 1000;
+
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | (Buffer_GLx[0] & 0xF0)) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | (Buffer_GLy[0] & 0xF0)) - GYOffset) * Sensitivity_250 / 1000;
 
 	angle_x = (0.985f) * (angle_x + y_gyro * 0.004f) - (0.015f) * (x_acc);  		
 	angle_y = (0.985f) * (angle_y + x_gyro * 0.004f) + (0.015f) * (y_acc); 
+
+	testx = angle_x;
+	testy = angle_y;	
 
 	argv.Pitch = angle_y;    //pitch degree
 	argv.Roll = angle_x;     //roll degree
@@ -335,34 +309,21 @@ void vTimerSample(xTimerHandle pxTimer)
 	ROLL  =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);	
 	YAW   = (int)(argv.YawD * z_gyro);
 
-	
-
 		if(pwm_flag == 0){
 
 		}else{
 
-			Motor1 = LIMIT(thrust[0] + PITCH - ROLL - YAW); 	//LD4	
-			Motor2 = LIMIT(thrust[1] + PITCH + ROLL + YAW); 	//LD3	
-			Motor3 = LIMIT(thrust[2] - PITCH + ROLL - YAW); 	//LD5
-			Motor4 = LIMIT(thrust[3] - PITCH - ROLL + YAW); 	//LD6
+			Motor1 = PWM_Motor1_tmp + PITCH - ROLL - YAW; 	//LD4	
+			Motor2 = PWM_Motor2_tmp + PITCH + ROLL + YAW; 	//LD3			
+			Motor3 = PWM_Motor3_tmp - PITCH + ROLL - YAW; 	//LD5
+			Motor4 = PWM_Motor4_tmp - PITCH - ROLL + YAW; 	//LD6
 
-/*
-			Motor1 = PWM_Motor1 + PITCH - ROLL - YAW; 	//LD4	
-			Motor2 = PWM_Motor2 + PITCH + ROLL + YAW; 	//LD3	
-			Motor3 = PWM_Motor3 - PITCH + ROLL - YAW; 	//LD5
-			Motor4 = PWM_Motor4 - PITCH - ROLL + YAW; 	//LD6
-*/
 			Motor_Control(Motor1, Motor2, Motor3, Motor4);
 		}
 
 }
-/*********************************************************************************************************/
-/*
-void vTimerPid(xTimerHandle pxTimer){
 
-}
 
-*/
 /* Task functions ------------------------------------------------- */
 
 //Task For Sending Data Via USART
@@ -433,7 +394,6 @@ void vBalanceTask(void *pvParameters)
    	PWM_Motor2 = PWM_MOTOR_INIT_MIN;
 	PWM_Motor3 = PWM_MOTOR_INIT_MIN;
    	PWM_Motor4 = PWM_MOTOR_INIT_MIN;   	
-	vTaskDelay( xDelay ); 
 	/*inital Offset value of Gryo. and Acce.*/
 
   	LIS3DSH_Read(Buffer_Hx, LIS3DSH_OUT_X_H_REG_ADDR, 1);
@@ -478,96 +438,33 @@ void vBalanceTask(void *pvParameters)
 	GYOffset = GYOffset / 128;
 	GZOffset = GZOffset / 128;
 
+
 	angle_x = 0;
 	angle_y = 0;
 
 	pwm_flag = 0;
 
-    argv.PitchP = 1; //0.8f 
-    argv.PitchD = 0;//0.15f;
-    argv.RollP = 1;
-    argv.RollD = 0;//0.15f;
+    argv.PitchP = 3;//2.5f; //2 //1.5f 
+    argv.PitchD = 1; //1
+    argv.RollP = 3;//2.5f;	
+    argv.RollD = 1;
 
 	argv.YawD = 0;
 
     argv.Pitch_desire = 0; //Desire angle of Pitch
     argv.Roll_desire = 0; //Desire angle of Roll
 
-	xTimerStart(xTimerSampleRate, 0);	
+	xTimerStart(xTimerSampleRate, 0);
+	
+	//xTimerStart(xTimerPidRate, 0);		
 
 	while(1){
 
 		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
+		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", testx, testy);
 	}
 }
 
-/*-----------------------------------------------------------*/
-
-
-void vApplicationIdleHook( void )
-{
-volatile size_t xFreeStackSpace;
-
-	/* This function is called on each cycle of the idle task.  In this case it
-	does nothing useful, other than report the amout of FreeRTOS heap that 
-	remains unallocated. */
-	xFreeStackSpace = xPortGetFreeHeapSize();
-
-	if( xFreeStackSpace > 100 )
-	{
-		/* By now, the kernel has allocated everything it is going to, so
-		if there is a lot of heap remaining unallocated then
-		the value of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h can be
-		reduced accordingly. */
-	}
-}
-
-/*-----------------------------------------------------------*/
-
-void vApplicationMallocFailedHook( void )
-{
-	/* Called if a call to pvPortMalloc() fails because there is insufficient
-	free memory available in the FreeRTOS heap.  pvPortMalloc() is called
-	internally by FreeRTOS API functions that create tasks, queues, software 
-	timers, and semaphores.  The size of the FreeRTOS heap is set by the
-	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
-	for( ;; );
-}
-/*-----------------------------------------------------------*/
-
-void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed char *pcTaskName )
-{
-	( void ) pcTaskName;
-	( void ) pxTask;
-
-	/* Run time stack overflow checking is performed if
-	configconfigCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
-	function is called if a stack overflow is detected. */
-	for( ;; );
-}
-/*-----------------------------------------------------------*/
-
-#ifdef  USE_FULL_ASSERT
-
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *   where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t* file, uint32_t line)
-{ 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
-  /* Infinite loop */
-  while (1)
-  {
-  }
-}
-#endif
 
 /**
   * @brief  Main program.
@@ -578,12 +475,11 @@ int main(void)
 { 
 	int timerID = 1;
 	int timerID1 = 2;
+	int timerID2 = 3;
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 40000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
-//														250HZ
-
 
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));

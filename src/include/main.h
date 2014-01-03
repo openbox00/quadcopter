@@ -29,8 +29,6 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-#define DOUBLECLICK_Z                    ((uint8_t)0x60)
-#define SINGLECLICK_Z                    ((uint8_t)0x50)
 
 /* TIM2 Autoreload and Capture Compare register values */
 #define TIM_ARR                          ((uint16_t)1900)
@@ -38,8 +36,8 @@
 /* Exported macro ------------------------------------------------------------*/
 #define ABS(x)                           (x < 0) ? (-x) : x
 #define MAX(a,b)                         (a < b) ? (b) : a
-#define LIMIT(x)						 (x > 65536) ? (65535) : (x < 0) ? 0 : x	
 /* Exported functions ------------------------------------------------------- */
+
 
 void TimingDelay_Decrement(void);
 void Delay(__IO uint32_t nTime);

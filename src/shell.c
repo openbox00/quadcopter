@@ -11,8 +11,6 @@
 #define HISTORY_COUNT 1
 #define CMDBUF_SIZE 12
 
-#define PWM_MOTOR_MIN 800
-
 int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
 {
@@ -29,6 +27,8 @@ int strcmp(const char *a, const char *b)
                 :::
         );
 }
+
+#define PWM_MOTOR_MIN 810
 
 extern int pwm_flag;
 
@@ -60,12 +60,13 @@ typedef struct {
 } hcmd_entry;
 
 const hcmd_entry cmd_data[CMD_COUNT] = {
-	[CMD_PWM] = {.cmd = "p", .func = pwm, .description = "P"}
+	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "P"}
 };
 
 
 void pwm(int argc, char* argv[])
 {
+/*
 	if (*argv[2] == '1'){
 	qprintf(xQueueUARTSend, "w = %s %s\n", argv[1], argv[2]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
@@ -88,6 +89,9 @@ void pwm(int argc, char* argv[])
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 	qprintf(xQueuePWMdirection, "%s", '0');	
 	}
+*/
+	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
+	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 }
 
 /* ref tim37021 */
