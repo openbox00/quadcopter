@@ -5,6 +5,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "timers.h"
+#include "queue.h"
 
 #include <math.h>
 #include <stdio.h>
