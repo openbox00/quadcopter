@@ -35,7 +35,6 @@ extern int pwm_flag;
 extern xQueueHandle xQueueUARTSend;
 extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
-extern xQueueHandle xQueuePWMdirection;
 
 extern void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4);
 
@@ -66,30 +65,6 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 
 void pwm(int argc, char* argv[])
 {
-/*
-	if (*argv[2] == '1'){
-	qprintf(xQueueUARTSend, "w = %s %s\n", argv[1], argv[2]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);	
-	qprintf(xQueuePWMdirection, "%s", argv[2]);	
-	}
-	else if (*argv[2] == '2'){
-	qprintf(xQueueUARTSend, "a = %s %s\n", argv[1], argv[2]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);	
-	qprintf(xQueuePWMdirection, "%s", argv[2]);	
-	}else if (*argv[2] == '3'){
-	qprintf(xQueueUARTSend, "s = %s %s\n", argv[1], argv[2]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);	
-	qprintf(xQueuePWMdirection, "%s", argv[2]);	
-	}else if (*argv[2] == '4'){
-	qprintf(xQueueUARTSend, "d = %s %s\n", argv[1], argv[2]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);	
-	qprintf(xQueuePWMdirection, "%s", argv[2]);	
-	}else{
-	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
-	qprintf(xQueueShell2PWM, "%s", argv[1]);	
-	qprintf(xQueuePWMdirection, "%s", '0');	
-	}
-*/
 	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 }

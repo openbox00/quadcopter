@@ -5,6 +5,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "timers.h"
+#include "queue.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -52,11 +53,6 @@
 #define PWM_Motor4 TIM4->CCR4   
 
 /* Task functions declarations */
-static void vPWMctrlTask(void *pvParameters);
-static void vBalanceTask(void *pvParameters);
-
-static void vUsartSendTask(void *pvParameters);
-static void vUsartReciveTask(void *pvParameters);
 
 int pwm_flag;
 
@@ -64,7 +60,6 @@ int pwm_flag;
 xQueueHandle xQueueUARTSend;
 xQueueHandle xQueueUARTRecvie;
 xQueueHandle xQueueShell2PWM;
-xQueueHandle xQueuePWMdirection;
 
 /* software Timers */
 xTimerHandle xTimerNoSignal;
@@ -83,6 +78,10 @@ typedef struct {
 typedef struct {
         char ch;
 } serial_ch_msg;
+
+typedef struct {
+        char pwm[10];
+} pwm_ch_msg;
 
 unsigned int thrust[4];
 
@@ -104,121 +103,6 @@ typedef struct {
 	float Pitch, Roll;  	//present Pitch and Roll
 	float Pitch_v, Roll_v;  //present Pitch and Roll velosity
 } PID;
-
-char receive_byte()
-{
-        serial_ch_msg msg;
-
-        /* Wait for a byte to be queued by the receive interrupts handler. */
-        while (!xQueueReceive(xQueueUARTRecvie, &msg, portMAX_DELAY));
-
-        return msg.ch;
-}
-
-/* for fg ref zzz0072*/
-int receive_byte_noblock(char *ch)
-{
-    serial_ch_msg msg;
-    int rval = xQueueReceive(xQueueUARTRecvie, &msg, 10);
-    if ( rval == 1) {
-        *ch = msg.ch;
-    }
-    return rval;
-}
-
-/* Private function prototypes -----------------------------------------------*/
-
-/* Private functions ---------------------------------------------------------*/
-
-unsigned int PWM_Motor1_tmp = 0;
-unsigned int PWM_Motor2_tmp = 0;
-unsigned int PWM_Motor3_tmp = 0;
-unsigned int PWM_Motor4_tmp = 0;
-
-static void vPWMctrlTask(void *pvParameters)
-{
-
-  char pwm_speed_char[4];
-
-  char pwm_direction[4];
-
-  unsigned int pwm_speed_int = 100;
-	
-  char direction;
-
-  unsigned int pwm_speed_1 = 0;
-  unsigned int pwm_speed_2 = 0;
-  unsigned int pwm_speed_3 = 0;
-  unsigned int pwm_speed_4 = 0;
-
-  while(1)  // Do not exit
-  {
-
-  while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
-
-  pwm_speed_int = atoi(pwm_speed_char);	
-
-  	if (pwm_speed_int > PWM_MOTOR_MAX) {
-		pwm_speed_int = PWM_MOTOR_MAX;
-	}else if (pwm_speed_int < 0){
-		pwm_speed_int = 0;
-	}else{
-		pwm_speed_int = pwm_speed_int;
-	}
-
-	thrust[0] = pwm_speed_int; //PWM_Motor1 = LED4
-	thrust[1] = pwm_speed_int; //PWM_Motor2 = LED3
-	thrust[2] = pwm_speed_int; //PWM_Motor3 = LED5 
-	thrust[3] = pwm_speed_int; //PWM_Motor4 = LED6
-
-	if (thrust[0] != 0 || thrust[1] !=0 || thrust[2] !=0 || thrust[3] != 0)
-	{
-		PWM_Motor1_tmp = 0;
-		PWM_Motor2_tmp = 0;
-		PWM_Motor3_tmp = 0;
-		PWM_Motor4_tmp = 0;
-		PWM_Motor1_tmp = thrust[0];
-		PWM_Motor2_tmp = thrust[1];
-		PWM_Motor3_tmp = thrust[2];
-		PWM_Motor4_tmp = thrust[3];
-
-		thrust[0] = 0;
-		thrust[1] = 0;
-		thrust[2] = 0;
-		thrust[3] = 0;
-
-		pwm_flag = 1;
-	}
-
-  }
-} 
-
-void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4)
-{
-	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
-	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
-		
-	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
-	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
-				
-	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
-	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
-						
-	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
-	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
-								
-	PWM_Motor1 = Motor1;
-	PWM_Motor2 = Motor2;	 	
-	PWM_Motor3 = Motor3;	
-	PWM_Motor4 = Motor4;	
-}
-
-
-void vTimerSystemIdle( xTimerHandle pxTimer ){
-	pwm_flag = 0;
-	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-	qprintf(xQueueUARTSend, "30 sec idle time pass ... trun off motor\n\r");
-}
 
 uint8_t Buffer_Hx[1];
 uint8_t Buffer_Hy[1];
@@ -265,6 +149,111 @@ unsigned int  Motor1, Motor2, Motor3, Motor4;
 
 PID argv;
 
+char receive_byte()
+{
+        serial_ch_msg msg;
+
+        /* Wait for a byte to be queued by the receive interrupts handler. */
+        while (!xQueueReceive(xQueueUARTRecvie, &msg, portMAX_DELAY));
+
+        return msg.ch;
+}
+
+/* for fg ref zzz0072*/
+int receive_byte_noblock(char *ch)
+{
+    serial_ch_msg msg;
+    int rval = xQueueReceive(xQueueUARTRecvie, &msg, 10);
+    if ( rval == 1) {
+        *ch = msg.ch;
+    }
+    return rval;
+}
+
+/* Private function prototypes -----------------------------------------------*/
+
+/* Private functions ---------------------------------------------------------*/
+
+unsigned int PWM_Motor1_tmp = 0;
+unsigned int PWM_Motor2_tmp = 0;
+unsigned int PWM_Motor3_tmp = 0;
+unsigned int PWM_Motor4_tmp = 0;
+
+void vPWMctrlTask(void *pvParameters)
+{
+	char pwm_speed_char[5];
+
+	unsigned int pwm_speed_int;
+
+  while(1)
+  {
+	while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
+	qprintf(xQueueUARTSend, "\npwm_speed_int: %s\n\r", pwm_speed_char);
+	pwm_speed_int = (unsigned int)atoi(pwm_speed_char);	
+
+
+	if (pwm_speed_int > PWM_MOTOR_MAX) {
+		pwm_speed_int = PWM_MOTOR_MAX;
+	}else if (pwm_speed_int < PWM_MOTOR_MIN){
+		pwm_speed_int = PWM_MOTOR_MIN;
+	}else{
+		pwm_speed_int = pwm_speed_int;
+	}
+
+	thrust[0] = pwm_speed_int;
+	thrust[1] = pwm_speed_int;
+	thrust[2] = pwm_speed_int;
+	thrust[3] = pwm_speed_int;
+
+	if (thrust[0] != 0 || thrust[1] !=0 || thrust[2] !=0 || thrust[3] != 0)
+	{
+		PWM_Motor1_tmp = 0;
+		PWM_Motor2_tmp = 0;
+		PWM_Motor3_tmp = 0;
+		PWM_Motor4_tmp = 0;
+		PWM_Motor1_tmp = thrust[0];
+		PWM_Motor2_tmp = thrust[1];
+		PWM_Motor3_tmp = thrust[2];
+		PWM_Motor4_tmp = thrust[3];
+
+		thrust[0] = 0;
+		thrust[1] = 0;
+		thrust[2] = 0;
+		thrust[3] = 0;
+
+		pwm_flag = 1;
+	}
+  }
+} 
+
+void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4)
+{
+	if(Motor1>PWM_MOTOR_MAX)      Motor1 = PWM_MOTOR_MAX;
+	else if(Motor1<PWM_MOTOR_MIN) Motor1 = PWM_MOTOR_MIN;
+		
+	if(Motor2>PWM_MOTOR_MAX)      Motor2 = PWM_MOTOR_MAX;
+	else if(Motor2<PWM_MOTOR_MIN) Motor2 = PWM_MOTOR_MIN;
+				
+	if(Motor3>PWM_MOTOR_MAX)      Motor3 = PWM_MOTOR_MAX;
+	else if(Motor3<PWM_MOTOR_MIN) Motor3 = PWM_MOTOR_MIN;
+						
+	if(Motor4>PWM_MOTOR_MAX)      Motor4 = PWM_MOTOR_MAX;
+	else if(Motor4<PWM_MOTOR_MIN) Motor4 = PWM_MOTOR_MIN;
+								
+	PWM_Motor1 = Motor1;
+	PWM_Motor2 = Motor2;	 	
+	PWM_Motor3 = Motor3;	
+	PWM_Motor4 = Motor4;	
+}
+
+
+void vTimerSystemIdle( xTimerHandle pxTimer ){
+	pwm_flag = 0;
+	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+	qprintf(xQueueUARTSend, "40 sec idle time pass ... trun off motor\n\r");
+}
+
+
 
 
 void vTimerSample(xTimerHandle pxTimer)
@@ -288,8 +277,8 @@ void vTimerSample(xTimerHandle pxTimer)
     Buffer_GLy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
 
 
-	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | (Buffer_GLx[0] & 0xF0)) - GXOffset) * Sensitivity_250 / 1000;
-	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | (Buffer_GLy[0] & 0xF0)) - GYOffset) * Sensitivity_250 / 1000;
+	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
+	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
 
 	angle_x = (0.985f) * (angle_x + y_gyro * 0.004f) - (0.015f) * (x_acc);  		
 	angle_y = (0.985f) * (angle_y + x_gyro * 0.004f) + (0.015f) * (y_acc); 
@@ -327,7 +316,7 @@ void vTimerSample(xTimerHandle pxTimer)
 /* Task functions ------------------------------------------------- */
 
 //Task For Sending Data Via USART
-static void vUsartSendTask(void *pvParameters)
+void vUsartSendTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
@@ -353,7 +342,7 @@ static void vUsartSendTask(void *pvParameters)
 }
 
 //Task For Sending Data Via USART
-static void vUsartReciveTask(void *pvParameters)
+void vUsartReciveTask(void *pvParameters)
 {
 	//Variable to store received data	
 	uint32_t Data;
@@ -444,9 +433,9 @@ void vBalanceTask(void *pvParameters)
 
 	pwm_flag = 0;
 
-    argv.PitchP = 3;//2.5f; //2 //1.5f 
-    argv.PitchD = 1; //1
-    argv.RollP = 3;//2.5f;	
+    argv.PitchP = 3.85f;//2.5f; //2 //1.5f 
+    argv.PitchD = 0.7f; //1
+    argv.RollP = 6.5f;//2.5f;	
     argv.RollD = 1;
 
 	argv.YawD = 0;
@@ -454,14 +443,12 @@ void vBalanceTask(void *pvParameters)
     argv.Pitch_desire = 0; //Desire angle of Pitch
     argv.Roll_desire = 0; //Desire angle of Roll
 
-	xTimerStart(xTimerSampleRate, 0);
-	
-	//xTimerStart(xTimerPidRate, 0);		
+	xTimerStart(xTimerSampleRate, 0);		
 
 	while(1){
 
-		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", testx, testy);
+		//qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
+//		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", testx, testy);
 	}
 }
 
@@ -484,8 +471,7 @@ int main(void)
 	/*a queue for tansfer the senddate to USART task*/
 	xQueueUARTSend = xQueueCreate(15, sizeof(serial_str_msg));
    	xQueueUARTRecvie = xQueueCreate(15, sizeof(serial_ch_msg));
-   	xQueueShell2PWM = xQueueCreate(1, sizeof(int));
-   	xQueuePWMdirection = xQueueCreate(1, sizeof(int));
+   	xQueueShell2PWM = xQueueCreate(3, sizeof(pwm_ch_msg));
 
 	/* initialize hardware... */
 	prvSetupHardware();
@@ -499,7 +485,7 @@ int main(void)
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
-	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, xBalanceHandle);
+	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
