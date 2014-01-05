@@ -261,10 +261,10 @@ void vPitchctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nPitchdirection: %s\n\r", pwm_pitch_direction);
 
 		if (pwm_pitch_direction[0] == 'p') {
-			Pitch_desire = 10;
+			Pitch_desire = 5;
 			qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else if (pwm_pitch_direction[0] == 'n'){
-			Pitch_desire = -10;
+			Pitch_desire = -5;
 			qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else{
 			Pitch_desire = 0;
@@ -284,10 +284,10 @@ void vRollctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nRolldirection: %s\n\r", pwm_roll_direction);
 		
 	  	if (pwm_roll_direction[0] == 'p') {
-			Roll_desire = 10;
+			Roll_desire = 5;
 			qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else if (pwm_roll_direction[0] == 'n'){
-			Roll_desire = -10;
+			Roll_desire = -5;
 			qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else{
 			Roll_desire = 0;
