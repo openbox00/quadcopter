@@ -5,11 +5,11 @@
 #include "semphr.h"
 
 
-#define MAX_ARGC 4
-#define MAX_CMDNAME 3
-#define MAX_CMDHELP 1
+#define MAX_ARGC 10
+#define MAX_CMDNAME 10
+#define MAX_CMDHELP 10
 #define HISTORY_COUNT 1
-#define CMDBUF_SIZE 12
+#define CMDBUF_SIZE 20
 
 int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
@@ -32,9 +32,16 @@ int strcmp(const char *a, const char *b)
 
 extern int pwm_flag;
 
+extern float Pitch_desire; //Desired Pich angle
+extern float Roll_desire;  //Desired Roll angle
+
+
 extern xQueueHandle xQueueUARTSend;
 extern xQueueHandle xQueueUARTRecvie;
 extern xQueueHandle xQueueShell2PWM;
+
+extern xQueueHandle xQueuePitchdirection;
+extern xQueueHandle xQueueRolldirection;
 
 extern void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4);
 
@@ -44,10 +51,14 @@ int cur_his=0;
 
 /* Command handlers. */
 void pwm(int argc, char *argv[]);
+void pitch(int argc, char* argv[]);
+void roll(int argc, char* argv[]);
 
 /* Enumeration for command types. */
 enum {
 	CMD_PWM = 0,
+	CMD_PITCH,
+	CMD_ROLL,
 	CMD_COUNT
 } CMD_TYPE;
 
@@ -59,14 +70,39 @@ typedef struct {
 } hcmd_entry;
 
 const hcmd_entry cmd_data[CMD_COUNT] = {
-	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "P"}
+	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "pwm"},
+	[CMD_PITCH] = {.cmd = "pitch", .func = pitch, .description = "pitch"},
+	[CMD_ROLL] = {.cmd = "roll", .func = roll, .description = "roll"}
 };
 
 
 void pwm(int argc, char* argv[])
 {
+
 	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
+}
+
+void pitch(int argc, char* argv[])
+{
+	if(!strcmp("p\0",(argv[1])) || !strcmp("n\0",(argv[1]))){
+		qprintf(xQueueUARTSend, "pitch = %s 10 degree\n", argv[1]);
+		qprintf(xQueuePitchdirection, "%s", argv[1]);	
+	}else{
+		qprintf(xQueueUARTSend, "pitch = 0 degree\n");	
+		qprintf(xQueuePitchdirection, "%s", '0');
+	}
+}
+
+void roll(int argc, char* argv[])
+{
+	if(!strcmp("p\0",(argv[1])) || !strcmp("n\0",(argv[1]))){
+		qprintf(xQueueUARTSend, "roll = %s 10 degree\n", argv[1]);
+		qprintf(xQueueRolldirection, "%s", argv[1]);
+	}else{
+		qprintf(xQueueUARTSend, "roll = 0 degree\n");
+		qprintf(xQueueRolldirection, "%s", '0');	
+	}
 }
 
 /* ref tim37021 */
@@ -75,9 +111,7 @@ int cmdtok(char *argv[], char *cmd)
 	char tmp[CMDBUF_SIZE];
 	int i = 0;
 	int j = 0;
-	int flag;
 
-	int x = -1;
 	
 	while (*cmd != '\0'){
 		if(*cmd == ' '){
@@ -94,23 +128,21 @@ int cmdtok(char *argv[], char *cmd)
 					cmd++;
 				}
 				else { 
-				tmp[i] = '\0';
-				i = 0;
-				break;
+					tmp[i] = '\0';
+					i = 0;
+					break;
 				}		
 			}
 			strcpy(argv[j++],tmp);
 		}
 	}
-
 	return j;	
 }
-
 
 void check_keyword()
 {
 	/*use hardcoded array*/	
-	char tok[MAX_ARGC + 1][5];
+	char tok[MAX_ARGC + 1][MAX_CMDHELP];
 
 	char *argv[MAX_ARGC + 1];
 	int k = 0;
@@ -118,13 +150,16 @@ void check_keyword()
 	for (k;k<MAX_ARGC + 1;k++){
 	argv[k] = &tok[k][0];
 	}
+
 	int i;
 	int argc;
-	
+
 	char cmdstr[CMDBUF_SIZE];
 	strcpy(cmdstr, &cmd[cur_his][0]);
 	
 	argc = cmdtok(argv, cmdstr);
+
+	qprintf(xQueueUARTSend, "command is = %s, argv is = %s\n", argv[0], argv[1]);
 
 
 	for (i = 0; i < CMD_COUNT; i++) {
@@ -136,9 +171,11 @@ void check_keyword()
 
 	if (i == CMD_COUNT) {
 		pwm_flag = 0;
+		Pitch_desire = 0; //Desire angle of Pitch
+	    Roll_desire = 0; //Desire angle of Roll
+		qprintf(xQueueUARTSend, "no command\n");
  		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
-
 }
 
 void shell(void *pvParameters)
@@ -151,9 +188,7 @@ void shell(void *pvParameters)
 		/* need use & that p can work correct, idk why p = cmd[cur_his] can't work */
 		p = &cmd[cur_his][0];
 
-		//printf("%s",str);
 		qprintf(xQueueUARTSend, "%s", str);
-
 
 		while (1) {
 			put_ch = receive_byte();			
@@ -175,8 +210,7 @@ void shell(void *pvParameters)
 			}
 
 		}
-		check_keyword();	
-		
+		check_keyword();			
 	}
 }
 
