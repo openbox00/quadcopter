@@ -16,6 +16,7 @@
 #include "shell.h"
 #include "I2C.h"
 #include "stm32f4_discovery_l3g4200d.h"
+#include "hw_it.h"
 
 #include "string-util.c"
 
@@ -62,6 +63,8 @@ xQueueHandle xQueueShell2PWM;
 
 xQueueHandle xQueuePitchdirection;
 xQueueHandle xQueueRolldirection;
+
+xSemaphoreHandle serial_tx_wait_sem;
 
 /* software Timers */
 xTimerHandle xTimerNoSignal;
@@ -357,6 +360,8 @@ void vUsartSendTask(void *pvParameters)
 
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
 
+		send_str(msg.str);
+#if 0
 		/* Write each character of the message to the RS232 port. */
 		curr_char = 0;
 		while (msg.str[curr_char] != '\0') {
@@ -366,7 +371,9 @@ void vUsartSendTask(void *pvParameters)
 			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
 			curr_char++;
 		}
+#endif		
 	}
+
 	while(1);
 }
 
@@ -507,23 +514,24 @@ int main(void)
    	xQueuePitchdirection = xQueueCreate(3, sizeof(pitch_direction_msg));
    	xQueueRolldirection = xQueueCreate(3, sizeof(roll_direction_msg));
 
+   	vSemaphoreCreateBinary(serial_tx_wait_sem);
 
 	/* initialize hardware... */
 	prvSetupHardware();
-	init_I2C1();
+	//init_I2C1();
 	//L3G4200D_Init();
 	xTimerStart(xTimerNoSignal, 0);
 
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	//xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	//xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
-	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	//xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-	xTaskCreate(vPitchctrlTask, ( signed portCHAR * ) "Pitchctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
-	xTaskCreate(vRollctrlTask, ( signed portCHAR * ) "Rollctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	//xTaskCreate(vPitchctrlTask, ( signed portCHAR * ) "Pitchctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	//xTaskCreate(vRollctrlTask, ( signed portCHAR * ) "Rollctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 
 
 	/* Start the scheduler. */

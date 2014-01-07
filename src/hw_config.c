@@ -21,6 +21,7 @@
 
 /* Library includes. */
 #include "hw_config.h"
+#include "FreeRTOSConfig.h"
 
 
 /*-----------------------------------------------------------*/
@@ -201,9 +202,24 @@ void USART_Configuration(void)
 
   //Configuring And Enabling USART2
   USART_Init(USART2, &USART_InitStructure);
+  
+
+  //Enable USART Interrupt ----
+  NVIC_InitTypeDef NVIC_InitStructure;
+
+  USART_ClearFlag(USART2, USART_FLAG_TC);
+  /* Enable transmit and receive interrupts for the USART2. */
+  USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
+  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+  /* Enable the USART2 IRQ in the NVIC module (so that the USART2 interrupt
+   * handler is enabled). */
+  NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = configMAX_SYSCALL_INTERRUPT_PRIORITY + 0x10;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
   USART_Cmd(USART2, ENABLE);
-
-
 }
 
 /*------------below is original code------------*/
