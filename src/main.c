@@ -311,14 +311,17 @@ void vTimerSample(xTimerHandle pxTimer)
 	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	
-    Buffer_GHx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-    Buffer_GHy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
-    Buffer_GLx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_L);
-    Buffer_GLy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
+    Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
 	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
 	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]) - GZOffset) * Sensitivity_250 / 1000;
 
 	angle_x = (0.99f) * (angle_x + y_gyro * 0.004f) - (0.01f) * (x_acc);  		
 	angle_y = (0.99f) * (angle_y + x_gyro * 0.004f) + (0.01f) * (y_acc); 
@@ -338,10 +341,10 @@ void vTimerSample(xTimerHandle pxTimer)
 	if(pwm_flag == 0){
 
 	}else{
-		Motor1 = PWM_Motor1_tmp + PITCH - ROLL - YAW; 	//LD4	
-		Motor2 = PWM_Motor2_tmp + PITCH + ROLL + YAW; 	//LD3			
-		Motor3 = PWM_Motor3_tmp - PITCH + ROLL - YAW; 	//LD5
-		Motor4 = PWM_Motor4_tmp - PITCH - ROLL + YAW; 	//LD6
+		Motor1 = PWM_Motor1_tmp + PITCH - ROLL + YAW; 	//LD4	
+		Motor2 = PWM_Motor2_tmp + PITCH + ROLL - YAW; 	//LD3			
+		Motor3 = PWM_Motor3_tmp - PITCH + ROLL + YAW; 	//LD5
+		Motor4 = PWM_Motor4_tmp - PITCH - ROLL - YAW; 	//LD6
 
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
 	}
@@ -465,7 +468,7 @@ void vBalanceTask(void *pvParameters)
     argv.RollP = 4.6f;//2.5f;	
     argv.RollD = 0.8f;
 
-	argv.YawD = 0.0f;
+	argv.YawD = 0.2f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -475,8 +478,8 @@ void vBalanceTask(void *pvParameters)
 	while(1){
 
 		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
-		//qprintf(xQueueUARTSend, "argv.Pitch_err: %d	,argv.Roll_err: %d\n\r", (int)argv.Pitch_err, (int)argv.Roll_err);
+		//qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
+		qprintf(xQueueUARTSend, "z_gyro : %d\n\r", (int)z_gyro);
 	}
 }
 
@@ -518,20 +521,20 @@ int main(void)
 
 	/* initialize hardware... */
 	prvSetupHardware();
-	//init_I2C1();
+	init_I2C1();
 	//L3G4200D_Init();
 	xTimerStart(xTimerNoSignal, 0);
 
 
 	/* Start the tasks defined within this file/specific to this demo. */
-	//xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	//xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
-	//xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
+	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
-	//xTaskCreate(vPitchctrlTask, ( signed portCHAR * ) "Pitchctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
-	//xTaskCreate(vRollctrlTask, ( signed portCHAR * ) "Rollctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(vPitchctrlTask, ( signed portCHAR * ) "Pitchctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
+	xTaskCreate(vRollctrlTask, ( signed portCHAR * ) "Rollctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 
 
 	/* Start the scheduler. */
