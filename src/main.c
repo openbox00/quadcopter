@@ -453,12 +453,12 @@ void vBalanceTask(void *pvParameters)
 
 	pwm_flag = 0;
 
-    argv.PitchP = 3.85f;
-    argv.PitchD = 0.7f; 
-    argv.RollP = 6.5f;//2.5f;	
-    argv.RollD = 1;
+    argv.PitchP = 4.6f;//4.6;
+    argv.PitchD = 0.8f; //0.8
+    argv.RollP = 4.6f;//2.5f;	
+    argv.RollD = 0.8f;
 
-	argv.YawD = 0;
+	argv.YawD = 0.0f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -467,8 +467,8 @@ void vBalanceTask(void *pvParameters)
 
 	while(1){
 
-		//qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		//qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
+		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
+		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
 		//qprintf(xQueueUARTSend, "argv.Pitch_err: %d	,argv.Roll_err: %d\n\r", (int)argv.Pitch_err, (int)argv.Roll_err);
 	}
 }
