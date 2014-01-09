@@ -33,6 +33,9 @@
 #define PWM_MOTOR_MIN 810
 #define PWM_MOTOR_MAX 1800
 
+#define MAXNUM	25
+#define MINNUM	-25
+
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
 #define Sensitivity_4G	0.12  
@@ -327,10 +330,26 @@ void vTimerSample(xTimerHandle pxTimer)
 
 	argv.Pitch_err = Pitch_desire - argv.Pitch;
 	argv.Roll_err  = Roll_desire - argv.Roll;
-
+	
 	PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
 	ROLL  =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);	
 	YAW   = (int)(argv.YawD * z_gyro);
+
+	if (PITCH > MAXNUM) {
+		PITCH =	MAXNUM;
+	}else if (PITCH < MINNUM) {
+		PITCH = MINNUM;
+	}else{
+		PITCH = PITCH;
+	}
+
+	if (ROLL > MAXNUM) {
+		ROLL = MAXNUM;
+	}else if (ROLL < MINNUM) {
+		ROLL = MINNUM;
+	}else{
+		ROLL = ROLL;
+	}
 
 	if(pwm_flag == 0){
 
@@ -456,9 +475,9 @@ void vBalanceTask(void *pvParameters)
     argv.PitchP = 4.6f;//4.6;
     argv.PitchD = 0.8f; //0.8
     argv.RollP = 4.6f;//2.5f;	
-    argv.RollD = 0.8f;
+    argv.RollD = 0.2f;
 
-	argv.YawD = 0.0f;
+	argv.YawD = 0.2f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -467,9 +486,6 @@ void vBalanceTask(void *pvParameters)
 
 	while(1){
 
-		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
-		//qprintf(xQueueUARTSend, "argv.Pitch_err: %d	,argv.Roll_err: %d\n\r", (int)argv.Pitch_err, (int)argv.Roll_err);
 	}
 }
 

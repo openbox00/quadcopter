@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "stm32f4xx.h"
 
 #define MAX_ARGC 10
 #define MAX_CMDNAME 10
@@ -53,12 +54,14 @@ int cur_his=0;
 void pwm(int argc, char *argv[]);
 void pitch(int argc, char* argv[]);
 void roll(int argc, char* argv[]);
+void landing(int argc, char* argv[]);
 
 /* Enumeration for command types. */
 enum {
 	CMD_PWM = 0,
 	CMD_PITCH,
 	CMD_ROLL,
+	CMD_LEAD,
 	CMD_COUNT
 } CMD_TYPE;
 
@@ -72,9 +75,9 @@ typedef struct {
 const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "pwm"},
 	[CMD_PITCH] = {.cmd = "pitch", .func = pitch, .description = "pitch"},
-	[CMD_ROLL] = {.cmd = "roll", .func = roll, .description = "roll"}
+	[CMD_ROLL] = {.cmd = "roll", .func = roll, .description = "roll"},
+	[CMD_LEAD] = {.cmd = "land", .func = landing, .description = "leading"}
 };
-
 
 void pwm(int argc, char* argv[])
 {
@@ -82,6 +85,34 @@ void pwm(int argc, char* argv[])
 	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 }
+
+void landing(int argc, char* argv[])
+{
+	pwm_flag = 0;
+	Pitch_desire = 0; //Desire angle of Pitch
+	Roll_desire = 0; //Desire angle of Roll
+	int PWM_MOTOR_LANDING = 0;
+
+	PWM_MOTOR_LANDING = TIM4->CCR1;   
+
+	while(PWM_MOTOR_LANDING>800){
+		PWM_MOTOR_LANDING-100;
+ 		Motor_Control(PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING);
+		Delay_1ms(1000);
+		PWM_MOTOR_LANDING = TIM4->CCR1;   
+	}
+
+	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+	qprintf(xQueueUARTSend, "leading finished\n");		
+}
+
+void Delay_1ms( int nCnt_1ms )
+{
+    int nCnt;
+    for(; nCnt_1ms != 0; nCnt_1ms--)
+    	for(nCnt = 56580; nCnt != 0; nCnt--);
+}
+
 
 void pitch(int argc, char* argv[])
 {
