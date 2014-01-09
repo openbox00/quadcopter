@@ -25,13 +25,20 @@ void init_I2C1(void)
 
     init_I2C1_lowlevel();
 
-
+    Delay_1ms(100);
     I2C_write(L3G4200D_ADDR, CTRL_REG1, 0x0F); // X,Y,Z eksenlerini aktif et ve 100Hz data çıkış frekansı 
     I2C_write(L3G4200D_ADDR, CTRL_REG2, 0x00); 
     I2C_write(L3G4200D_ADDR, CTRL_REG3, 0x00); //eğer istenilirse sensörün int2 (data hazır) interuptı kullanılabilir
     I2C_write(L3G4200D_ADDR, CTRL_REG4, 0x00); //250 DPS
     I2C_write(L3G4200D_ADDR, CTRL_REG5, 0x00);
 }
+void Delay_1ms( int nCnt_1ms )
+{
+    int nCnt;
+          for(; nCnt_1ms != 0; nCnt_1ms--)
+                    for(nCnt = 56580; nCnt != 0; nCnt--);
+}
+
 
 
 void init_I2C1_lowlevel(void)

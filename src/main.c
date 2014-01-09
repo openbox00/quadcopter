@@ -217,7 +217,6 @@ void vPWMctrlTask(void *pvParameters)
 
 	while(1) {
 		while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
-		//qprintf(xQueueUARTSend, "\npwm_speed_int: %s\n\r", pwm_speed_char);
 		pwm_speed_int = (unsigned int)atoi(pwm_speed_char);	
 
 		if (pwm_speed_int > PWM_MOTOR_MAX) {
@@ -364,40 +363,9 @@ void vUsartSendTask(void *pvParameters)
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
 
 		send_str(msg.str);
-#if 0
-		/* Write each character of the message to the RS232 port. */
-		curr_char = 0;
-		while (msg.str[curr_char] != '\0') {
-			//Wait till the flag resets
-			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
-			//Send the data
-			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
-			curr_char++;
-		}
-#endif		
 	}
 
 	while(1);
-}
-
-//Task For Sending Data Via USART
-void vUsartReciveTask(void *pvParameters)
-{
-	//Variable to store received data	
-	uint32_t Data;
-	uint8_t curr_char;	
-
-	while(1) {		
-		//Wait for character
-		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
-           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
-		 		USART_ReceiveData(USART2); // Clear Error		 		
-		 }		
-		xTimerReset(xTimerNoSignal, 10);
-		//Collect the character
-		Data = USART_ReceiveData(USART2);
-		while (!xQueueSendToBack(xQueueUARTRecvie, &Data, portMAX_DELAY));
-	}
 }
 
 void vBalanceTask(void *pvParameters)
@@ -424,7 +392,6 @@ void vBalanceTask(void *pvParameters)
 
   	XOffset = (int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]);
  	YOffset = (int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]);
-
 
 	/* reset gyro offset */	
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
@@ -468,7 +435,7 @@ void vBalanceTask(void *pvParameters)
     argv.RollP = 4.6f;//2.5f;	
     argv.RollD = 0.8f;
 
-	argv.YawD = 0.2f;
+	argv.YawD = 1.0f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -477,9 +444,9 @@ void vBalanceTask(void *pvParameters)
 
 	while(1){
 
-		qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
+		//qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
 		//qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
-		qprintf(xQueueUARTSend, "z_gyro : %d\n\r", (int)z_gyro);
+		//qprintf(xQueueUARTSend, "z_gyro : %d\n\r", (int)z_gyro);
 	}
 }
 
@@ -529,7 +496,6 @@ int main(void)
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	//xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
 	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 

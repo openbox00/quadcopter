@@ -159,7 +159,7 @@ void check_keyword()
 	
 	argc = cmdtok(argv, cmdstr);
 
-	qprintf(xQueueUARTSend, "command is = %s, argv is = %s\n", argv[0], argv[1]);
+	qprintf(xQueueUARTSend, "cmd is = %s, %s\n", argv[0], argv[1]);
 
 
 	for (i = 0; i < CMD_COUNT; i++) {
