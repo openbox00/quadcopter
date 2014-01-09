@@ -217,7 +217,6 @@ void vPWMctrlTask(void *pvParameters)
 
 	while(1) {
 		while (!xQueueReceive(xQueueShell2PWM , pwm_speed_char, portMAX_DELAY));
-		//qprintf(xQueueUARTSend, "\npwm_speed_int: %s\n\r", pwm_speed_char);
 		pwm_speed_int = (unsigned int)atoi(pwm_speed_char);	
 
 		if (pwm_speed_int > PWM_MOTOR_MAX) {

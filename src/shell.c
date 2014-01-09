@@ -54,7 +54,7 @@ int cur_his=0;
 void pwm(int argc, char *argv[]);
 void pitch(int argc, char* argv[]);
 void roll(int argc, char* argv[]);
-void landing(int argc, char* argv[]);
+void land(int argc, char* argv[]);
 
 /* Enumeration for command types. */
 enum {
@@ -76,7 +76,7 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "pwm"},
 	[CMD_PITCH] = {.cmd = "pitch", .func = pitch, .description = "pitch"},
 	[CMD_ROLL] = {.cmd = "roll", .func = roll, .description = "roll"},
-	[CMD_LEAD] = {.cmd = "land", .func = landing, .description = "leading"}
+	[CMD_LEAD] = {.cmd = "land", .func = land, .description = "lead"}
 };
 
 void pwm(int argc, char* argv[])
@@ -86,23 +86,24 @@ void pwm(int argc, char* argv[])
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 }
 
-void landing(int argc, char* argv[])
+void land(int argc, char* argv[])
 {
 	pwm_flag = 0;
 	Pitch_desire = 0; //Desire angle of Pitch
 	Roll_desire = 0; //Desire angle of Roll
-	int PWM_MOTOR_LANDING = 0;
+	unsigned int PWM_MOTOR_LANDING = 0;
 
 	PWM_MOTOR_LANDING = TIM4->CCR1;   
 
-	while(PWM_MOTOR_LANDING > 800){
+	while(PWM_MOTOR_LANDING > 820){
 		PWM_MOTOR_LANDING = PWM_MOTOR_LANDING -100;
  		Motor_Control(PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING);
-		Delay_1ms(1000);
+		Delay_1ms(400);
 		PWM_MOTOR_LANDING = TIM4->CCR1;   
 	}
 
 	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+
 	qprintf(xQueueUARTSend, "leading finished\n");		
 }
 
