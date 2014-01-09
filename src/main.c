@@ -477,7 +477,7 @@ void vBalanceTask(void *pvParameters)
     argv.RollP = 4.6f;//2.5f;	
     argv.RollD = 0.2f;
 
-	argv.YawD = 0.2f;
+	argv.YawD = 0.4f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
