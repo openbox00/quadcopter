@@ -329,9 +329,18 @@ void vTimerSample(xTimerHandle pxTimer)
 
 	argv.Pitch_err = Pitch_desire - argv.Pitch;
 	argv.Roll_err  = Roll_desire - argv.Roll;
-	
-	PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
-	ROLL  =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);	
+	if(argv.Roll > 1 || argv.Roll < -1){
+		ROLL =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);
+	} else {
+		ROLL = 0;
+	}
+
+	if (argv.Pitch > 1 || argv.Pitch < -1){	
+		PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
+	} else {
+		PITCH = 0;
+	}
+
 	YAW   = (int)(argv.YawD * z_gyro);
 
 	if (PITCH > MAXNUM) {
@@ -348,6 +357,15 @@ void vTimerSample(xTimerHandle pxTimer)
 		ROLL = MINNUM;
 	}else{
 		ROLL = ROLL;
+	}
+
+	if(argv.Roll > 30 || argv.Roll < -30){
+		pwm_flag == 0;
+		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+	}
+	if(argv.Pitch >30 || argv.Pitch < -30){
+		pwm_flag == 0;
+		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 
 	if(pwm_flag == 0){
@@ -496,7 +514,7 @@ void vTimerSystemIdle( xTimerHandle pxTimer )
     Roll_desire = 0; //Desire angle of Roll
 
 	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-	qprintf(xQueueUARTSend, "40 sec idle time pass ... trun off motor\n\r");
+	qprintf(xQueueUARTSend, "10 sec idle time pass ... trun off motor\n\r");
 }
 
 /**
@@ -510,7 +528,7 @@ int main(void)
 	int timerID1 = 2;
 
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 40000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
