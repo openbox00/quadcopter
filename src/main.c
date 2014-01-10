@@ -32,7 +32,10 @@
 #define PWM_MOTOR_INIT_MAX 2000
 
 #define PWM_MOTOR_MIN 810
-#define PWM_MOTOR_MAX 1800
+#define PWM_MOTOR_MAX 1350
+
+#define MAXNUM	25
+#define MINNUM	-25
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -333,17 +336,52 @@ void vTimerSample(xTimerHandle pxTimer)
 	argv.Pitch_err = Pitch_desire - argv.Pitch;
 	argv.Roll_err  = Roll_desire - argv.Roll;
 
-	PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
-	ROLL  =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);	
+	if(argv.Roll > 1 || argv.Roll < -1){
+		ROLL =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);
+	} else {
+		ROLL = 0;
+	}
+
+	if (argv.Pitch > 1 || argv.Pitch < -1){	
+		PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
+	} else {
+		PITCH = 0;
+	}
+
 	YAW   = (int)(argv.YawD * z_gyro);
+
+	if (PITCH > MAXNUM) {
+		PITCH =	MAXNUM;
+	}else if (PITCH < MINNUM) {
+		PITCH = MINNUM;
+	}else{
+		PITCH = PITCH;
+	}
+
+	if (ROLL > MAXNUM) {
+		ROLL = MAXNUM;
+	}else if (ROLL < MINNUM) {
+		ROLL = MINNUM;
+	}else{
+		ROLL = ROLL;
+	}
+
+	if(argv.Roll > 30 || argv.Roll < -30){
+		pwm_flag == 0;
+		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+	}
+	if(argv.Pitch >30 || argv.Pitch < -30){
+		pwm_flag == 0;
+		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
+	}
 
 	if(pwm_flag == 0){
 
 	}else{
-		Motor1 = PWM_Motor1_tmp + PITCH - ROLL + YAW; 	//LD4	
-		Motor2 = PWM_Motor2_tmp + PITCH + ROLL - YAW; 	//LD3			
-		Motor3 = PWM_Motor3_tmp - PITCH + ROLL + YAW; 	//LD5
-		Motor4 = PWM_Motor4_tmp - PITCH - ROLL - YAW; 	//LD6
+		Motor1 = PWM_Motor1_tmp + PITCH - ROLL - YAW; 	//LD4	
+		Motor2 = PWM_Motor2_tmp + PITCH + ROLL + YAW; 	//LD3			
+		Motor3 = PWM_Motor3_tmp - PITCH + ROLL - YAW; 	//LD5
+		Motor4 = PWM_Motor4_tmp - PITCH - ROLL + YAW; 	//LD6
 
 		Motor_Control(Motor1, Motor2, Motor3, Motor4);
 	}
@@ -362,9 +400,16 @@ void vUsartSendTask(void *pvParameters)
 
 		while (!xQueueReceive(xQueueUARTSend , &msg, portMAX_DELAY));
 
-		send_str(msg.str);
+		/* Write each character of the message to the RS232 port. */
+		curr_char = 0;
+		while (msg.str[curr_char] != '\0') {
+			//Wait till the flag resets
+			while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);
+			//Send the data
+			USART_SendData(USART2, msg.str[curr_char]); // Send Char from queue
+			curr_char++;
+		}
 	}
-
 	while(1);
 }
 
@@ -392,6 +437,7 @@ void vBalanceTask(void *pvParameters)
 
   	XOffset = (int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]);
  	YOffset = (int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]);
+
 
 	/* reset gyro offset */	
     Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
@@ -435,7 +481,7 @@ void vBalanceTask(void *pvParameters)
     argv.RollP = 4.6f;//2.5f;	
     argv.RollD = 0.8f;
 
-	argv.YawD = 1.0f;
+	argv.YawD = 0.4f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -444,9 +490,6 @@ void vBalanceTask(void *pvParameters)
 
 	while(1){
 
-		//qprintf(xQueueUARTSend, "Motor1(P12):%d	,Motor2(P13):%d	,Motor3(P14):%d	,Motor4(P15):%d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);			
-		//qprintf(xQueueUARTSend, "angle_x: %d	,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
-		//qprintf(xQueueUARTSend, "z_gyro : %d\n\r", (int)z_gyro);
 	}
 }
 
@@ -458,7 +501,7 @@ void vTimerSystemIdle( xTimerHandle pxTimer )
     Roll_desire = 0; //Desire angle of Roll
 
 	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-	qprintf(xQueueUARTSend, "40 sec idle time pass ... trun off motor\n\r");
+	qprintf(xQueueUARTSend, "10 sec idle time pass ... trun off motor\n\r");
 }
 
 /**
@@ -472,7 +515,7 @@ int main(void)
 	int timerID1 = 2;
 
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 40000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
@@ -509,5 +552,4 @@ int main(void)
 	/* Will only get here if there was not enough heap space to create the idle task. */
 	return 0;  
 }
-
 
