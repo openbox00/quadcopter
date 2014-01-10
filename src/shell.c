@@ -98,7 +98,7 @@ void land(int argc, char* argv[])
 	while(PWM_MOTOR_LANDING > 820){
 		PWM_MOTOR_LANDING = PWM_MOTOR_LANDING -100;
  		Motor_Control(PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING, PWM_MOTOR_LANDING);
-		Delay_1ms(400);
+		Delay_5ms(400);
 		PWM_MOTOR_LANDING = TIM4->CCR1;   
 	}
 
@@ -107,7 +107,7 @@ void land(int argc, char* argv[])
 	qprintf(xQueueUARTSend, "leading finished\n");		
 }
 
-void Delay_1ms( int nCnt_1ms )
+void Delay_5ms( int nCnt_1ms )
 {
     int nCnt;
     for(; nCnt_1ms != 0; nCnt_1ms--)

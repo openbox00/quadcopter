@@ -16,6 +16,7 @@
 #include "shell.h"
 #include "I2C.h"
 #include "stm32f4_discovery_l3g4200d.h"
+#include "hw_it.h"
 
 #include "string-util.c"
 
@@ -31,7 +32,7 @@
 #define PWM_MOTOR_INIT_MAX 2000
 
 #define PWM_MOTOR_MIN 810
-#define PWM_MOTOR_MAX 1800
+#define PWM_MOTOR_MAX 1350
 
 #define MAXNUM	25
 #define MINNUM	-25
@@ -49,7 +50,7 @@
 #define Sensitivity_2000	70    	
 
 
-/*PWM signal to drive brushless motor*/
+/*PWM signal to drive brushless motor */
 #define PWM_Motor1 TIM4->CCR1   
 #define PWM_Motor2 TIM4->CCR2   
 #define PWM_Motor3 TIM4->CCR3   
@@ -65,6 +66,8 @@ xQueueHandle xQueueShell2PWM;
 
 xQueueHandle xQueuePitchdirection;
 xQueueHandle xQueueRolldirection;
+
+xSemaphoreHandle serial_tx_wait_sem;
 
 /* software Timers */
 xTimerHandle xTimerNoSignal;
@@ -310,14 +313,17 @@ void vTimerSample(xTimerHandle pxTimer)
 	x_acc = (float)((int16_t)(Buffer_Hx[0] << 8 | Buffer_Lx[0]) - XOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	y_acc = (float)((int16_t)(Buffer_Hy[0] << 8 | Buffer_Ly[0]) - YOffset) * Sensitivity_2G / 1000 * 180 / 3.14159f;
 	
-    Buffer_GHx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_H);
-    Buffer_GHy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_H);
+    Buffer_GHy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_H);
+    Buffer_GHz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_H);
 
-    Buffer_GLx[0] = I2C_readreg(L3G4200D_ADDR,OUT_X_L);
-    Buffer_GLy[0] = I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLx[0]=I2C_readreg(L3G4200D_ADDR,OUT_X_L);
+    Buffer_GLy[0]=I2C_readreg(L3G4200D_ADDR,OUT_Y_L);
+    Buffer_GLz[0]=I2C_readreg(L3G4200D_ADDR,OUT_Z_L);
 
 	x_gyro = (float)((int16_t)(Buffer_GHx[0] << 8 | Buffer_GLx[0]) - GXOffset) * Sensitivity_250 / 1000;
 	y_gyro = (float)((int16_t)(Buffer_GHy[0] << 8 | Buffer_GLy[0]) - GYOffset) * Sensitivity_250 / 1000;
+	z_gyro = (float)((int16_t)(Buffer_GHz[0] << 8 | Buffer_GLz[0]) - GZOffset) * Sensitivity_250 / 1000;
 
 	angle_x = (0.99f) * (angle_x + y_gyro * 0.004f) - (0.01f) * (x_acc);  		
 	angle_y = (0.99f) * (angle_y + x_gyro * 0.004f) + (0.01f) * (y_acc); 
@@ -329,6 +335,7 @@ void vTimerSample(xTimerHandle pxTimer)
 
 	argv.Pitch_err = Pitch_desire - argv.Pitch;
 	argv.Roll_err  = Roll_desire - argv.Roll;
+
 	if(argv.Roll > 1 || argv.Roll < -1){
 		ROLL =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);
 	} else {
@@ -360,11 +367,11 @@ void vTimerSample(xTimerHandle pxTimer)
 	}
 
 	if(argv.Roll > 30 || argv.Roll < -30){
-		pwm_flag == 0;
+		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 	if(argv.Pitch >30 || argv.Pitch < -30){
-		pwm_flag == 0;
+		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
 
@@ -404,26 +411,6 @@ void vUsartSendTask(void *pvParameters)
 		}
 	}
 	while(1);
-}
-
-//Task For Sending Data Via USART
-void vUsartReciveTask(void *pvParameters)
-{
-	//Variable to store received data	
-	uint32_t Data;
-	uint8_t curr_char;	
-
-	while(1) {		
-		//Wait for character
-		 while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET) {
-           if (USART_GetFlagStatus(USART2, (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE)))
-		 		USART_ReceiveData(USART2); // Clear Error		 		
-		 }		
-		xTimerReset(xTimerNoSignal, 10);
-		//Collect the character
-		Data = USART_ReceiveData(USART2);
-		while (!xQueueSendToBack(xQueueUARTRecvie, &Data, portMAX_DELAY));
-	}
 }
 
 void vBalanceTask(void *pvParameters)
@@ -492,7 +479,7 @@ void vBalanceTask(void *pvParameters)
     argv.PitchP = 4.6f;//4.6;
     argv.PitchD = 0.8f; //0.8
     argv.RollP = 4.6f;//2.5f;	
-    argv.RollD = 0.2f;
+    argv.RollD = 0.8f;
 
 	argv.YawD = 0.4f;
 
@@ -540,6 +527,7 @@ int main(void)
    	xQueuePitchdirection = xQueueCreate(3, sizeof(pitch_direction_msg));
    	xQueueRolldirection = xQueueCreate(3, sizeof(roll_direction_msg));
 
+   	vSemaphoreCreateBinary(serial_tx_wait_sem);
 
 	/* initialize hardware... */
 	prvSetupHardware();
@@ -551,7 +539,6 @@ int main(void)
 	/* Start the tasks defined within this file/specific to this demo. */
 	xTaskCreate(vPWMctrlTask, ( signed portCHAR * ) "pwmctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(vUsartSendTask, ( signed portCHAR * ) "USART", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
-	xTaskCreate(vUsartReciveTask, ( signed portCHAR * ) "Usartrecive", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 	xTaskCreate(shell, ( signed portCHAR * ) "shell", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY + 5, NULL);
 	xTaskCreate(vBalanceTask, ( signed portCHAR * ) "Balance", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL);
 
@@ -565,5 +552,4 @@ int main(void)
 	/* Will only get here if there was not enough heap space to create the idle task. */
 	return 0;  
 }
-
 

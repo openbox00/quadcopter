@@ -24,6 +24,7 @@ SOURCES += src/syscalls.c
 SOURCES += src/modbus.c
 SOURCES += src/test.c
 SOURCES += src/shell.c
+SOURCES += src/hw_it.c
 
 SOURCES += src/stm32f4_discovery.c
 SOURCES += src/stm32f4_discovery_lis3dsh.c

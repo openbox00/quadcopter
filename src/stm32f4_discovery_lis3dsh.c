@@ -42,7 +42,7 @@ void LIS3DSH_Init(LIS3DSH_InitTypeDef *LIS3DSH_InitStruct)
 	ctrl = 0x67; //100Hz
 	LIS3DSH_Write(&ctrl, LIS3DSH_CTRL_REG4_ADDR, 1);
 
-	Delay_1ms(100);
+	//Delay_1ms(100);
 
 }
 
