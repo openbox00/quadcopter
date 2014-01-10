@@ -32,10 +32,10 @@
 #define PWM_MOTOR_INIT_MAX 2000
 
 #define PWM_MOTOR_MIN 810
-#define PWM_MOTOR_MAX 1450
+#define PWM_MOTOR_MAX 1650
 
-#define MAXNUM	30
-#define MINNUM	-30
+#define MAXNUM	150
+#define MINNUM	-150
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -336,18 +336,8 @@ void vTimerSample(xTimerHandle pxTimer)
 	argv.Pitch_err = Pitch_desire - argv.Pitch;
 	argv.Roll_err  = Roll_desire - argv.Roll;
 
-	if(argv.Roll > 1 || argv.Roll < -1){
-		ROLL =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);
-	} else {
-		ROLL = 0;
-	}
-
-	if (argv.Pitch > 1 || argv.Pitch < -1){	
-		PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
-	} else {
-		PITCH = 0;
-	}
-
+	ROLL =	(int)(argv.RollP  * argv.Roll_err  - argv.RollD  * argv.Roll_v);
+	PITCH = (int)(argv.PitchP * argv.Pitch_err - argv.PitchD * argv.Pitch_v);
 	YAW   = (int)(argv.YawD * z_gyro);
 
 	if (PITCH > MAXNUM) {
@@ -366,11 +356,11 @@ void vTimerSample(xTimerHandle pxTimer)
 		ROLL = ROLL;
 	}
 
-	if(argv.Roll > 30 || argv.Roll < -30){
+	if(argv.Roll > 45 || argv.Roll < -45){
 		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
-	if(argv.Pitch >30 || argv.Pitch < -30){
+	if(argv.Pitch > 45 || argv.Pitch < -45){
 		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
@@ -476,10 +466,10 @@ void vBalanceTask(void *pvParameters)
 
 	pwm_flag = 0;
 
-    argv.PitchP = 0.0f;//4.6f;
-    argv.PitchD = 0.0f;//0.8f;
-    argv.RollP = 4.6f;	
-    argv.RollD = 0.8f;
+    argv.PitchP = 5.5f;//4.6f;
+    argv.PitchD = 1.2f;//0.8f;
+    argv.RollP = 5.5f;	
+    argv.RollD = 1.2f;
 
 	argv.YawD = 0.0f;
 
@@ -489,7 +479,7 @@ void vBalanceTask(void *pvParameters)
 	xTimerStart(xTimerSampleRate, 0);		
 
 	while(1){
-		qprintf(xQueueUARTSend, "angle_x: %d,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
+		//qprintf(xQueueUARTSend, "angle_x: %d,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
 	}
 }
 
