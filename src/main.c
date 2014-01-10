@@ -32,10 +32,10 @@
 #define PWM_MOTOR_INIT_MAX 2000
 
 #define PWM_MOTOR_MIN 810
-#define PWM_MOTOR_MAX 1350
+#define PWM_MOTOR_MAX 1450
 
-#define MAXNUM	25
-#define MINNUM	-25
+#define MAXNUM	30
+#define MINNUM	-30
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -476,12 +476,12 @@ void vBalanceTask(void *pvParameters)
 
 	pwm_flag = 0;
 
-    argv.PitchP = 4.6f;//4.6;
-    argv.PitchD = 0.8f; //0.8
-    argv.RollP = 4.6f;//2.5f;	
+    argv.PitchP = 0.0f;//4.6f;
+    argv.PitchD = 0.0f;//0.8f;
+    argv.RollP = 4.6f;	
     argv.RollD = 0.8f;
 
-	argv.YawD = 0.4f;
+	argv.YawD = 0.0f;
 
     Pitch_desire = 0; //Desire angle of Pitch
     Roll_desire = 0; //Desire angle of Roll
@@ -489,7 +489,7 @@ void vBalanceTask(void *pvParameters)
 	xTimerStart(xTimerSampleRate, 0);		
 
 	while(1){
-
+		qprintf(xQueueUARTSend, "angle_x: %d,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
 	}
 }
 
@@ -501,7 +501,7 @@ void vTimerSystemIdle( xTimerHandle pxTimer )
     Roll_desire = 0; //Desire angle of Roll
 
 	Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
-	qprintf(xQueueUARTSend, "10 sec idle time pass ... trun off motor\n\r");
+	qprintf(xQueueUARTSend, "30 sec idle time pass ... trun off motor\n\r");
 }
 
 /**
@@ -515,7 +515,7 @@ int main(void)
 	int timerID1 = 2;
 
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 30000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
