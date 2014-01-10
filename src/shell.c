@@ -81,7 +81,6 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 
 void pwm(int argc, char* argv[])
 {
-
 	qprintf(xQueueUARTSend, "all = %s\n", argv[1]);
 	qprintf(xQueueShell2PWM, "%s", argv[1]);	
 }
