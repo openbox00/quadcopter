@@ -190,7 +190,6 @@ int receive_byte_noblock(char *ch)
 	return rval;
 }
 
-
 /* Control Motor's function ref Hom19910422 */
 void Motor_Control(unsigned int Motor1, unsigned int Motor2, unsigned int Motor3, unsigned int Motor4)
 {
@@ -300,6 +299,7 @@ void vRollctrlTask(void *pvParameters)
 		}
 	}	
 }
+
 
 /* sample rate and calculate rate (4ms,250HZ) */
 void vTimerSample(xTimerHandle pxTimer)
@@ -534,7 +534,6 @@ int main(void)
 
 	xTaskCreate(vPitchctrlTask, ( signed portCHAR * ) "Pitchctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
 	xTaskCreate(vRollctrlTask, ( signed portCHAR * ) "Rollctrl", configMINIMAL_STACK_SIZE, NULL,tskIDLE_PRIORITY, NULL );
-
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();

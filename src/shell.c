@@ -54,6 +54,7 @@ int cur_his=0;
 void pwm(int argc, char *argv[]);
 void pitch(int argc, char* argv[]);
 void roll(int argc, char* argv[]);
+void tune(int argc, char* argv[]);
 void land(int argc, char* argv[]);
 
 /* Enumeration for command types. */
@@ -61,6 +62,7 @@ enum {
 	CMD_PWM = 0,
 	CMD_PITCH,
 	CMD_ROLL,
+	CMD_TUNE,
 	CMD_LEAD,
 	CMD_COUNT
 } CMD_TYPE;
@@ -76,6 +78,7 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_PWM] = {.cmd = "pwm", .func = pwm, .description = "pwm"},
 	[CMD_PITCH] = {.cmd = "pitch", .func = pitch, .description = "pitch"},
 	[CMD_ROLL] = {.cmd = "roll", .func = roll, .description = "roll"},
+	[CMD_TUNE] = {.cmd = "tune", .func = tune, .description = "tune"},
 	[CMD_LEAD] = {.cmd = "land", .func = land, .description = "lead"}
 };
 
@@ -113,6 +116,22 @@ void Delay_5ms( int nCnt_1ms )
     	for(nCnt = 56580; nCnt != 0; nCnt--);
 }
 
+void tune(int argc, char* argv[]){
+	if(!strcmp("p\0",(argv[1])) || !strcmp("n\0",(argv[1]))){
+		qprintf(xQueueUARTSend, "pitch = %s 10 degree\n", argv[1]);
+		qprintf(xQueuePitchdirection, "%s", argv[1]);	
+	}else{
+		qprintf(xQueueUARTSend, "pitch = 0 degree\n");	
+		qprintf(xQueuePitchdirection, "%s", '0');
+	}
+	if(!strcmp("p\0",(argv[2])) || !strcmp("n\0",(argv[2]))){
+		qprintf(xQueueUARTSend, "roll = %s 10 degree\n", argv[2]);
+		qprintf(xQueueRolldirection, "%s", argv[2]);
+	}else{
+		qprintf(xQueueUARTSend, "roll = 0 degree\n");
+		qprintf(xQueueRolldirection, "%s", '0');	
+	}
+}
 
 void pitch(int argc, char* argv[])
 {
