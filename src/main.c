@@ -34,8 +34,8 @@
 #define PWM_MOTOR_MIN 810
 #define PWM_MOTOR_MAX 1650
 
-#define MAXNUM	150
-#define MINNUM	-150
+#define MAXNUM	90
+#define MINNUM	-90
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -266,14 +266,14 @@ void vPitchctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nPitchdirection: %s\n\r", pwm_pitch_direction);
 
 		if (pwm_pitch_direction[0] == 'p') {
-			Pitch_desire = 5;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
+			Pitch_desire = 5.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else if (pwm_pitch_direction[0] == 'n'){
-			Pitch_desire = -5;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
+			Pitch_desire = -5.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else{
-			Pitch_desire = 0;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
+			Pitch_desire = 0.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}
  	}
 } 
@@ -289,14 +289,14 @@ void vRollctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nRolldirection: %s\n\r", pwm_roll_direction);
 		
 	  	if (pwm_roll_direction[0] == 'p') {
-			Roll_desire = 5;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
+			Roll_desire = 5.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else if (pwm_roll_direction[0] == 'n'){
-			Roll_desire = -5;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
+			Roll_desire = -5.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else{
-			Roll_desire = 0;
-			qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
+			Roll_desire = 0.0f;
+			//qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}
 	}	
 }
@@ -356,11 +356,11 @@ void vTimerSample(xTimerHandle pxTimer)
 		ROLL = ROLL;
 	}
 
-	if(argv.Roll > 45 || argv.Roll < -45){
+	if(argv.Roll > 35 || argv.Roll < -35){
 		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
-	if(argv.Pitch > 45 || argv.Pitch < -45){
+	if(argv.Pitch > 35 || argv.Pitch < -35){
 		pwm_flag = 0;
 		Motor_Control(PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN, PWM_MOTOR_MIN);
 	}
@@ -471,15 +471,15 @@ void vBalanceTask(void *pvParameters)
     argv.RollP = 5.5f;	
     argv.RollD = 1.2f;
 
-	argv.YawD = 0.0f;
+	argv.YawD = 4.1f;
 
-    Pitch_desire = 0; //Desire angle of Pitch
-    Roll_desire = 0; //Desire angle of Roll
+    Pitch_desire = 0.0f; //Desire angle of Pitch
+    Roll_desire = 0.0f; //Desire angle of Roll
 
 	xTimerStart(xTimerSampleRate, 0);		
 
 	while(1){
-		//qprintf(xQueueUARTSend, "angle_x: %d,angle_y: %d\n\r", (int)angle_x, (int)angle_y);
+	//qprintf(xQueueUARTSend, "P12:%d ,P13:%d ,P14:%d ,P15:%d  ,angle_x: %d,angle_y: %d\n\r", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4, (int)angle_x, (int)angle_y);     
 	}
 }
 
@@ -505,7 +505,7 @@ int main(void)
 	int timerID1 = 2;
 
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 40000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
