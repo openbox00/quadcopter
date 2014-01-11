@@ -34,8 +34,8 @@
 #define PWM_MOTOR_MIN 810
 #define PWM_MOTOR_MAX 1650
 
-#define MAXNUM	90
-#define MINNUM	-90
+#define MAXNUM	50
+#define MINNUM	-50
 
 /*acc sensitivity*/
 #define Sensitivity_2G	0.06  	
@@ -265,10 +265,10 @@ void vPitchctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nPitchdirection: %s\n\r", pwm_pitch_direction);
 
 		if (pwm_pitch_direction[0] == 'p') {
-			Pitch_desire = 5.0f;
+			Pitch_desire = 3.0f;
 			//qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else if (pwm_pitch_direction[0] == 'n'){
-			Pitch_desire = -5.0f;
+			Pitch_desire = -3.0f;
 			//qprintf(xQueueUARTSend, "%d\n\r", (int)Pitch_desire);
 		}else{
 			Pitch_desire = 0.0f;
@@ -288,10 +288,10 @@ void vRollctrlTask(void *pvParameters)
 		qprintf(xQueueUARTSend, "\nRolldirection: %s\n\r", pwm_roll_direction);
 		
 	  	if (pwm_roll_direction[0] == 'p') {
-			Roll_desire = 5.0f;
+			Roll_desire = 3.0f;
 			//qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else if (pwm_roll_direction[0] == 'n'){
-			Roll_desire = -5.0f;
+			Roll_desire = -3.0f;
 			//qprintf(xQueueUARTSend, "%d\n\r", (int)Roll_desire);
 		}else{
 			Roll_desire = 0.0f;
@@ -505,7 +505,7 @@ int main(void)
 	int timerID1 = 2;
 
 	/*A Timer used to count how long there is no signal come in*/
-	xTimerNoSignal = xTimerCreate("TurnOffTime", 40000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
+	xTimerNoSignal = xTimerCreate("TurnOffTime", 10000 / portTICK_RATE_MS, pdFALSE,  (void *) timerID, vTimerSystemIdle);
 
 	xTimerSampleRate = xTimerCreate("SensorSampleRate", 4 / portTICK_RATE_MS, pdTRUE,  (void *) timerID1, vTimerSample);
 
